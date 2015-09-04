@@ -139,6 +139,10 @@ public class CallStatsHttpClient {
 	}
 		
 	public HttpResponse sendHttpRequest(String url, String httpMethodType, String body) {
+		
+		if(url == null || httpMethodType == null || body == null) {
+			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
+		}
 	
 		HttpUriRequest request = null;
 		String apiUrl = url.toLowerCase();
@@ -164,10 +168,8 @@ public class CallStatsHttpClient {
 				response = httpclient.execute(request);
 				System.out.println("Response is "+response);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}		
@@ -176,6 +178,10 @@ public class CallStatsHttpClient {
 	
 	
 	public void sendAsyncHttpRequest(String url, String httpMethodType, String body,final CallStatsHttpResponseListener listener) {
+		if(url == null || httpMethodType == null || body == null || listener == null) {
+			throw new IllegalArgumentException("sendAsyncHttpRequest: Arguments cannot be null");
+		}
+		
 		HttpUriRequest request = null;
 		String apiUrl = url.toLowerCase();
 		StringBuilder sb = new StringBuilder();
@@ -199,19 +205,16 @@ public class CallStatsHttpClient {
 			httpAsyncClient.execute(request, new FutureCallback<HttpResponse>() {
 				
 				public void failed(Exception e) {
-					// TODO Auto-generated method stub
 					listener.onFailure(e);
 					System.out.println("failed "+e.toString());
 				}
 				
 				public void completed(HttpResponse response) {
-					// TODO Auto-generated method stub
-					System.out.println("Completed "+response);
+					System.out.println("HTTP Req Completed, received response ");
 					listener.onResponse(response);
 				}
 				
 				public void cancelled() {
-					// TODO Auto-generated method stub
 					Exception e = new Exception();
 					listener.onFailure(e);
 					System.out.println("cancelled ");					
