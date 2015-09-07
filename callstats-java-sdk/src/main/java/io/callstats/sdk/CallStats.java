@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -39,7 +42,11 @@ public class CallStats {
 	private int appId;
 	private String appSecret;
 	private String bridgeId;
-	Gson gson;
+	private Gson gson;
+	private CallStatsInitListener listener;
+	private int  authenticationRetryTimeout = 5000;
+	private static final ScheduledExecutorService scheduler = 
+			  Executors.newSingleThreadScheduledExecutor();
 	
 	public CallStatsHttpClient getHttpClient() {
 		return httpClient;
@@ -74,11 +81,10 @@ public class CallStats {
 	}
 
 	public CallStats() {
-		// TODO Auto-generated constructor stub
 		gson = new Gson();
 	}
 
-	public void intialize(int appId, String appSecret, String bridgeId) {
+	public void intialize(int appId, String appSecret, String bridgeId,CallStatsInitListener listener) {
 		if(appId <= 0 || appSecret == null || bridgeId == null) {
 			throw new IllegalArgumentException("intialize: Arguments cannot be null");
 		}
@@ -86,6 +92,7 @@ public class CallStats {
 		this.appId = appId;
 		this.appSecret = appSecret;
 		this.bridgeId = bridgeId;
+		this.listener = listener;
 		
 		httpClient = new CallStatsHttpClient();
 		sendAsyncAuthenticationRequest(appId,appSecret,bridgeId);
@@ -108,7 +115,7 @@ public class CallStats {
 		return response;
 	}
 	
-	private void handleAuthenticationChallenge(int appId,String appSecret,String challenge,String bridgeId) {
+	private void handleAuthenticationChallenge(final int appId,final String appSecret,final String challenge,final String bridgeId) {
 		
 		String response = getHmacResponse(challenge);
 		ChallengeRequestMessage requestMessage = new ChallengeRequestMessage(appId, bridgeId, CS_VERSION, END_POINT_TYPE, response);		
@@ -131,20 +138,23 @@ public class CallStats {
 				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
 					if(challengeResponseMessage.getStatus().equals("OK")) {
 						System.out.println("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());						
-						//callback with SDK authentication successful.
+						listener.onInitialized("SDK authentication successful");
 					}
 					else {
 						//if its proto error , callback to inform the error
-						
-						//if csNoAuthState send authentication request after the _authenticationRetryTimeout
+						if(challengeResponseMessage.getReason() == CallStatsErrors.CS_PROTO_ERROR.getReason()) {
+							listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
+						} else {
+							scheduleAuthentication(appId, appSecret, bridgeId);
+						}
 					}
 				} else if(responseStatus == GATEWAY_ERROR) {
-					//send authentication request after the _authenticationRetryTimeout
-					//callback to inform the error (APP_CONNECTIVITY_ERROR)
+					scheduleAuthentication(appId, appSecret, bridgeId);
+					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
 				} else if(responseStatus == INVALID_PROTO_FORMAT_ERROR) {
-					//callback to inform the error (AUTH_ERROR)
+					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
 				} else {
-					//callback to inform the error (HTTP_ERROR)
+					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
 				}
 			}		
 			
@@ -152,6 +162,15 @@ public class CallStats {
 				
 			}
 		});
+	}
+	
+	private void scheduleAuthentication(final int appId,final String appSecret,final String bridgeId) {
+		scheduler.schedule(new Runnable() {
+			
+			public void run() {
+				sendAsyncAuthenticationRequest(appId, appSecret, bridgeId);
+			}
+		}, authenticationRetryTimeout, TimeUnit.MILLISECONDS);
 	}
 	
 	private void sendAsyncAuthenticationRequest(final int appId,final String appSecret,final String bridgeId) {
@@ -179,15 +198,15 @@ public class CallStats {
 						handleAuthenticationChallenge(appId,appSecret,challenge,bridgeId);
 					}
 					else {
-						//callback to inform the error
+						listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
 					}
 				} else if(responseStatus == SERVER_ERROR || responseStatus == GATEWAY_ERROR) {
-					//send authentication request after the _authenticationRetryTimeout
-					//callback to inform the error (APP_CONNECTIVITY_ERROR)
+					scheduleAuthentication(appId, appSecret, bridgeId);
+					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
 				} else if(responseStatus == INVALID_PROTO_FORMAT_ERROR) {
-					//callback to inform the error (AUTH_ERROR)
+					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
 				} else {
-					//callback to inform the error (HTTP_ERROR)
+					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
 				}
 			}
 
