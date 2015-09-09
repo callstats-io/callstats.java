@@ -23,6 +23,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 *
@@ -31,6 +33,7 @@ import org.apache.http.nio.reactor.IOReactorException;
 public class CallStatsHttpClient {
 	
 	private static String BASE_URL = "https://c1-as-jitsi.callstats.io";
+	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");
 	
 	private String appId;
 	private String authToken;
@@ -166,7 +169,7 @@ public class CallStatsHttpClient {
 			HttpResponse response;
 			try {
 				response = httpclient.execute(request);
-				System.out.println("Response is "+response);
+				logger.info("Response is "+response);
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -206,18 +209,18 @@ public class CallStatsHttpClient {
 				
 				public void failed(Exception e) {
 					listener.onFailure(e);
-					System.out.println("failed "+e.toString());
+					logger.info("failed "+e.toString());
 				}
 				
 				public void completed(HttpResponse response) {
-					System.out.println("HTTP Req Completed, received response ");
+					logger.info("HTTP Req Completed, received response ");
 					listener.onResponse(response);
 				}
 				
 				public void cancelled() {
 					Exception e = new Exception();
 					listener.onFailure(e);
-					System.out.println("cancelled ");					
+					logger.info("cancelled ");					
 				}
 			});
 		}

@@ -20,6 +20,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 
@@ -47,6 +49,7 @@ public class CallStats {
 	private int  authenticationRetryTimeout = 5000;
 	private static final ScheduledExecutorService scheduler = 
 			  Executors.newSingleThreadScheduledExecutor();
+	private static final Logger logger = LogManager.getLogger("CallStats");
 	
 	public CallStatsHttpClient getHttpClient() {
 		return httpClient;
@@ -137,7 +140,7 @@ public class CallStats {
 				}
 				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
 					if(challengeResponseMessage.getStatus().equals("OK")) {
-						System.out.println("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());						
+						logger.info("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());
 						listener.onInitialized("SDK authentication successful");
 					}
 					else {
@@ -194,7 +197,7 @@ public class CallStats {
 				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
 					if(authorizeResponseMessage.getStatus().equals("OK")) {
 						challenge = authorizeResponseMessage.getChallenge();
-						System.out.println("Challenge is "+challenge);			
+						logger.info("Challenge "+challenge);		
 						handleAuthenticationChallenge(appId,appSecret,challenge,bridgeId);
 					}
 					else {

@@ -27,7 +27,7 @@ public class CallStatsTest{
 		listener = mock(CallStatsInitListener.class);
 		callstatslib.intialize(175240362, "Gvd126EUWQheaWQX9mwmeWIbzvs=", "jit.si.345",listener);
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,7 +44,7 @@ public class CallStatsTest{
 		String errMsg = "SDK Authentication Error";
 		callstatslib.intialize(175240363, "Gvd126EUWQheaWQX9mwmeWIbzvs=", "jit.si.345",listener);
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
