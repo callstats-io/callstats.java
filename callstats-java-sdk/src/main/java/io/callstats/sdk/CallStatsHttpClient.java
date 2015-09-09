@@ -30,7 +30,7 @@ import org.apache.http.nio.reactor.IOReactorException;
 */
 public class CallStatsHttpClient {
 	
-	private static String BASE_URL = "http://127.0.0.1:3000";
+	private static String BASE_URL = "https://c1-as-jitsi.callstats.io";
 	
 	private String appId;
 	private String authToken;

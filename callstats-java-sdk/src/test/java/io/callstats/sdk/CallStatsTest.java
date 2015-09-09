@@ -1,8 +1,10 @@
 package io.callstats.sdk;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -12,6 +14,12 @@ import org.junit.Test;
 public class CallStatsTest{
 	CallStats callstatslib;
 	CallStatsInitListener listener;
+	
+	
+	@Before
+	public void setUp() {
+
+	}
 	
 	@Test
 	public void intializeTest() {
