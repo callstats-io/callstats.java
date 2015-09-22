@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.ning.http.client.Response;
 
 public class CallStatsAuthenticator {
 
@@ -33,8 +34,9 @@ public class CallStatsAuthenticator {
 	private static final int INVALID_PROTO_FORMAT_ERROR = 400;
 	private static final int INVALID_PARAM_ERROR = 403;
 	private static final int GATEWAY_ERROR = 502;
-	private static final String CS_VERSION = "0.1.0";	
-	private static final String END_POINT_TYPE = "VideoBridge";
+	
+	private static final String challengeUrl = "/o/challenge";
+	private static final String authorizeUrl = "/o/authorize";
 	
 	private CallStatsInitListener listener;
 	private int  authenticationRetryTimeout = 5000;
@@ -67,6 +69,11 @@ public class CallStatsAuthenticator {
 		sendAsyncAuthenticationRequest(appId,appSecret,bridgeId,httpClient);
 	}
 	
+	
+	public void doAuthentication1(final int appId,final String appSecret,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
+		sendAsyncAuthenticationRequest(appId,appSecret,bridgeId,httpClient);
+	}
+	
 	private String getHmacResponse(String challenge, String appSecret) {
 		String HMAC_SHA1_ALGORITHM = "HmacSHA1";   
 		String response = null;
@@ -85,12 +92,11 @@ public class CallStatsAuthenticator {
 	}
 	
 	private void handleAuthenticationChallenge(final int appId,final String appSecret,final String challenge,final String bridgeId,final CallStatsHttpClient httpClient) {
-		
 		String response = getHmacResponse(challenge,appSecret);
-		ChallengeRequestMessage requestMessage = new ChallengeRequestMessage(appId, bridgeId, CS_VERSION, END_POINT_TYPE, response);		
+		ChallengeRequestMessage requestMessage = new ChallengeRequestMessage(appId, bridgeId, CallStats.CS_VERSION, CallStats.END_POINT_TYPE, response);		
 		String requestMessageString = gson.toJson(requestMessage);
 		
-		httpClient.sendAsyncHttpRequest("/o/challenge", "POST", requestMessageString,new CallStatsHttpResponseListener() {		
+		httpClient.sendAsyncHttpRequest(challengeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {		
 			public void onResponse(HttpResponse response) {
 				int responseStatus = response.getStatusLine().getStatusCode();
 				ChallengeResponseMessage challengeResponseMessage;
@@ -104,6 +110,7 @@ public class CallStatsAuthenticator {
 					e.printStackTrace();
 					throw new RuntimeException(e);					
 				}
+				logger.info("Response status "+responseStatus);
 				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
 					if(challengeResponseMessage.getStatus().equals("OK")) {
 						logger.info("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());
@@ -135,6 +142,58 @@ public class CallStatsAuthenticator {
 		});
 	}
 	
+	
+	private void handleAuthenticationChallenge(final int appId,final String appSecret,final String challenge,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
+		String response = getHmacResponse(challenge,appSecret);
+		ChallengeRequestMessage requestMessage = new ChallengeRequestMessage(appId, bridgeId, CallStats.CS_VERSION, CallStats.END_POINT_TYPE, response);		
+		String requestMessageString = gson.toJson(requestMessage);
+		
+		httpClient.sendAsyncHttpRequest(challengeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {		
+			public void onResponse(Response response) {
+				int responseStatus = response.getStatusCode();
+				ChallengeResponseMessage challengeResponseMessage;
+				try {
+					String responseString = response.getResponseBody();
+					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponseMessage.class);							
+				} catch (ParseException e) {						
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException(e);					
+				}
+				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
+					if(challengeResponseMessage.getStatus().equals("OK")) {
+						logger.info("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());
+						expires = challengeResponseMessage.getExpires();
+						token = challengeResponseMessage.getToken();
+						listener.onInitialized("SDK authentication successful");
+					}
+					else {
+						//if its proto error , callback to inform the error
+						if(challengeResponseMessage.getReason() == CallStatsErrors.CS_PROTO_ERROR.getReason()) {
+							listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
+						} else {
+							scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
+						}
+					}
+				} else if(responseStatus == GATEWAY_ERROR) {
+					scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
+					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
+				} else if(responseStatus == INVALID_PROTO_FORMAT_ERROR) {
+					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
+				} else {
+					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
+				}
+			}
+
+			public void onFailure(Exception e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
+	
 	private void scheduleAuthentication(final int appId,final String appSecret,final String bridgeId, final CallStatsHttpClient httpClient) {
 		scheduler.schedule(new Runnable() {
 			
@@ -144,10 +203,21 @@ public class CallStatsAuthenticator {
 		}, authenticationRetryTimeout, TimeUnit.MILLISECONDS);
 	}
 	
+	
+	private void scheduleAuthentication(final int appId,final String appSecret,final String bridgeId, final CallStatsAsyncHttpClient httpClient) {
+		scheduler.schedule(new Runnable() {
+			
+			public void run() {
+				sendAsyncAuthenticationRequest(appId, appSecret, bridgeId,httpClient);
+			}
+		}, authenticationRetryTimeout, TimeUnit.MILLISECONDS);
+	}
+	
+	
 	private void sendAsyncAuthenticationRequest(final int appId,final String appSecret,final String bridgeId,final CallStatsHttpClient httpClient) {
-		AuthorizeRequestMessage requestMessage = new AuthorizeRequestMessage(appId, bridgeId, CS_VERSION, END_POINT_TYPE);	
+		AuthorizeRequestMessage requestMessage = new AuthorizeRequestMessage(appId, bridgeId,CallStats.CS_VERSION, CallStats.END_POINT_TYPE);	
 		String requestMessageString = gson.toJson(requestMessage);
-		httpClient.sendAsyncHttpRequest("/o/authorize", "POST", requestMessageString,new CallStatsHttpResponseListener() {
+		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
 				String challenge;
 				int responseStatus = response.getStatusLine().getStatusCode();
@@ -186,5 +256,52 @@ public class CallStatsAuthenticator {
 			}
 			
 		});
+	}
+	
+	
+	private void sendAsyncAuthenticationRequest(final int appId,final String appSecret,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
+		AuthorizeRequestMessage requestMessage = new AuthorizeRequestMessage(appId, bridgeId, CallStats.CS_VERSION, CallStats.END_POINT_TYPE);	
+		String requestMessageString = gson.toJson(requestMessage);
+		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {
+			
+			public void onResponse(Response response) {
+				// TODO Auto-generated method stub
+				String challenge;
+				int responseStatus = response.getStatusCode();
+				AuthorizeResponseMessage authorizeResponseMessage;
+				try {
+					String responseString = response.getResponseBody();
+					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponseMessage.class);							
+				} catch (ParseException e) {						
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
+					if(authorizeResponseMessage.getStatus().equals("OK")) {
+						challenge = authorizeResponseMessage.getChallenge();
+						logger.info("Challenge "+challenge);		
+						handleAuthenticationChallenge(appId,appSecret,challenge,bridgeId,httpClient);
+					}
+					else {
+						listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
+					}
+				} else if(responseStatus == SERVER_ERROR || responseStatus == GATEWAY_ERROR) {
+					scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
+					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
+				} else if(responseStatus == INVALID_PROTO_FORMAT_ERROR) {
+					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
+				} else {
+					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
+				}
+			}
+			
+			public void onFailure(Exception e) {
+				// TODO Auto-generated method stub
+				
+			}
+		}); 
 	}
 }

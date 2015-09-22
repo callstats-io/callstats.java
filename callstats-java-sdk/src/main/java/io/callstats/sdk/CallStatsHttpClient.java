@@ -1,9 +1,11 @@
 package io.callstats.sdk;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -32,14 +34,16 @@ import org.apache.logging.log4j.Logger;
 */
 public class CallStatsHttpClient {
 	
-	private static String BASE_URL = "https://c1-as-jc.callstats.io";
+	//private static String BASE_URL = "https://c1-as-jc.callstats.io";
+	private static String BASE_URL;
 	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");
 	
 	private String appId;
 	private String authToken;
-	private int numRetries = 3;
 	private HttpClient httpclient;
 	private HttpAsyncClient httpAsyncClient;
+	private int connectionTimeOut;
+	private int soTimeOut;
 	
 	public HttpClient getHttpclient() {
 		return httpclient;
@@ -47,14 +51,6 @@ public class CallStatsHttpClient {
 	
 	public void setHttpclient(HttpClient httpclient) {
 		this.httpclient = httpclient;
-	}
-
-	public int getNumRetries() {
-		return numRetries;
-	}
-	
-	public void setNumRetries(int numRetries) {
-		this.numRetries = numRetries;
 	}
 	
 	public String getAppId() {
@@ -71,12 +67,30 @@ public class CallStatsHttpClient {
 	
 	public CallStatsHttpClient() {
 		super();  
+		Properties prop = new Properties();
+		InputStream input = null;
+	     
+    
+		input = getClass().getClassLoader().getResourceAsStream(CallStats.CallStatsJavaSDKPropertyFileName);
+		if(input !=null){
+			try {
+				prop.load(input);
+				BASE_URL = prop.getProperty("CallStats.BaseURL");
+				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
+				soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		
+		logger.info("Base URL is "+BASE_URL);
         // Create I/O reactor configuration
         IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
                 .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-                .setConnectTimeout(30000)
-                .setSoTimeout(30000)
+                .setConnectTimeout(connectionTimeOut)
+                .setSoTimeout(soTimeOut)
                 .build();
 
         // Create a custom I/O reactort
@@ -159,7 +173,7 @@ public class CallStatsHttpClient {
 		sb.append(url);
 		
 		url = sb.toString();
-		if (httpMethodType.equalsIgnoreCase("POST")) {
+		if (httpMethodType.equalsIgnoreCase(CallStats.httpPostMethod)) {
 			request = generateHttpPostRequest(url,body);
 		}
 		
@@ -197,7 +211,7 @@ public class CallStatsHttpClient {
 		sb.append(url);
 		
 		url = sb.toString();
-		if (httpMethodType.equalsIgnoreCase("POST")) {
+		if (httpMethodType.equalsIgnoreCase(CallStats.httpPostMethod)) {
 			request = generateHttpPostRequest(url,body);
 		}
 		
