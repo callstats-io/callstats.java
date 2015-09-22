@@ -32,8 +32,7 @@ import org.apache.logging.log4j.Logger;
 *
 * @author Karthik Budigere
 */
-public class CallStatsHttpClient {
-	
+public class CallStatsHttpClient {	
 	//private static String BASE_URL = "https://c1-as-jc.callstats.io";
 	private static String BASE_URL;
 	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");

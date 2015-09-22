@@ -46,6 +46,7 @@ public class CallStatsAsyncHttpClient {
 	    builder.setCompressionEnforced(true)
 	        .setAllowPoolingConnections(true)
 	        .setRequestTimeout(connectionTimeOut)
+	        .setAllowPoolingSslConnections(true)
 	        .build();
 	    httpClient = new AsyncHttpClient(builder.build());
 	}

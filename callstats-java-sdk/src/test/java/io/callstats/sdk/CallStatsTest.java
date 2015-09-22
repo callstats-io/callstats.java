@@ -24,15 +24,14 @@ public class CallStatsTest{
 		endpointInfo.setEndpointType(CallStats.END_POINT_TYPE);
 		endpointInfo.setName("JitSi");
 		endpointInfo.setOs("LINUX");
-		endpointInfo.setVer("4.4");
-		
+		endpointInfo.setVer("4.4");		
 		System.out.println("Setup completed");
+		callstatslib = new CallStats();
+		listener = mock(CallStatsInitListener.class);
 	}
 	
 	@Test
 	public void intializeTest() {
-		callstatslib = new CallStats();
-		listener = mock(CallStatsInitListener.class);
 		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
 		try {
 			Thread.sleep(2000);
@@ -46,8 +45,6 @@ public class CallStatsTest{
 	
 	@Test
 	public void intializeWithInvalidAppIdTest() {
-		callstatslib = new CallStats();
-		listener = mock(CallStatsInitListener.class);
 		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
 		String errMsg = "SDK Authentication Error";
 		callstatslib.intialize(175240363, appSecret, "jit.si.345",endpointInfo,listener);
@@ -63,8 +60,7 @@ public class CallStatsTest{
 	@Test
 	public void intializeWithNullArgsTest() {
 		Throwable e = null;
-		callstatslib = new CallStats();
-		listener = mock(CallStatsInitListener.class);
+
 		try {
 		callstatslib.intialize(0, appSecret, "jit.si.345",endpointInfo,listener);
 		} catch (Throwable e1) {
@@ -91,8 +87,6 @@ public class CallStatsTest{
 	
 	@Test
 	public void intializeTestWithSendCallStatsEvent() {
-		callstatslib = new CallStats();
-		listener = mock(CallStatsInitListener.class);
 		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
 		try {
 			Thread.sleep(2000);
@@ -107,7 +101,7 @@ public class CallStatsTest{
 			HealthStatusData healthStatusData = new HealthStatusData();
 			TrafficStatusData trafficStatusData = new TrafficStatusData();
 			trafficStatusData.setIntervalLoss(i);
-			callstatslib.sendCallStatsEvents(healthStatusData,trafficStatusData);
+			callstatslib.sendCallStatsBridgeEvent(healthStatusData,trafficStatusData);
 		}
 		try {
 			Thread.sleep(100000);

@@ -5,7 +5,7 @@ import io.callstats.sdk.HealthStatusData;
 import io.callstats.sdk.TrafficStatusData;
 
 
-public class CallStatsEventMessage {
+public class CallStatsBridgeEventMessage {
 	
 	static final String MSG_TYPE = "CallStatsEvent";
 	
@@ -17,7 +17,7 @@ public class CallStatsEventMessage {
 	String token;
 	EventInfo event;
 		
-	public CallStatsEventMessage(int appID, String bridgeID, String version,
+	public CallStatsBridgeEventMessage(int appID, String bridgeID, String version,
 		String endpointType, String apiTS, String token,HealthStatusData healthStatusData,
 			TrafficStatusData trafficStatusData,EndpointInfo endpointInfo) {
 		super();
