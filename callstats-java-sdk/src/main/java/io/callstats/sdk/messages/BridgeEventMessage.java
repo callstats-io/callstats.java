@@ -5,19 +5,19 @@ import io.callstats.sdk.HealthStatusData;
 import io.callstats.sdk.TrafficStatusData;
 
 
-public class CallStatsBridgeEventMessage {
+public class BridgeEventMessage {
 	
-	static final String MSG_TYPE = "CallStatsEvent";
+	private static final String MSG_TYPE = "CallStatsBridgeEvent";
 	
-	int appID;
-	String bridgeID;
-	String version;
-	String endpointType;
-	String apiTS;
-	String token;
-	EventInfo event;
+	private int appID;
+	private String bridgeID;
+	private String version;
+	private String endpointType;
+	private String apiTS;
+	private String token;
+	private EventInfo event;
 		
-	public CallStatsBridgeEventMessage(int appID, String bridgeID, String version,
+	public BridgeEventMessage(int appID, String bridgeID, String version,
 		String endpointType, String apiTS, String token,HealthStatusData healthStatusData,
 			TrafficStatusData trafficStatusData,EndpointInfo endpointInfo) {
 		super();

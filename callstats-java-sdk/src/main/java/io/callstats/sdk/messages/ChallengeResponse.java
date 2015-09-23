@@ -1,19 +1,20 @@
 package io.callstats.sdk.messages;
 
-public class CallStatsEventResponse {
-	
-	int appID;
-	String userID;
-	String version;
-	String endpointType;
-	CallStatsEventResponseData eventData;
-	
-	public CallStatsEventResponse() {
-		eventData = new CallStatsEventResponseData();
-	}
+/**
+*
+* @author Karthik Budigere
+*/
+public class ChallengeResponse {
+	private int appID;
+	private String userID;
+	private String version;
+	private String endpointType;
+	private ChallengeResponseBody challenge;
 
-	private class CallStatsEventResponseData {
+	class ChallengeResponseBody {
 		String status;
+		String token;
+		String expires;
 		String reason;
 		String description;
 		
@@ -22,6 +23,18 @@ public class CallStatsEventResponse {
 		}
 		public void setStatus(String status) {
 			this.status = status;
+		}
+		public String getToken() {
+			return token;
+		}
+		public void setToken(String token) {
+			this.token = token;
+		}
+		public String getExpires() {
+			return expires;
+		}
+		public void setExpires(String expires) {
+			this.expires = expires;
 		}
 		public String getReason() {
 			return reason;
@@ -34,9 +47,12 @@ public class CallStatsEventResponse {
 		}
 		public void setDescription(String description) {
 			this.description = description;
-		}
+		}		
 	}
 	
+	public ChallengeResponse() {
+		challenge = new ChallengeResponseBody();
+	}
 	
 	public int getAppID() {
 		return appID;
@@ -71,21 +87,33 @@ public class CallStatsEventResponse {
 	}
 	
 	public String getStatus() {
-		return eventData.getStatus();
+		return challenge.getStatus();
 	}
 	public void setStatus(String status) {
-		eventData.setStatus(status);
+		challenge.setStatus(status);
+	}
+	public String getToken() {
+		return challenge.getToken();
+	}
+	public void setToken(String token) {
+		challenge.setToken(token);
+	}
+	public String getExpires() {
+		return challenge.getExpires();
+	}
+	public void setExpires(String expires) {
+		challenge.setExpires(expires);
 	}
 	public String getReason() {
-		return eventData.getReason();
+		return challenge.getReason();
 	}
 	public void setReason(String reason) {
-		eventData.setReason(reason);
+		challenge.setReason(reason);
 	}
 	public String getDescription() {
-		return eventData.getDescription();
+		return challenge.getDescription();
 	}
 	public void setDescription(String description) {
-		eventData.setDescription(description);
-	}
+		challenge.setDescription(description);
+	}		
 }

@@ -1,9 +1,9 @@
 package io.callstats.sdk;
 
-import io.callstats.sdk.messages.AuthorizeRequestMessage;
-import io.callstats.sdk.messages.AuthorizeResponseMessage;
-import io.callstats.sdk.messages.ChallengeRequestMessage;
-import io.callstats.sdk.messages.ChallengeResponseMessage;
+import io.callstats.sdk.messages.AuthorizeRequest;
+import io.callstats.sdk.messages.AuthorizeResponse;
+import io.callstats.sdk.messages.ChallengeRequest;
+import io.callstats.sdk.messages.ChallengeResponse;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -93,16 +93,16 @@ public class CallStatsAuthenticator {
 	
 	private void handleAuthenticationChallenge(final int appId,final String appSecret,final String challenge,final String bridgeId,final CallStatsHttpClient httpClient) {
 		String response = getHmacResponse(challenge,appSecret);
-		ChallengeRequestMessage requestMessage = new ChallengeRequestMessage(appId, bridgeId, CallStats.CS_VERSION, CallStats.END_POINT_TYPE, response);		
+		ChallengeRequest requestMessage = new ChallengeRequest(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, response);		
 		String requestMessageString = gson.toJson(requestMessage);
 		
-		httpClient.sendAsyncHttpRequest(challengeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {		
+		httpClient.sendAsyncHttpRequest(challengeUrl, CallStatsConst.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {		
 			public void onResponse(HttpResponse response) {
 				int responseStatus = response.getStatusLine().getStatusCode();
-				ChallengeResponseMessage challengeResponseMessage;
+				ChallengeResponse challengeResponseMessage;
 				try {
 					String responseString = EntityUtils.toString(response.getEntity());
-					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponseMessage.class);							
+					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponse.class);							
 				} catch (ParseException e) {						
 					e.printStackTrace();
 					throw new RuntimeException(e);
@@ -145,16 +145,16 @@ public class CallStatsAuthenticator {
 	
 	private void handleAuthenticationChallenge(final int appId,final String appSecret,final String challenge,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
 		String response = getHmacResponse(challenge,appSecret);
-		ChallengeRequestMessage requestMessage = new ChallengeRequestMessage(appId, bridgeId, CallStats.CS_VERSION, CallStats.END_POINT_TYPE, response);		
+		ChallengeRequest requestMessage = new ChallengeRequest(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, response);		
 		String requestMessageString = gson.toJson(requestMessage);
 		
-		httpClient.sendAsyncHttpRequest(challengeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {		
+		httpClient.sendAsyncHttpRequest(challengeUrl, CallStatsConst.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {		
 			public void onResponse(Response response) {
 				int responseStatus = response.getStatusCode();
-				ChallengeResponseMessage challengeResponseMessage;
+				ChallengeResponse challengeResponseMessage;
 				try {
 					String responseString = response.getResponseBody();
-					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponseMessage.class);							
+					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponse.class);							
 				} catch (ParseException e) {						
 					e.printStackTrace();
 					throw new RuntimeException(e);
@@ -215,16 +215,16 @@ public class CallStatsAuthenticator {
 	
 	
 	private void sendAsyncAuthenticationRequest(final int appId,final String appSecret,final String bridgeId,final CallStatsHttpClient httpClient) {
-		AuthorizeRequestMessage requestMessage = new AuthorizeRequestMessage(appId, bridgeId,CallStats.CS_VERSION, CallStats.END_POINT_TYPE);	
+		AuthorizeRequest requestMessage = new AuthorizeRequest(appId, bridgeId,CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE);	
 		String requestMessageString = gson.toJson(requestMessage);
-		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
+		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStatsConst.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
 				String challenge;
 				int responseStatus = response.getStatusLine().getStatusCode();
-				AuthorizeResponseMessage authorizeResponseMessage;
+				AuthorizeResponse authorizeResponseMessage;
 				try {
 					String responseString = EntityUtils.toString(response.getEntity());
-					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponseMessage.class);							
+					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);							
 				} catch (ParseException e) {						
 					e.printStackTrace();
 					throw new RuntimeException(e);
@@ -260,18 +260,18 @@ public class CallStatsAuthenticator {
 	
 	
 	private void sendAsyncAuthenticationRequest(final int appId,final String appSecret,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
-		AuthorizeRequestMessage requestMessage = new AuthorizeRequestMessage(appId, bridgeId, CallStats.CS_VERSION, CallStats.END_POINT_TYPE);	
+		AuthorizeRequest requestMessage = new AuthorizeRequest(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE);	
 		String requestMessageString = gson.toJson(requestMessage);
-		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStats.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {
+		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStatsConst.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {
 			
 			public void onResponse(Response response) {
 				// TODO Auto-generated method stub
 				String challenge;
 				int responseStatus = response.getStatusCode();
-				AuthorizeResponseMessage authorizeResponseMessage;
+				AuthorizeResponse authorizeResponseMessage;
 				try {
 					String responseString = response.getResponseBody();
-					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponseMessage.class);							
+					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);							
 				} catch (ParseException e) {						
 					e.printStackTrace();
 					throw new RuntimeException(e);

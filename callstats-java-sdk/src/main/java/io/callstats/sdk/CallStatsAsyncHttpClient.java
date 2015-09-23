@@ -22,14 +22,14 @@ public class CallStatsAsyncHttpClient {
 	private static String BASE_URL;
 	private int connectionTimeOut;
 	private static final Logger logger = LogManager.getLogger("CallStatsAsyncHttpClient");
-	AsyncHttpClient httpClient;
+	private AsyncHttpClient httpClient;
 
 	public CallStatsAsyncHttpClient() {
 		Properties prop = new Properties();
 		InputStream input = null;
 	     
     
-		input = getClass().getClassLoader().getResourceAsStream(CallStats.CallStatsJavaSDKPropertyFileName);
+		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 		if(input !=null){
 			try {
 				prop.load(input);

@@ -2,8 +2,8 @@ package io.callstats.sdk;
 
 import java.io.IOException;
 
-import io.callstats.sdk.messages.CallStatsBridgeEventMessage;
-import io.callstats.sdk.messages.CallStatsEventResponse;
+import io.callstats.sdk.messages.BridgeEventMessage;
+import io.callstats.sdk.messages.BridgeEventResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -19,7 +19,6 @@ import com.google.gson.Gson;
  */
 public class CallStats {	
 	private CallStatsHttpClient httpClient;
-	public static final String CallStatsJavaSDKPropertyFileName = "callstats-java-sdk.properties";
 	private int appId;
 	private String appSecret;
 	private String bridgeId;
@@ -29,45 +28,7 @@ public class CallStats {
 	private Gson gson;
 	private EndpointInfo endpointInfo;
 	private boolean isInitialized;
-	
-
-	public static final String CS_VERSION = "0.1.0";	
-	public static final String END_POINT_TYPE = "VideoBridge";
-	public static final String bridgeEventsUrl = "/o/callStatsBridgeEvent";
-	public static final String httpPostMethod = "POST";
-	
-	public CallStatsHttpClient getHttpClient() {
-		return httpClient;
-	}
-
-	public void setHttpClient(CallStatsHttpClient httpClient) {
-		this.httpClient = httpClient;
-	}
-
-	public int getAppId() {
-		return appId;
-	}
-
-	public void setAppId(int appId) {
-		this.appId = appId;
-	}
-
-	public String getAppSecret() {
-		return appSecret;
-	}
-
-	public void setAppSecret(String appSecret) {
-		this.appSecret = appSecret;
-	}
-
-	public String getBridgeId() {
-		return bridgeId;
-	}
-
-	public void setBridgeId(String bridgeId) {
-		this.bridgeId = bridgeId;
-	}
-	
+			
 	public boolean isInitialized() {
 		return isInitialized;
 	}
@@ -75,7 +36,6 @@ public class CallStats {
 	private void setInitialized(boolean isInitialized) {
 		this.isInitialized = isInitialized;
 	}
-
 
 	public CallStats() {
 		gson = new Gson();
@@ -116,17 +76,17 @@ public class CallStats {
 	public void sendCallStatsBridgeEvent(HealthStatusData healthStatusData,TrafficStatusData trafficStatusData) {	
 		if(isInitialized())	{			 
 			long epoch = System.currentTimeMillis()/1000;				
-			CallStatsBridgeEventMessage eventMessage = new CallStatsBridgeEventMessage(appId, bridgeId, CS_VERSION, END_POINT_TYPE, ""+epoch, authenticator.getToken(), healthStatusData, trafficStatusData, endpointInfo);
+			BridgeEventMessage eventMessage = new BridgeEventMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), healthStatusData, trafficStatusData, endpointInfo);
 			String requestMessageString = gson.toJson(eventMessage);
-			httpClient.sendAsyncHttpRequest(bridgeEventsUrl,httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
+			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl,CallStatsConst.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
 				public void onResponse(HttpResponse response) {
 					
 					int responseStatus = response.getStatusLine().getStatusCode();
 					logger.info("Response "+response.toString()+":"+responseStatus);
-					CallStatsEventResponse eventResponseMessage;
+					BridgeEventResponse eventResponseMessage;
 					try {
 						String responseString = EntityUtils.toString(response.getEntity());
-						eventResponseMessage  = gson.fromJson(responseString,CallStatsEventResponse.class);	
+						eventResponseMessage  = gson.fromJson(responseString,BridgeEventResponse.class);	
 					} catch (ParseException e) {						
 						e.printStackTrace();
 						throw new RuntimeException(e);

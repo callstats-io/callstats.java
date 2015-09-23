@@ -4,12 +4,12 @@ package io.callstats.sdk.messages;
 *
 * @author Karthik Budigere
 */
-public class ChallengeRequestMessage {
-	int appID;
-	String userID;
-	String version;
-	String endpointType;
-	ChallengeRequestBody challenge;
+public class ChallengeRequest {
+	private int appID;
+	private String userID;
+	private String version;
+	private String endpointType;
+	private ChallengeRequestBody challenge;
 
 	class ChallengeRequestBody {
 		String response;
@@ -23,7 +23,7 @@ public class ChallengeRequestMessage {
 		}
 	}
 	
-	public ChallengeRequestMessage(int appID, String userID, String version,
+	public ChallengeRequest(int appID, String userID, String version,
 			String endpointType, String response) {
 		super();
 		this.appID = appID;

@@ -14,14 +14,7 @@ public class EndpointInfo {
 	}
 	public void setEndpointType(String endpointType) {
 		this.endpointType = endpointType;
-	}
-	public EndPointData getEndpointData() {
-		return endpointData;
-	}
-	public void setEndpointData(EndPointData endpointData) {
-		this.endpointData = endpointData;
-	}
-	
+	}	
 	public String getName() {
 		return endpointData.getName();
 	}

@@ -4,14 +4,14 @@ package io.callstats.sdk.messages;
 *
 * @author Karthik Budigere
 */
-public class AuthorizeResponseMessage {
-	int appID;
-	String userID;
-	String version;
-	String endpointType;
-	AuthorizeResponseBody authorize;
+public class AuthorizeResponse {
+	private int appID;
+	private String userID;
+	private String version;
+	private String endpointType;
+	private AuthorizeResponseBody authorize;
 	
-	public AuthorizeResponseMessage() {
+	public AuthorizeResponse() {
 		authorize = new AuthorizeResponseBody();
 	}
 

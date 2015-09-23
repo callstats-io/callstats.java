@@ -70,7 +70,7 @@ public class CallStatsHttpClient {
 		InputStream input = null;
 	     
     
-		input = getClass().getClassLoader().getResourceAsStream(CallStats.CallStatsJavaSDKPropertyFileName);
+		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 		if(input !=null){
 			try {
 				prop.load(input);
@@ -172,7 +172,7 @@ public class CallStatsHttpClient {
 		sb.append(url);
 		
 		url = sb.toString();
-		if (httpMethodType.equalsIgnoreCase(CallStats.httpPostMethod)) {
+		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
 			request = generateHttpPostRequest(url,body);
 		}
 		
@@ -210,7 +210,7 @@ public class CallStatsHttpClient {
 		sb.append(url);
 		
 		url = sb.toString();
-		if (httpMethodType.equalsIgnoreCase(CallStats.httpPostMethod)) {
+		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
 			request = generateHttpPostRequest(url,body);
 		}
 		

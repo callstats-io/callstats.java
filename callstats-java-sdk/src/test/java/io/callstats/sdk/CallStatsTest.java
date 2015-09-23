@@ -21,7 +21,7 @@ public class CallStatsTest{
 	@Before
 	public void setUp() {	
 		endpointInfo = new EndpointInfo();
-		endpointInfo.setEndpointType(CallStats.END_POINT_TYPE);
+		endpointInfo.setEndpointType(CallStatsConst.END_POINT_TYPE);
 		endpointInfo.setName("JitSi");
 		endpointInfo.setOs("LINUX");
 		endpointInfo.setVer("4.4");		

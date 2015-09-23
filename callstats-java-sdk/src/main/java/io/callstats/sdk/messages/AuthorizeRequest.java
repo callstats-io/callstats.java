@@ -4,13 +4,13 @@ package io.callstats.sdk.messages;
 *
 * @author Karthik Budigere
 */
-public class AuthorizeRequestMessage {
-	int appID;
-	String userID;
-	String version;
-	String endpointType;
+public class AuthorizeRequest {
+	private int appID;
+	private String userID;
+	private String version;
+	private String endpointType;
 	
-	public AuthorizeRequestMessage(int appID, String userID, String version,
+	public AuthorizeRequest(int appID, String userID, String version,
 			String endpointType) {
 		super();
 		this.appID = appID;
