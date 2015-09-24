@@ -34,7 +34,7 @@ public class CallStatsTest{
 	public void intializeTest() {
 		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -98,10 +98,12 @@ public class CallStatsTest{
 		verify(listener).onInitialized(msg);
 		
 		for (int i=0;i<1000;i++) {
-			HealthStatusData healthStatusData = new HealthStatusData();
-			TrafficStatusData trafficStatusData = new TrafficStatusData();
-			trafficStatusData.setIntervalLoss(i);
-			callstatslib.sendCallStatsBridgeEvent(healthStatusData,trafficStatusData);
+			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
+			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
+												.avgIntervalJitter(1)
+												.cpuUsage(20+i)
+												.build();						
+			callstatslib.sendCallStatsBridgeEvent(bridgeStatusInfo);
 		}
 		try {
 			Thread.sleep(100000);

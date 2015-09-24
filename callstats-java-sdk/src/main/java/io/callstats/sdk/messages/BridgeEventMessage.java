@@ -1,5 +1,6 @@
 package io.callstats.sdk.messages;
 
+import io.callstats.sdk.BridgeStatusInfo;
 import io.callstats.sdk.EndpointInfo;
 import io.callstats.sdk.HealthStatusData;
 import io.callstats.sdk.TrafficStatusData;
@@ -18,8 +19,7 @@ public class BridgeEventMessage {
 	private EventInfo event;
 		
 	public BridgeEventMessage(int appID, String bridgeID, String version,
-		String endpointType, String apiTS, String token,HealthStatusData healthStatusData,
-			TrafficStatusData trafficStatusData,EndpointInfo endpointInfo) {
+		String endpointType, String apiTS, String token,BridgeStatusInfo bridgeStatusInfo,EndpointInfo endpointInfo) {
 		super();
 		this.appID = appID;
 		this.bridgeID = bridgeID;
@@ -28,14 +28,34 @@ public class BridgeEventMessage {
 		this.apiTS = apiTS;
 		this.token = token;
 		this.event = new EventInfo();
-		EventData data = new EventData();
-		data.setHealthStatusData(healthStatusData);
-		data.setTrafficStatusData(trafficStatusData);		
-		event.setEventData(data);
+		
+		setData(bridgeStatusInfo);		
+		
 		event.setEventType(MSG_TYPE);
 		event.setEndpointInfo(endpointInfo);		
 	}
 
+	private void setData(BridgeStatusInfo bridgeStatusInfo) {
+		EventData data = new EventData();
+		HealthStatusData healthStatusData = new HealthStatusData();
+		TrafficStatusData trafficStatusData = new TrafficStatusData();
+		
+		healthStatusData.setCpuUsage(bridgeStatusInfo.getCpuUsage());
+		healthStatusData.setMemoryUsage(bridgeStatusInfo.getMemoryUsage());
+		
+		trafficStatusData.setAvgIntervalJitter(bridgeStatusInfo.getAvgIntervalJitter());
+		trafficStatusData.setAvgIntervalRtt(bridgeStatusInfo.getAvgIntervalRtt());
+		trafficStatusData.setIntervalLoss(bridgeStatusInfo.getIntervalLoss());
+		trafficStatusData.setReceivedBytes(bridgeStatusInfo.getReceivedBytes());
+		trafficStatusData.setSentBytes(bridgeStatusInfo.getSentBytes());
+		trafficStatusData.setTotalLoss(bridgeStatusInfo.getTotalLoss());
+		
+		
+		data.setHealthStatusData(healthStatusData);
+		data.setTrafficStatusData(trafficStatusData);
+		event.setEventData(data);
+	}
+	
 	public int getAppID() {
 		return appID;
 	}

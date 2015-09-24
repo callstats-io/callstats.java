@@ -41,7 +41,7 @@ public class CallStats {
 		gson = new Gson();
 	}
 
-	public void intialize(int appId, String appSecret,String bridgeId,EndpointInfo endpointInfo,CallStatsInitListener callStatsInitListener) {
+	public void intialize(final int appId, String appSecret,final String bridgeId,EndpointInfo endpointInfo,CallStatsInitListener callStatsInitListener) {
 		if(appId <= 0 || appSecret == null || bridgeId == null || endpointInfo == null) {
 			logger.error("intialize: Arguments cannot be null");
 			throw new IllegalArgumentException("intialize: Arguments cannot be null");
@@ -59,13 +59,14 @@ public class CallStats {
 			public void onInitialized(String msg) {
 				listener.onInitialized(msg);
 				setInitialized(true);
+				CallStatsBridgeKeepAliveManager BridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient);
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
 				listener.onError(error, errMsg);;				
 			}
 		});		
-		authenticator.doAuthentication(appId, appSecret, bridgeId,httpClient);
+		authenticator.doAuthentication(appId, appSecret, bridgeId, httpClient);
 		
 //		CallStatsAsyncHttpClient httpClient1;
 //		httpClient1 = new CallStatsAsyncHttpClient();	
@@ -73,34 +74,34 @@ public class CallStats {
 	}
 	
 	
-	public void sendCallStatsBridgeEvent(HealthStatusData healthStatusData,TrafficStatusData trafficStatusData) {	
+	public void sendCallStatsBridgeEvent(BridgeStatusInfo bridgeStatusInfo) {	
 		if(isInitialized())	{			 
 			long epoch = System.currentTimeMillis()/1000;				
-			BridgeEventMessage eventMessage = new BridgeEventMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), healthStatusData, trafficStatusData, endpointInfo);
+			BridgeEventMessage eventMessage = new BridgeEventMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), bridgeStatusInfo, endpointInfo);
 			String requestMessageString = gson.toJson(eventMessage);
 			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl,CallStatsConst.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
 				public void onResponse(HttpResponse response) {
 					
 					int responseStatus = response.getStatusLine().getStatusCode();
-					logger.info("Response "+response.toString()+":"+responseStatus);
+					logger.debug("Response "+response.toString()+":"+responseStatus);
 					BridgeEventResponse eventResponseMessage;
 					try {
 						String responseString = EntityUtils.toString(response.getEntity());
 						eventResponseMessage  = gson.fromJson(responseString,BridgeEventResponse.class);	
 					} catch (ParseException e) {						
-						e.printStackTrace();
+						logger.error("ParseException "+e.getMessage()+":"+e.getStackTrace().toString());
 						throw new RuntimeException(e);
 					} catch (IOException e) {
-						e.printStackTrace();
+						logger.error("IO Execption "+e.getMessage()+":"+e.getStackTrace().toString());
 						throw new RuntimeException(e);					
 					}
 					if(responseStatus == 200) {
-						logger.info("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
+						logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
 					}
 				}
 				
 				public void onFailure(Exception e) {
-					logger.info("Response exception"+e.toString());
+					logger.error("Response exception"+e.toString());
 				}
 				
 			});	

@@ -224,7 +224,8 @@ public class CallStatsAuthenticator {
 				AuthorizeResponse authorizeResponseMessage;
 				try {
 					String responseString = EntityUtils.toString(response.getEntity());
-					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);							
+					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);	
+					logger.info("Auth response "+responseString);
 				} catch (ParseException e) {						
 					e.printStackTrace();
 					throw new RuntimeException(e);
@@ -239,6 +240,7 @@ public class CallStatsAuthenticator {
 						handleAuthenticationChallenge(appId,appSecret,challenge,bridgeId,httpClient);
 					}
 					else {
+						logger.info("Authentication Request Error");
 						listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
 					}
 				} else if(responseStatus == SERVER_ERROR || responseStatus == GATEWAY_ERROR) {
