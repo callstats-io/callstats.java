@@ -101,7 +101,7 @@ public class CallStatsTest{
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
 												.avgIntervalJitter(i)
-												.cpuUsage(20)
+												.cpuUsage(22)
 												.intervalLoss(i)
 												.build();						
 			callstatslib.sendCallStatsBridgeEvent(bridgeStatusInfo);
