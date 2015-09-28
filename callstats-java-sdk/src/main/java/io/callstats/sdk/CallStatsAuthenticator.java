@@ -120,7 +120,7 @@ public class CallStatsAuthenticator {
 					}
 					else {
 						//if its proto error , callback to inform the error
-						if(challengeResponseMessage.getReason() == CallStatsErrors.CS_PROTO_ERROR.getReason()) {
+						if(challengeResponseMessage.getReason().equals(CallStatsErrors.CS_PROTO_ERROR.getReason())) {
 							listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
 						} else {
 							scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
@@ -171,7 +171,7 @@ public class CallStatsAuthenticator {
 					}
 					else {
 						//if its proto error , callback to inform the error
-						if(challengeResponseMessage.getReason() == CallStatsErrors.CS_PROTO_ERROR.getReason()) {
+						if(challengeResponseMessage.getReason().equals(CallStatsErrors.CS_PROTO_ERROR.getReason())) {
 							listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
 						} else {
 							scheduleAuthentication(appId, appSecret, bridgeId,httpClient);

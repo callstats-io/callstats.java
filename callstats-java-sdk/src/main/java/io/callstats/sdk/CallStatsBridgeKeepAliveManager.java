@@ -24,6 +24,7 @@ public class CallStatsBridgeKeepAliveManager {
 	private static final ScheduledExecutorService scheduler = 
 			  Executors.newSingleThreadScheduledExecutor();
 	private Gson gson;
+	private CallStatsHttpClient httpClient;
 	private static final Logger logger = LogManager.getLogger("CallStatsBridgeKeepAliveManager");
 	
 	public CallStatsBridgeKeepAliveManager(int appId,
@@ -33,10 +34,13 @@ public class CallStatsBridgeKeepAliveManager {
 		this.bridgeId = bridgeId;
 		this.token = token;
 		gson = new Gson();
-		startKeepAliveSender(httpClient);
 	}
 	
-	private void startKeepAliveSender(final CallStatsHttpClient httpClient) {
+	public void stopKeepAliveSender() {
+		scheduler.shutdownNow();
+	}
+	
+	public void startKeepAliveSender() {
 		scheduler.scheduleAtFixedRate(new Runnable() {			
 			public void run() {
 				sendKeepAliveBridgeMessage(appId,bridgeId,token,httpClient);
@@ -50,6 +54,7 @@ public class CallStatsBridgeKeepAliveManager {
 		String apiTS = ""+epoch;
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
 		String requestMessageString = gson.toJson(message);
+		this.httpClient = httpClient;
 		httpClient.sendAsyncHttpRequest(keepAliveEventUrl,CallStatsConst.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
 				

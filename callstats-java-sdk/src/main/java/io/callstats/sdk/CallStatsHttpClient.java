@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -26,7 +25,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,11 +34,9 @@ import org.apache.logging.log4j.Logger;
 */
 public class CallStatsHttpClient {	
 	//private static String BASE_URL = "https://c1-as-jc.callstats.io";
-	private static String BASE_URL;
+	private String BASE_URL;
 	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");
-	
-	private String appId;
-	private String authToken;
+
 	private HttpClient httpclient;
 	private HttpAsyncClient httpAsyncClient;
 	private int connectionTimeOut;
@@ -54,15 +50,8 @@ public class CallStatsHttpClient {
 		this.httpclient = httpclient;
 	}
 	
-	public String getAppId() {
-		return appId;
-	}
 	
-	public String getAuthToken() {
-		return authToken;
-	}
-	
-	public static String getBaseUrl() {
+	public String getBaseUrl() {
 		return BASE_URL;
 	}
 	

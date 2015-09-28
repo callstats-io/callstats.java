@@ -59,14 +59,15 @@ public class CallStats {
 			public void onInitialized(String msg) {
 				listener.onInitialized(msg);
 				setInitialized(true);
-				CallStatsBridgeKeepAliveManager BridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient);
+				CallStatsBridgeKeepAliveManager bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient);
+				bridgeKeepAliveManager.startKeepAliveSender();
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
 				listener.onError(error, errMsg);;				
 			}
 		});		
-		authenticator.doAuthentication(appId, appSecret, bridgeId, httpClient);
+		authenticator.doAuthentication(appId, this.appSecret, bridgeId, httpClient);
 		
 //		CallStatsAsyncHttpClient httpClient1;
 //		httpClient1 = new CallStatsAsyncHttpClient();	
@@ -89,10 +90,10 @@ public class CallStats {
 						String responseString = EntityUtils.toString(response.getEntity());
 						eventResponseMessage  = gson.fromJson(responseString,BridgeEventResponse.class);	
 					} catch (ParseException e) {						
-						logger.error("ParseException "+e.getMessage()+":"+e.getStackTrace().toString());
+						logger.error("ParseException "+e.getMessage()+":"+e.getStackTrace());
 						throw new RuntimeException(e);
 					} catch (IOException e) {
-						logger.error("IO Execption "+e.getMessage()+":"+e.getStackTrace().toString());
+						logger.error("IO Execption "+e.getMessage()+":"+e.getStackTrace());
 						throw new RuntimeException(e);					
 					}
 					if(responseStatus == 200) {

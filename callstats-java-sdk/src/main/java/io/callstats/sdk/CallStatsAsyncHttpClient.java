@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 public class CallStatsAsyncHttpClient {
 	
-	private static String BASE_URL;
+	private String BASE_URL;
 	private int connectionTimeOut;
 	private static final Logger logger = LogManager.getLogger("CallStatsAsyncHttpClient");
 	private AsyncHttpClient httpClient;
