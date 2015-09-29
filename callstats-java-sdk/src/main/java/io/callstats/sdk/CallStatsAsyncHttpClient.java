@@ -1,7 +1,4 @@
 package io.callstats.sdk;
-
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -14,23 +11,37 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * The Class CallStatsAsyncHttpClient.
+ */
 public class CallStatsAsyncHttpClient {
 	
+	/** The base url. */
 	private String BASE_URL;
+	
+	/** The connection time out. */
 	private int connectionTimeOut;
+	
+	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsAsyncHttpClient");
+	
+	/** The http client. */
 	private AsyncHttpClient httpClient;
 
+	/**
+	 * Instantiates a new call stats async http client.
+	 */
 	public CallStatsAsyncHttpClient() {
 		Properties prop = new Properties();
 		InputStream input = null;
 	     
     
 		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-		if(input !=null){
+		if (input !=null){
 			try {
 				prop.load(input);
 				BASE_URL = prop.getProperty("CallStats.BaseURL");
@@ -51,8 +62,16 @@ public class CallStatsAsyncHttpClient {
 	    httpClient = new AsyncHttpClient(builder.build());
 	}
 	
-	public void sendAsyncHttpRequest(String url, String httpMethodType, String body,final CallStatsAsyncHttpResponseListener listener) {
-		if(url == null || httpMethodType == null || body == null || listener == null) {
+	/**
+	 * Send async http request.
+	 *
+	 * @param url the url
+	 * @param httpMethodType the http method type
+	 * @param body the body
+	 * @param listener the listener
+	 */
+	public void sendAsyncHttpRequest(String url, String httpMethodType, String body, final CallStatsAsyncHttpResponseListener listener) {
+		if (StringUtils.isNotBlank(url) || StringUtils.isNotBlank(httpMethodType) || StringUtils.isNotBlank(body) || listener == null) {
 			throw new IllegalArgumentException("sendAsyncHttpRequest: Arguments cannot be null");
 		}
 		

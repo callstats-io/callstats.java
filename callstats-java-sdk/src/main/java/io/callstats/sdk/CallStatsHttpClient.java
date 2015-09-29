@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -29,32 +30,62 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
-*
-* @author Karthik Budigere
-*/
+ * The Class CallStatsHttpClient.
+ *
+ * @author Karthik Budigere
+ */
 public class CallStatsHttpClient {	
+	
+	/** The base url. */
 	//private static String BASE_URL = "https://c1-as-jc.callstats.io";
 	private String BASE_URL;
+	
+	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");
 
+	/** The httpclient. */
 	private HttpClient httpclient;
+	
+	/** The http async client. */
 	private HttpAsyncClient httpAsyncClient;
+	
+	/** The connection time out. */
 	private int connectionTimeOut;
+	
+	/** The so time out. */
 	private int soTimeOut;
 	
+	/**
+	 * Gets the httpclient.
+	 *
+	 * @return the httpclient
+	 */
 	public HttpClient getHttpclient() {
 		return httpclient;
 	}
 	
-	public void setHttpclient(HttpClient httpclient) {
+	/**
+	 * Sets the httpclient.
+	 *
+	 * @param httpclient the new httpclient
+	 */
+	public void setHttpclient(final HttpClient httpclient) {
 		this.httpclient = httpclient;
 	}
 	
 	
+	/**
+	 * Gets the base url.
+	 *
+	 * @return the base url
+	 */
 	public String getBaseUrl() {
 		return BASE_URL;
 	}
 	
+	/**
+	 * Instantiates a new call stats http client.
+	 */
 	public CallStatsHttpClient() {
 		super();  
 		Properties prop = new Properties();
@@ -62,7 +93,7 @@ public class CallStatsHttpClient {
 	     
     
 		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-		if(input !=null){
+		if (input != null){
 			try {
 				prop.load(input);
 				BASE_URL = prop.getProperty("CallStats.BaseURL");
@@ -94,20 +125,25 @@ public class CallStatsHttpClient {
 		}
         
         
-		PoolingHttpClientConnectionManager mgr;
-		mgr = new PoolingHttpClientConnectionManager();
-		((PoolingHttpClientConnectionManager) mgr).setDefaultMaxPerRoute(10);
+		PoolingHttpClientConnectionManager mgr = new PoolingHttpClientConnectionManager();
+		mgr.setDefaultMaxPerRoute(10);
 		httpclient = HttpClients.custom()
 	            .setConnectionManager(mgr)
 	            .build();
 		
-		PoolingNHttpClientConnectionManager asyncMgr;
-		asyncMgr = new PoolingNHttpClientConnectionManager(ioReactor);
+		PoolingNHttpClientConnectionManager asyncMgr = new PoolingNHttpClientConnectionManager(ioReactor);
 		httpAsyncClient = HttpAsyncClients.custom()
 				.setConnectionManager(asyncMgr)
 	            .build();
 	}
 	
+	/**
+	 * Generate http post request.
+	 *
+	 * @param url the url
+	 * @param body the body
+	 * @return the http post
+	 */
 	private HttpPost generateHttpPostRequest(String url, String body) {
 		URI uri = generateURI(url);
 		StringEntity entity = generateEntity(body);
@@ -116,10 +152,15 @@ public class CallStatsHttpClient {
 		post.setHeader("Content-type", "application/json");
 	    post.setHeader("Accept", "application/json");
 		post.setEntity(entity);
-
 		return post;
 	}
 	
+	/**
+	 * Generate uri.
+	 *
+	 * @param url the url
+	 * @return the uri
+	 */
 	private URI generateURI(String url) {
 		URI uri;
 		try {
@@ -132,6 +173,12 @@ public class CallStatsHttpClient {
 		return uri;
 	}
 	
+	/**
+	 * Generate entity.
+	 *
+	 * @param body the body
+	 * @return the string entity
+	 */
 	private StringEntity generateEntity(String body) {
 		StringEntity entity;
 		try {
@@ -145,9 +192,18 @@ public class CallStatsHttpClient {
 		return entity;
 	}
 		
-	public HttpResponse sendHttpRequest(String url, String httpMethodType, String body) {
+	/**
+	 * Send http request.
+	 *
+	 * @param url the url
+	 * @param httpMethodType the http method type
+	 * @param body the body
+	 * @return the http response
+	 * @throws IOException 
+	 */
+	public HttpResponse sendHttpRequest(String url, String httpMethodType, String body) throws IOException {
 		
-		if(url == null || httpMethodType == null || body == null) {
+		if(StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body)) {
 			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
 	
@@ -176,17 +232,27 @@ public class CallStatsHttpClient {
 				logger.info("Response is "+response);
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
+				throw new ClientProtocolException(e);
 			} catch (IOException e) {
 				e.printStackTrace();
+				throw new IOException(e);
 			}
 		}		
 		return null;
 	}
 	
 	
-	public void sendAsyncHttpRequest(String url, String httpMethodType, String body,final CallStatsHttpResponseListener listener) {
-		if(url == null || httpMethodType == null || body == null || listener == null) {
-			throw new IllegalArgumentException("sendAsyncHttpRequest: Arguments cannot be null");
+	/**
+	 * Send async http request.
+	 *
+	 * @param url the url
+	 * @param httpMethodType the http method type
+	 * @param body the body
+	 * @param listener the listener
+	 */
+	public void sendAsyncHttpRequest(String url, String httpMethodType, String body, final CallStatsHttpResponseListener listener) {
+		if(StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body) || listener == null) {
+			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
 		
 		HttpUriRequest request = null;
@@ -202,10 +268,10 @@ public class CallStatsHttpClient {
 		
 		url = sb.toString();
 		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
-			request = generateHttpPostRequest(url,body);
+			request = generateHttpPostRequest(url, body);
 		}
 		
-		if(request != null) {
+		if (request != null) {
 			request.addHeader(new BasicHeader("Accept", "application/json"));
 			request.addHeader(new BasicHeader("Accept-Charset", "utf-8"));
 			((CloseableHttpAsyncClient) httpAsyncClient).start();
@@ -222,7 +288,7 @@ public class CallStatsHttpClient {
 				}
 				
 				public void cancelled() {
-					Exception e = new Exception();
+					Exception e = new Exception("http request execute cancelled");
 					listener.onFailure(e);
 					logger.info("cancelled ");					
 				}

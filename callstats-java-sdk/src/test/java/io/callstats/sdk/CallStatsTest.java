@@ -7,17 +7,32 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 
+// TODO: Auto-generated Javadoc
 /**
-*
-* @author Karthik Budigere
-*/
+ * The Class CallStatsTest.
+ *
+ * @author Karthik Budigere
+ */
 public class CallStatsTest{
+	
+	/** The callstatslib. */
 	CallStats callstatslib;
+	
+	/** The listener. */
 	CallStatsInitListener listener;
+	
+	/** The endpoint info. */
 	EndpointInfo endpointInfo;
+	
+	/** The app id. */
 	int appId = 497346896;
+	
+	/** The app secret. */
 	String appSecret = "usKVYjMm3JoqGhILunSSgfJynYs=";
 	
+	/**
+	 * Sets the up.
+	 */
 	@Before
 	public void setUp() {	
 		endpointInfo = new EndpointInfo();
@@ -30,6 +45,9 @@ public class CallStatsTest{
 		listener = mock(CallStatsInitListener.class);
 	}
 	
+	/**
+	 * Intialize test.
+	 */
 	@Test
 	public void intializeTest() {
 		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
@@ -43,6 +61,9 @@ public class CallStatsTest{
 		verify(listener).onInitialized(msg);
 	}
 	
+	/**
+	 * Intialize with invalid app id test.
+	 */
 	@Test
 	public void intializeWithInvalidAppIdTest() {
 		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
@@ -57,6 +78,9 @@ public class CallStatsTest{
 		verify(listener).onError(error, errMsg);
 	}
 	
+	/**
+	 * Intialize with null args test.
+	 */
 	@Test
 	public void intializeWithNullArgsTest() {
 		Throwable e = null;
@@ -81,10 +105,27 @@ public class CallStatsTest{
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
+		
+		try {
+			callstatslib.intialize(175240363, "", "jit.si.345",endpointInfo,listener);
+		} catch (Throwable e1) {
+				e = e1;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+		
+		try {
+			callstatslib.intialize(175240363, appSecret, "",endpointInfo,listener);
+		} catch (Throwable e1) {
+				e = e1;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
 	}
 	
 	
 	
+	/**
+	 * Intialize test with send call stats event.
+	 */
 	@Test
 	public void intializeTestWithSendCallStatsEvent() {
 		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
