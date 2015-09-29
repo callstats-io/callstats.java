@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+		<Property name="log-path">logs</Property>
+	</Properties>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %-5p (%F:%L) - %m%n"/>
+        </Console>
+        <File name="trace-log" fileName="${log-path}/cs.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d %-5p (%F:%L) - %m%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+    <Logger name="org.apache.log4j.xml" level="debug"/>
+        <Root level="debug">
+            <AppenderRef ref="trace-log"/>
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>
