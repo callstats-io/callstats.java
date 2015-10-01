@@ -52,6 +52,9 @@ public class CallStats {
 	/** The is initialized. */
 	private boolean isInitialized;
 			
+	
+	private CallStatsBridgeKeepAliveManager bridgeKeepAliveManager;
+	
 	/**
 	 * Checks if is initialized.
 	 *
@@ -104,7 +107,17 @@ public class CallStats {
 			public void onInitialized(String msg) {
 				listener.onInitialized(msg);
 				setInitialized(true);
-				CallStatsBridgeKeepAliveManager bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient);
+				if(bridgeKeepAliveManager == null) {
+					bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient, 
+							new CallStatsBridgeKeepAliveStatusListener() {
+						
+						public void onKeepAliveError(CallStatsErrors error, String errMsg) {
+							if(error == CallStatsErrors.AUTH_ERROR) {
+								authenticator.doAuthentication();
+							}							
+						}
+					});
+				}
 				bridgeKeepAliveManager.startKeepAliveSender();
 			}
 			
@@ -148,6 +161,11 @@ public class CallStats {
 					}
 					if(responseStatus == 200) {
 						logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
+						if (eventResponseMessage.getStatus().equals("Error") && eventResponseMessage.getReason().contains("Invalid client token")) {
+							//logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
+							bridgeKeepAliveManager.stopKeepAliveSender();
+							authenticator.doAuthentication();
+						}						
 					}
 				}
 				

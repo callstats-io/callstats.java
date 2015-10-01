@@ -120,8 +120,7 @@ public class CallStatsTest{
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 	}
-	
-	
+		
 	
 	/**
 	 * Intialize test with send call stats event.
@@ -138,15 +137,15 @@ public class CallStatsTest{
 		String msg = "SDK authentication successful";
 		verify(listener).onInitialized(msg);
 		
-		for (int i=0;i<1000;i++) {
+		//for (int i=0;i<1000;i++) {
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
-												.avgIntervalJitter(i)
+												.avgIntervalJitter(2)
 												.cpuUsage(22)
-												.intervalLoss(i)
+												.intervalLoss(2)
 												.build();						
 			callstatslib.sendCallStatsBridgeEvent(bridgeStatusInfo);
-		}
+		//}
 		try {
 			Thread.sleep(100000);
 		} catch (InterruptedException e) {
