@@ -5,9 +5,6 @@ package io.callstats.sdk;
  */
 public class ServerInfo {
 	
-	/** The endpoint type. */
-	String endpointType;
-	
 	/** The endpoint data. */
 	EndPointData endpointData;
 	
@@ -18,24 +15,6 @@ public class ServerInfo {
 		super();
 		endpointData = new EndPointData();
 	}
-	
-	/**
-	 * Gets the endpoint type.
-	 *
-	 * @return the endpoint type
-	 */
-	public String getEndpointType() {
-		return endpointType;
-	}
-	
-	/**
-	 * Sets the endpoint type.
-	 *
-	 * @param endpointType the new endpoint type
-	 */
-	public void setEndpointType(String endpointType) {
-		this.endpointType = endpointType;
-	}	
 	
 	/**
 	 * Gets the name.
