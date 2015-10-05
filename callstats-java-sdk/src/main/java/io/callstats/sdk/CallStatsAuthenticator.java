@@ -245,6 +245,7 @@ public class CallStatsAuthenticator {
 			
 			public void onFailure(Exception e) {
 				isAuthenticationInProgress = false;
+				listener.onError(CallStatsErrors.HTTP_ERROR,e.getMessage());
 			}
 		});
 	}
@@ -401,6 +402,7 @@ public class CallStatsAuthenticator {
 
 			public void onFailure(Exception e) {
 				isAuthenticationInProgress = false;
+				listener.onError(CallStatsErrors.HTTP_ERROR,e.getMessage());
 			}
 			
 		});

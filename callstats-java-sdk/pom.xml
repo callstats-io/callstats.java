@@ -2,6 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>callstats</groupId>
   <artifactId>callstats</artifactId>
+  <packaging>jar</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <name>callstats-java-sdk</name>
   
@@ -69,5 +70,44 @@
       <version>1.6.1</version>
 	</dependency>
   </dependencies>
+
+   <build>
+      <resources>
+       <resource>
+         <directory>src/main/java</directory>
+       </resource>
+       <resource>
+         <directory>src/test/java</directory>
+       </resource>
+       <resource>
+         <directory>src/main/resources</directory>
+       </resource>  
+       <resource>
+         <directory>src/test/resources</directory>
+       </resource>        
+     </resources> 
+     
+     <plugins>
+      <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+
+            </configuration>
+            <executions>
+                <execution>
+                    <id>assemble-all</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+     </plugins>
+   </build>
 </project>
 

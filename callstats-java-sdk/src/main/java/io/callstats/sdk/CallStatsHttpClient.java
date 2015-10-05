@@ -277,9 +277,9 @@ public class CallStatsHttpClient {
 			((CloseableHttpAsyncClient) httpAsyncClient).start();
 			httpAsyncClient.execute(request, new FutureCallback<HttpResponse>() {
 				
-				public void failed(Exception e) {
-					listener.onFailure(e);
+				public void failed(Exception e) {					
 					logger.info("failed "+e.toString());
+					listener.onFailure(e);
 				}
 				
 				public void completed(HttpResponse response) {
@@ -289,8 +289,8 @@ public class CallStatsHttpClient {
 				
 				public void cancelled() {
 					Exception e = new Exception("http request execute cancelled");
+					logger.info("cancelled ");	
 					listener.onFailure(e);
-					logger.info("cancelled ");					
 				}
 			});
 		}

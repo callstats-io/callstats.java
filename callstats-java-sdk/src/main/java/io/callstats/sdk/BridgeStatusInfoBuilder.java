@@ -11,6 +11,12 @@ public class BridgeStatusInfoBuilder {
 	/** The memory usage. */
 	private float memoryUsage;
 	
+	/** The total memory of the machine. */
+	private float totalMemory;
+	
+	/** The number of Java threads that the video bridge is using. */
+	private int threadCount;
+	
 	/** The sent bytes. */
 	private long sentBytes;
 	
@@ -29,11 +35,32 @@ public class BridgeStatusInfoBuilder {
 	/** The avg interval jitter. */
 	private float avgIntervalJitter;
 	
+	/** Download bit rate for the video bridge in kilobits per second.*/
+	private int downloadBitRate;
+	
+	/** Upload bit rate for the video bridge in kilobits per second.*/
+	private int uploadBitRate;
+	
+	/** The value is between 0 and 1 and represents the RTP packet loss for the video bridge. */
+	private float rtpLoss;
+	
+	/** Number of audio channels. */
+	private int audioChannelsCount;
+	
+	/** Number of video channels. */
+	private int videoChannelsCount;
+	
+	/** Number of video conferences. */
+	private int conferenceCount;
+	
+	/** Number of video participants. */
+	private int participantsCount;
+	
 	/**
 	 * Instantiates a new bridge status info builder.
 	 */
 	public BridgeStatusInfoBuilder() {
-		
+
 	}
 	
 	/**
@@ -57,6 +84,17 @@ public class BridgeStatusInfoBuilder {
 		this.memoryUsage = memoryUsage;
 		return this;
 	}
+	
+	public BridgeStatusInfoBuilder totalMemory(float totalMemory) {
+		this.totalMemory = totalMemory;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder threadCount(int threadCount) {
+		this.threadCount = threadCount;
+		return this;
+	}
+	
 	
 	/**
 	 * Sent bytes.
@@ -124,12 +162,50 @@ public class BridgeStatusInfoBuilder {
 		return this;
 	}
 	
+	public BridgeStatusInfoBuilder downloadBitRate(int downloadBitRate) {
+		this.downloadBitRate = downloadBitRate;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder uploadBitRate(int uploadBitRate) {
+		this.uploadBitRate = uploadBitRate;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder rtpLoss(float rtpLoss) {
+		this.rtpLoss = rtpLoss;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder audioChannelsCount(int audioChannelsCount) {
+		this.audioChannelsCount = audioChannelsCount;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder videoChannelsCount(int videoChannelsCount) {
+		this.videoChannelsCount = videoChannelsCount;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder conferenceCount(int conferenceCount) {
+		this.conferenceCount = conferenceCount;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder participantsCount(int participantsCount) {
+		this.participantsCount = participantsCount;
+		return this;
+	}
+	
 	/**
 	 * Builds the.
 	 *
 	 * @return the bridge status info
 	 */
 	public BridgeStatusInfo build() {
-		return new BridgeStatusInfo(cpuUsage, memoryUsage, sentBytes, receivedBytes, intervalLoss, totalLoss, avgIntervalRtt, avgIntervalJitter);
+		return new BridgeStatusInfo(cpuUsage, memoryUsage, totalMemory, threadCount, sentBytes, 
+				receivedBytes, intervalLoss, totalLoss, avgIntervalRtt, avgIntervalJitter, 
+				downloadBitRate, uploadBitRate, rtpLoss, audioChannelsCount, videoChannelsCount, 
+				conferenceCount, participantsCount);
 	}		
 }

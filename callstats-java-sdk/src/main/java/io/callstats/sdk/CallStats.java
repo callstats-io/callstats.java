@@ -46,8 +46,8 @@ public class CallStats {
 	/** The gson. */
 	private Gson gson;
 	
-	/** The endpoint info. */
-	private EndpointInfo endpointInfo;
+	/** The server info. */
+	private ServerInfo serverInfo;
 	
 	/** The is initialized. */
 	private boolean isInitialized;
@@ -86,11 +86,11 @@ public class CallStats {
 	 * @param appId the app id
 	 * @param appSecret the app secret
 	 * @param bridgeId the bridge id
-	 * @param endpointInfo the endpoint info
+	 * @param serverInfo the server info
 	 * @param callStatsInitListener the call stats init listener
 	 */
-	public void intialize(final int appId, final String appSecret, final String bridgeId, final EndpointInfo endpointInfo, final CallStatsInitListener callStatsInitListener) {
-		if (appId <= 0 || StringUtils.isBlank(appSecret) || StringUtils.isBlank(bridgeId) || endpointInfo == null || callStatsInitListener == null) {
+	public void intialize(final int appId, final String appSecret, final String bridgeId, final ServerInfo serverInfo, final CallStatsInitListener callStatsInitListener) {
+		if (appId <= 0 || StringUtils.isBlank(appSecret) || StringUtils.isBlank(bridgeId) || serverInfo == null || callStatsInitListener == null) {
 			logger.error("intialize: Arguments cannot be null ");
 			throw new IllegalArgumentException("intialize: Arguments cannot be null");
 		}
@@ -99,14 +99,14 @@ public class CallStats {
 		this.appSecret = appSecret;
 		this.bridgeId = bridgeId;
 		this.listener = callStatsInitListener;
-		this.endpointInfo = endpointInfo;
+		this.serverInfo = serverInfo;
 		
 		httpClient = new CallStatsHttpClient();
 		authenticator = new CallStatsAuthenticator(appId, this.appSecret, bridgeId, httpClient, new CallStatsInitListener() {
 			
-			public void onInitialized(String msg) {
-				listener.onInitialized(msg);
+			public void onInitialized(String msg) {				
 				setInitialized(true);
+				logger.info("SDK Initialized "+msg);
 				if(bridgeKeepAliveManager == null) {
 					bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient, 
 							new CallStatsBridgeKeepAliveStatusListener() {
@@ -119,6 +119,7 @@ public class CallStats {
 					});
 				}
 				bridgeKeepAliveManager.startKeepAliveSender();
+				listener.onInitialized(msg);
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
@@ -141,7 +142,7 @@ public class CallStats {
 	public void sendCallStatsBridgeEvent(BridgeStatusInfo bridgeStatusInfo) {	
 		if (isInitialized()) {			 
 			long epoch = System.currentTimeMillis()/1000;				
-			BridgeEventMessage eventMessage = new BridgeEventMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), bridgeStatusInfo, endpointInfo);
+			BridgeEventMessage eventMessage = new BridgeEventMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), bridgeStatusInfo, serverInfo);
 			String requestMessageString = gson.toJson(eventMessage);
 			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
 				public void onResponse(HttpResponse response) {

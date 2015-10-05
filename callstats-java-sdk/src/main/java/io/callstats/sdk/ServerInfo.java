@@ -3,7 +3,7 @@ package io.callstats.sdk;
 /**
  * The Class EndpointInfo.
  */
-public class EndpointInfo {
+public class ServerInfo {
 	
 	/** The endpoint type. */
 	String endpointType;
@@ -14,7 +14,7 @@ public class EndpointInfo {
 	/**
 	 * Instantiates a new endpoint info.
 	 */
-	public EndpointInfo() {
+	public ServerInfo() {
 		super();
 		endpointData = new EndPointData();
 	}

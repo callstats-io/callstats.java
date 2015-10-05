@@ -9,8 +9,12 @@
         </File>
     </Appenders>
     <Loggers>
-    <Logger name="org.apache.log4j.xml" level="debug"/>
+    	<Logger name="org.apache.log4j.xml" level="debug"/>
+    	<Logger name="org.apache.log4j.xml" level="info"/>
         <Root level="debug">
+            <AppenderRef ref="trace-log"/>
+        </Root>
+        <Root level="info">
             <AppenderRef ref="trace-log"/>
         </Root>
     </Loggers>
