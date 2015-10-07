@@ -78,7 +78,7 @@ public class CallStats {
 	}
 	
 	/**
-	 * Intialize callstats.
+	 * Initialize callstats.
 	 *
 	 * @param appId the app id
 	 * @param appSecret the app secret
@@ -86,10 +86,10 @@ public class CallStats {
 	 * @param endpointInfo the endpoint info
 	 * @param callStatsInitListener the call stats init listener
 	 */
-	public void intialize(final int appId, final String appSecret, final String bridgeId, final EndpointInfo endpointInfo, final CallStatsInitListener callStatsInitListener) {
+	public void initialize(final int appId, final String appSecret, final String bridgeId, final EndpointInfo endpointInfo, final CallStatsInitListener callStatsInitListener) {
 		if (appId <= 0 || StringUtils.isBlank(appSecret) || StringUtils.isBlank(bridgeId) || endpointInfo == null || callStatsInitListener == null) {
-			logger.error("intialize: Arguments cannot be null ");
-			throw new IllegalArgumentException("intialize: Arguments cannot be null");
+			logger.error("initialize: Arguments cannot be null ");
+			throw new IllegalArgumentException("initialize: Arguments cannot be null");
 		}
 		
 		this.appId = appId;

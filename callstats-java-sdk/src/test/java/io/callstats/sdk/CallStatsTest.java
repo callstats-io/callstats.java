@@ -46,11 +46,11 @@ public class CallStatsTest{
 	}
 	
 	/**
-	 * Intialize test.
+	 * Initialize test.
 	 */
 	@Test
-	public void intializeTest() {
-		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
+	public void initializeTest() {
+		callstatslib.initialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
@@ -62,13 +62,13 @@ public class CallStatsTest{
 	}
 	
 	/**
-	 * Intialize with invalid app id test.
+	 * Initialize with invalid app id test.
 	 */
 	@Test
-	public void intializeWithInvalidAppIdTest() {
+	public void initializeWithInvalidAppIdTest() {
 		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
 		String errMsg = "SDK Authentication Error";
-		callstatslib.intialize(175240363, appSecret, "jit.si.345",endpointInfo,listener);
+		callstatslib.initialize(175240363, appSecret, "jit.si.345",endpointInfo,listener);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -79,42 +79,42 @@ public class CallStatsTest{
 	}
 	
 	/**
-	 * Intialize with null args test.
+	 * Initialize with null args test.
 	 */
 	@Test
-	public void intializeWithNullArgsTest() {
+	public void initializeWithNullArgsTest() {
 		Throwable e = null;
 
 		try {
-		callstatslib.intialize(0, appSecret, "jit.si.345",endpointInfo,listener);
+		callstatslib.initialize(0, appSecret, "jit.si.345",endpointInfo,listener);
 		} catch (Throwable e1) {
 			e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.intialize(175240363, null, "jit.si.345",endpointInfo,listener);
+			callstatslib.initialize(175240363, null, "jit.si.345",endpointInfo,listener);
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.intialize(175240363, appSecret, null,endpointInfo,listener);
+			callstatslib.initialize(175240363, appSecret, null,endpointInfo,listener);
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.intialize(175240363, "", "jit.si.345",endpointInfo,listener);
+			callstatslib.initialize(175240363, "", "jit.si.345",endpointInfo,listener);
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.intialize(175240363, appSecret, "",endpointInfo,listener);
+			callstatslib.initialize(175240363, appSecret, "",endpointInfo,listener);
 		} catch (Throwable e1) {
 				e = e1;
 		}
@@ -124,11 +124,11 @@ public class CallStatsTest{
 	
 	
 	/**
-	 * Intialize test with send call stats event.
+	 * Initialize test with send call stats event.
 	 */
 	@Test
-	public void intializeTestWithSendCallStatsEvent() {
-		callstatslib.intialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
+	public void initializeTestWithSendCallStatsEvent() {
+		callstatslib.initialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
