@@ -59,48 +59,27 @@ public class BridgeStatusInfo {
 	/**
 	 * Instantiates a new bridge status info.
 	 *
-	 * @param cpuUsage the cpu usage
-	 * @param memoryUsage the memory usage
-	 * @param totalMemory the total memory
-	 * @param threadCount the thread count
-	 * @param sentBytes the sent bytes
-	 * @param receivedBytes the received bytes
-	 * @param intervalLoss the interval loss
-	 * @param totalLoss the total loss
-	 * @param avgIntervalRtt the avg interval rtt
-	 * @param avgIntervalJitter the avg interval jitter
-	 * @param downloadBitRate the download bit rate
-	 * @param uploadBitRate the upload bit rate
-	 * @param rtpLoss the rtp loss
-	 * @param audioChannelsCount the audio channels count
-	 * @param videoChannelsCount the video channels count
-	 * @param conferenceCount the conference count
-	 * @param participantsCount the participants count
+	 * @param builder the builder
 	 */
-	public BridgeStatusInfo(float cpuUsage, float memoryUsage,
-			float totalMemory, int threadCount, long sentBytes,
-			long receivedBytes, float intervalLoss, float totalLoss,
-			float avgIntervalRtt, float avgIntervalJitter, int downloadBitRate,
-			int uploadBitRate, float rtpLoss, int audioChannelsCount,
-			int videoChannelsCount, int conferenceCount, int participantsCount) {
+	public BridgeStatusInfo(BridgeStatusInfoBuilder builder) {
 		super();
-		this.cpuUsage = cpuUsage;
-		this.memoryUsage = memoryUsage;
-		this.totalMemory = totalMemory;
-		this.threadCount = threadCount;
-		this.sentBytes = sentBytes;
-		this.receivedBytes = receivedBytes;
-		this.intervalLoss = intervalLoss;
-		this.totalLoss = totalLoss;
-		this.avgIntervalRtt = avgIntervalRtt;
-		this.avgIntervalJitter = avgIntervalJitter;
-		this.downloadBitRate = downloadBitRate;
-		this.uploadBitRate = uploadBitRate;
-		this.rtpLoss = rtpLoss;
-		this.audioChannelsCount = audioChannelsCount;
-		this.videoChannelsCount = videoChannelsCount;
-		this.conferenceCount = conferenceCount;
-		this.participantsCount = participantsCount;
+		this.cpuUsage = builder.getCpuUsage();
+		this.memoryUsage = builder.getMemoryUsage();
+		this.totalMemory = builder.getTotalMemory();
+		this.threadCount = builder.getThreadCount();
+		this.sentBytes = builder.getSentBytes();
+		this.receivedBytes = builder.getReceivedBytes();
+		this.intervalLoss = builder.getIntervalLoss();
+		this.totalLoss = builder.getTotalLoss();
+		this.avgIntervalRtt = builder.getAvgIntervalRtt();
+		this.avgIntervalJitter = builder.getAvgIntervalJitter();
+		this.downloadBitRate = builder.getDownloadBitRate();
+		this.uploadBitRate = builder.getUploadBitRate();
+		this.rtpLoss = builder.getRtpLoss();
+		this.audioChannelsCount = builder.getAudioChannelsCount();
+		this.videoChannelsCount = builder.getVideoChannelsCount();
+		this.conferenceCount = builder.getConferenceCount();
+		this.participantsCount = builder.getParticipantsCount();
 	}
 
 	/**
@@ -408,4 +387,5 @@ public class BridgeStatusInfo {
 	public void setParticipantsCount(int participantsCount) {
 		this.participantsCount = participantsCount;
 	}
+			 
 }

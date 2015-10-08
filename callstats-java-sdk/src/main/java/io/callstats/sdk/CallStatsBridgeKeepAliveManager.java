@@ -4,6 +4,8 @@ import io.callstats.sdk.messages.BridgeKeepAliveMessage;
 import io.callstats.sdk.messages.BridgeKeepAliveResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,6 +53,8 @@ public class CallStatsBridgeKeepAliveManager {
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsBridgeKeepAliveManager");
 	
+	private int keepAliveInterval; 
+	
 	/**
 	 * Instantiates a new call stats bridge keep alive manager.
 	 *
@@ -62,12 +66,28 @@ public class CallStatsBridgeKeepAliveManager {
 	public CallStatsBridgeKeepAliveManager(int appId,
 			String bridgeId, String token,final CallStatsHttpClient httpClient,CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener) {
 		super();
+		Properties prop = new Properties();
+		InputStream input = null;
+	     
+    
+		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+		if (input != null){
+			try {
+				prop.load(input);
+				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		this.appId = appId;
 		this.bridgeId = bridgeId;
 		this.token = token;
 		this.httpClient = httpClient;
 		this.keepAliveStatusListener = keepAliveStatusListener;
 		gson = new Gson();
+		
 	}
 	
 	/**
@@ -96,7 +116,7 @@ public class CallStatsBridgeKeepAliveManager {
 			public void run() {
 				sendKeepAliveBridgeMessage(appId,bridgeId,token,httpClient);
 			}
-		}, 0,1000,TimeUnit.MILLISECONDS);
+		}, 0,keepAliveInterval,TimeUnit.MILLISECONDS);
 	}
 	
 	

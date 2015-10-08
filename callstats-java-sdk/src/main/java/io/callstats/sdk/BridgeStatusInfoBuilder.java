@@ -7,7 +7,7 @@ public class BridgeStatusInfoBuilder {
 	
 	/** The cpu usage. */
 	private float cpuUsage;
-	
+
 	/** The memory usage. */
 	private float memoryUsage;
 	
@@ -55,6 +55,76 @@ public class BridgeStatusInfoBuilder {
 	
 	/** Number of video participants. */
 	private int participantsCount;
+	
+	
+	public float getCpuUsage() {
+		return cpuUsage;
+	}
+
+	public float getMemoryUsage() {
+		return memoryUsage;
+	}
+
+	public float getTotalMemory() {
+		return totalMemory;
+	}
+
+	public int getThreadCount() {
+		return threadCount;
+	}
+
+	public long getSentBytes() {
+		return sentBytes;
+	}
+
+	public long getReceivedBytes() {
+		return receivedBytes;
+	}
+
+	public float getIntervalLoss() {
+		return intervalLoss;
+	}
+
+	public float getTotalLoss() {
+		return totalLoss;
+	}
+
+	public float getAvgIntervalRtt() {
+		return avgIntervalRtt;
+	}
+
+	public float getAvgIntervalJitter() {
+		return avgIntervalJitter;
+	}
+
+	public int getDownloadBitRate() {
+		return downloadBitRate;
+	}
+
+	public int getUploadBitRate() {
+		return uploadBitRate;
+	}
+
+	public float getRtpLoss() {
+		return rtpLoss;
+	}
+
+	public int getAudioChannelsCount() {
+		return audioChannelsCount;
+	}
+
+	public int getVideoChannelsCount() {
+		return videoChannelsCount;
+	}
+
+	public int getConferenceCount() {
+		return conferenceCount;
+	}
+
+	public int getParticipantsCount() {
+		return participantsCount;
+	}
+
 	
 	/**
 	 * Instantiates a new bridge status info builder.
@@ -203,9 +273,6 @@ public class BridgeStatusInfoBuilder {
 	 * @return the bridge status info
 	 */
 	public BridgeStatusInfo build() {
-		return new BridgeStatusInfo(cpuUsage, memoryUsage, totalMemory, threadCount, sentBytes, 
-				receivedBytes, intervalLoss, totalLoss, avgIntervalRtt, avgIntervalJitter, 
-				downloadBitRate, uploadBitRate, rtpLoss, audioChannelsCount, videoChannelsCount, 
-				conferenceCount, participantsCount);
+		return new BridgeStatusInfo(this);
 	}		
 }

@@ -1,7 +1,7 @@
 package io.callstats.sdk;
 
 /**
- * The Class EndpointInfo.
+ * The Class ServerInfo.
  */
 public class ServerInfo {
 	
@@ -122,9 +122,9 @@ public class ServerInfo {
 		}
 		
 		/**
-		 * Gets the ver.
+		 * Gets the version.
 		 *
-		 * @return the ver
+		 * @return the version
 		 */
 		public String getVer() {
 			return ver;

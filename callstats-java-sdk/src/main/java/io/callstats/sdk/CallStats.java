@@ -81,7 +81,7 @@ public class CallStats {
 	}
 	
 	/**
-	 * Intialize callstats.
+	 * Initialize callstats.
 	 *
 	 * @param appId the app id
 	 * @param appSecret the app secret
@@ -89,7 +89,7 @@ public class CallStats {
 	 * @param serverInfo the server info
 	 * @param callStatsInitListener the call stats init listener
 	 */
-	public void intialize(final int appId, final String appSecret, final String bridgeId, final ServerInfo serverInfo, final CallStatsInitListener callStatsInitListener) {
+	public void initialize(final int appId, final String appSecret, final String bridgeId, final ServerInfo serverInfo, final CallStatsInitListener callStatsInitListener) {
 		if (appId <= 0 || StringUtils.isBlank(appSecret) || StringUtils.isBlank(bridgeId) || serverInfo == null || callStatsInitListener == null) {
 			logger.error("intialize: Arguments cannot be null ");
 			throw new IllegalArgumentException("intialize: Arguments cannot be null");
@@ -162,7 +162,7 @@ public class CallStats {
 					}
 					if(responseStatus == 200) {
 						logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
-						if (eventResponseMessage.getStatus().equals("Error") && eventResponseMessage.getReason().contains("Invalid client token")) {
+						if (eventResponseMessage.getStatus().equals("Error") && eventResponseMessage.getReason().contains(CallStatsErrors.INVALID_TOKEN_ERROR.getReason())) {
 							//logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
 							bridgeKeepAliveManager.stopKeepAliveSender();
 							authenticator.doAuthentication();
