@@ -49,7 +49,9 @@ public class CallStatsTest{
 	 */
 	@Test
 	public void initializeTest() {
+
 		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
@@ -67,7 +69,9 @@ public class CallStatsTest{
 	public void initializeWithInvalidAppIdTest() {
 		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
 		String errMsg = "SDK Authentication Error";
+
 		callstatslib.initialize(appId+1, appSecret, "jit.si.345",serverInfo,listener);
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -81,32 +85,40 @@ public class CallStatsTest{
 	 * Initialize with null args test.
 	 */
 	@Test
-	public void intializeWithNullArgsTest() {
+	public void initializeWithNullArgsTest() {
 		Throwable e = null;
 
 		try {
+
 		callstatslib.initialize(0, appSecret, "jit.si.345",serverInfo,listener);
+
 		} catch (Throwable e1) {
 			e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
+
 			callstatslib.initialize(appId, null, "jit.si.345",serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
+
 			callstatslib.initialize(appId, appSecret, null,serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
+
 			callstatslib.initialize(appId, "", "jit.si.345",serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
@@ -114,6 +126,7 @@ public class CallStatsTest{
 		
 		try {
 			callstatslib.initialize(appId, appSecret, "",serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
@@ -127,6 +140,7 @@ public class CallStatsTest{
 	@Test
 	public void initializeTestWithSendCallStatsEvent() {
 		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {

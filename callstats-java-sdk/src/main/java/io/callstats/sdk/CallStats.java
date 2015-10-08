@@ -89,6 +89,7 @@ public class CallStats {
 	 * @param serverInfo the server info
 	 * @param callStatsInitListener the call stats init listener
 	 */
+
 	public void initialize(final int appId, final String appSecret, final String bridgeId, final ServerInfo serverInfo, final CallStatsInitListener callStatsInitListener) {
 		if (appId <= 0 || StringUtils.isBlank(appSecret) || StringUtils.isBlank(bridgeId) || serverInfo == null || callStatsInitListener == null) {
 			logger.error("intialize: Arguments cannot be null ");
