@@ -1,5 +1,7 @@
 package io.callstats.sample;
 
+import java.util.Random;
+
 import io.callstats.sdk.BridgeStatusInfo;
 import io.callstats.sdk.BridgeStatusInfoBuilder;
 import io.callstats.sdk.CallStats;
@@ -53,11 +55,12 @@ public class CallStatsMainClass {
 	
 	public static void sendBridgeStatusInfoMessage() {
 		//Building the video bridge status info.
+		Random randomGenerator = new Random();
 		BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 		BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
-											.avgIntervalJitter(1)
-											.cpuUsage(22)
-											.intervalLoss(1)
+											.avgIntervalJitter(randomGenerator.nextFloat())
+											.cpuUsage(randomGenerator.nextInt(100))
+											.intervalLoss(randomGenerator.nextFloat())
 											.build();	
 		System.out.println("Sending bridge status info ");
 		
