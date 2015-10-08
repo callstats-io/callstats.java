@@ -24,8 +24,11 @@ public enum CallStatsErrors {
 	CS_PROTO_ERROR(4,"CallStats Protocol Error"),
 	
 	/** The app connectivity error. */
-	APP_CONNECTIVITY_ERROR(5,"App Connectivity Error");
-  	    	
+	APP_CONNECTIVITY_ERROR(5,"App Connectivity Error"),
+	
+	
+	INVALID_TOKEN_ERROR(6,"Invalid client token");
+	
 	/** The index. */
 	private int index;
 	

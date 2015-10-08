@@ -1,12 +1,9 @@
 package io.callstats.sdk;
 
 /**
- * The Class EndpointInfo.
+ * The Class ServerInfo.
  */
-public class EndpointInfo {
-	
-	/** The endpoint type. */
-	String endpointType;
+public class ServerInfo {
 	
 	/** The endpoint data. */
 	EndPointData endpointData;
@@ -14,28 +11,10 @@ public class EndpointInfo {
 	/**
 	 * Instantiates a new endpoint info.
 	 */
-	public EndpointInfo() {
+	public ServerInfo() {
 		super();
 		endpointData = new EndPointData();
 	}
-	
-	/**
-	 * Gets the endpoint type.
-	 *
-	 * @return the endpoint type
-	 */
-	public String getEndpointType() {
-		return endpointType;
-	}
-	
-	/**
-	 * Sets the endpoint type.
-	 *
-	 * @param endpointType the new endpoint type
-	 */
-	public void setEndpointType(String endpointType) {
-		this.endpointType = endpointType;
-	}	
 	
 	/**
 	 * Gets the name.
@@ -143,9 +122,9 @@ public class EndpointInfo {
 		}
 		
 		/**
-		 * Gets the ver.
+		 * Gets the version.
 		 *
-		 * @return the ver
+		 * @return the version
 		 */
 		public String getVer() {
 			return ver;

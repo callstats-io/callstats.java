@@ -1,7 +1,7 @@
 package io.callstats.sdk.messages;
 
 import io.callstats.sdk.BridgeStatusInfo;
-import io.callstats.sdk.EndpointInfo;
+import io.callstats.sdk.ServerInfo;
 import io.callstats.sdk.HealthStatusData;
 import io.callstats.sdk.TrafficStatusData;
 
@@ -47,7 +47,7 @@ public class BridgeEventMessage {
 	 * @param endpointInfo the endpoint info
 	 */
 	public BridgeEventMessage(int appID, String bridgeID, String version,
-		String endpointType, String apiTS, String token,BridgeStatusInfo bridgeStatusInfo,EndpointInfo endpointInfo) {
+		String endpointType, String apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
 		super();
 		this.appID = appID;
 		this.bridgeID = bridgeID;
@@ -284,7 +284,7 @@ public class BridgeEventMessage {
 		EventData eventData;
 		
 		/** The endpoint info. */
-		EndpointInfo endpointInfo;
+		ServerInfo endpointInfo;
 		
 		/**
 		 * Instantiates a new event info.
@@ -292,7 +292,7 @@ public class BridgeEventMessage {
 		public EventInfo() {
 			super();
 			eventData = new EventData();
-			endpointInfo = new EndpointInfo();
+			endpointInfo = new ServerInfo();
 		}
 		
 		/**
@@ -336,7 +336,7 @@ public class BridgeEventMessage {
 		 *
 		 * @return the endpoint info
 		 */
-		public EndpointInfo getEndpointInfo() {
+		public ServerInfo getEndpointInfo() {
 			return endpointInfo;
 		}
 		
@@ -345,7 +345,7 @@ public class BridgeEventMessage {
 		 *
 		 * @param endpointInfo the new endpoint info
 		 */
-		public void setEndpointInfo(EndpointInfo endpointInfo) {
+		public void setEndpointInfo(ServerInfo endpointInfo) {
 			this.endpointInfo = endpointInfo;
 		}
 	}

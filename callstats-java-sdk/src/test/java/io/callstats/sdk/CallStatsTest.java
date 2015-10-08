@@ -22,24 +22,23 @@ public class CallStatsTest{
 	CallStatsInitListener listener;
 	
 	/** The endpoint info. */
-	EndpointInfo endpointInfo;
+	ServerInfo serverInfo;
 	
 	/** The app id. */
-	int appId = 497346896;
+	int appId = 1234567;
 	
 	/** The app secret. */
-	String appSecret = "usKVYjMm3JoqGhILunSSgfJynYs=";
+	String appSecret = "appSecret";
 	
 	/**
 	 * Sets the up.
 	 */
 	@Before
 	public void setUp() {	
-		endpointInfo = new EndpointInfo();
-		endpointInfo.setEndpointType(CallStatsConst.END_POINT_TYPE);
-		endpointInfo.setName("JitSi");
-		endpointInfo.setOs("LINUX");
-		endpointInfo.setVer("4.4");		
+		serverInfo = new ServerInfo();
+		serverInfo.setName("JitSi");
+		serverInfo.setOs("LINUX");
+		serverInfo.setVer("4.4");		
 		System.out.println("Setup completed");
 		callstatslib = new CallStats();
 		listener = mock(CallStatsInitListener.class);
@@ -50,7 +49,9 @@ public class CallStatsTest{
 	 */
 	@Test
 	public void initializeTest() {
-		callstatslib.initialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
+
+		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
@@ -68,7 +69,9 @@ public class CallStatsTest{
 	public void initializeWithInvalidAppIdTest() {
 		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
 		String errMsg = "SDK Authentication Error";
-		callstatslib.initialize(175240363, appSecret, "jit.si.345",endpointInfo,listener);
+
+		callstatslib.initialize(appId+1, appSecret, "jit.si.345",serverInfo,listener);
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -86,49 +89,58 @@ public class CallStatsTest{
 		Throwable e = null;
 
 		try {
-		callstatslib.initialize(0, appSecret, "jit.si.345",endpointInfo,listener);
+
+		callstatslib.initialize(0, appSecret, "jit.si.345",serverInfo,listener);
+
 		} catch (Throwable e1) {
 			e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.initialize(175240363, null, "jit.si.345",endpointInfo,listener);
+
+			callstatslib.initialize(appId, null, "jit.si.345",serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.initialize(175240363, appSecret, null,endpointInfo,listener);
+
+			callstatslib.initialize(appId, appSecret, null,serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.initialize(175240363, "", "jit.si.345",endpointInfo,listener);
+
+			callstatslib.initialize(appId, "", "jit.si.345",serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 		
 		try {
-			callstatslib.initialize(175240363, appSecret, "",endpointInfo,listener);
+			callstatslib.initialize(appId, appSecret, "",serverInfo,listener);
+
 		} catch (Throwable e1) {
 				e = e1;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 	}
-	
-	
+		
 	
 	/**
 	 * Initialize test with send call stats event.
 	 */
 	@Test
 	public void initializeTestWithSendCallStatsEvent() {
-		callstatslib.initialize(497346896, appSecret, "jit.si.345",endpointInfo,listener);
+		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -138,17 +150,17 @@ public class CallStatsTest{
 		String msg = "SDK authentication successful";
 		verify(listener).onInitialized(msg);
 		
-		for (int i=0;i<1000;i++) {
+		//for (int i=0;i<1000;i++) {
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
-												.avgIntervalJitter(i)
-												.cpuUsage(22)
-												.intervalLoss(i)
+												.avgIntervalJitter(2)
+												.cpuUsage(33)
+												.intervalLoss(2)
 												.build();						
 			callstatslib.sendCallStatsBridgeEvent(bridgeStatusInfo);
-		}
+		//}
 		try {
-			Thread.sleep(100000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

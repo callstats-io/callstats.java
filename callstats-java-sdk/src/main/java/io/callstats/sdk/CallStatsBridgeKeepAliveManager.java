@@ -4,7 +4,10 @@ import io.callstats.sdk.messages.BridgeKeepAliveMessage;
 import io.callstats.sdk.messages.BridgeKeepAliveResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -43,8 +46,14 @@ public class CallStatsBridgeKeepAliveManager {
 	/** The http client. */
 	private CallStatsHttpClient httpClient;
 	
+	private CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener;
+	
+	Future<?> future;
+	
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsBridgeKeepAliveManager");
+	
+	private int keepAliveInterval; 
 	
 	/**
 	 * Instantiates a new call stats bridge keep alive manager.
@@ -55,31 +64,59 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param httpClient the http client
 	 */
 	public CallStatsBridgeKeepAliveManager(int appId,
-			String bridgeId, String token,final CallStatsHttpClient httpClient) {
+			String bridgeId, String token,final CallStatsHttpClient httpClient,CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener) {
 		super();
+		Properties prop = new Properties();
+		InputStream input = null;
+	     
+    
+		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+		if (input != null){
+			try {
+				prop.load(input);
+				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		this.appId = appId;
 		this.bridgeId = bridgeId;
 		this.token = token;
 		this.httpClient = httpClient;
+		this.keepAliveStatusListener = keepAliveStatusListener;
 		gson = new Gson();
+		
 	}
 	
 	/**
 	 * Stop keep alive sender.
 	 */
 	public void stopKeepAliveSender() {
-		scheduler.shutdownNow();
+		logger.info("Stoping keepAlive Sender");
+		future.cancel(true);
 	}
 	
+	
+	/**
+	 * Shuts keep alive sender.
+	 */
+	public void shutDownKeepAliveSender() {
+		logger.info("Shutting down keepAlive Sender");
+		scheduler.shutdownNow();
+	}
+
 	/**
 	 * Start keep alive sender.
 	 */
 	public void startKeepAliveSender() {
-		scheduler.scheduleAtFixedRate(new Runnable() {			
+		logger.info("Starting keepAlive Sender");
+		future = scheduler.scheduleAtFixedRate(new Runnable() {			
 			public void run() {
 				sendKeepAliveBridgeMessage(appId,bridgeId,token,httpClient);
 			}
-		}, 0,1000,TimeUnit.MILLISECONDS);
+		}, 0,keepAliveInterval,TimeUnit.MILLISECONDS);
 	}
 	
 	
@@ -114,6 +151,10 @@ public class CallStatsBridgeKeepAliveManager {
 				}
 				if(responseStatus == 200) {
 					logger.info("Response status is "+keepAliveResponse.getStatus()+":"+keepAliveResponse.getReason());
+					if (keepAliveResponse.getStatus().equals("Error") && keepAliveResponse.getReason().contains("Invalid client token")) {
+						stopKeepAliveSender();
+						keepAliveStatusListener.onKeepAliveError(CallStatsErrors.AUTH_ERROR,keepAliveResponse.getReason() );
+					}	
 				}
 			}
 			

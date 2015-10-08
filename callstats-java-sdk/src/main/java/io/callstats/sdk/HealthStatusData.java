@@ -8,8 +8,15 @@ public class HealthStatusData {
 	/** The cpu usage. */
 	private float cpuUsage;
 	
-	/** The memory usage. */
+	/** Total used memory on the machine. */
 	private float memoryUsage;
+	
+	/** The total memory of the machine. */
+	private float totalMemory;
+	
+	/** The number of Java threads that the video bridge is using. */
+	private int threadCount;
+
 	
 	/**
 	 * Instantiates a new health status data.
@@ -52,5 +59,43 @@ public class HealthStatusData {
 	 */
 	public void setCpuUsage(float cpuUsage) {
 		this.cpuUsage = cpuUsage;
-	}		
+	}	
+	
+	
+	/**
+	 * Gets the total memory.
+	 *
+	 * @return the total memory
+	 */
+	public float getTotalMemory() {
+		return totalMemory;
+	}
+
+	/**
+	 * Sets the total memory.
+	 *
+	 * @param cpuUsage the new cpu usage
+	 */
+	public void setTotalMemory(float totalMemory) {
+		this.totalMemory = totalMemory;
+	}
+
+	
+	/**
+	 * Gets the thread count.
+	 *
+	 * @return the thread count
+	 */
+	public int getThreadCount() {
+		return threadCount;
+	}
+
+	/**
+	 * Sets the thread count.
+	 *
+	 * @param cpuUsage the new cpu usage
+	 */
+	public void setThreadCount(int threadCount) {
+		this.threadCount = threadCount;
+	}
 }
