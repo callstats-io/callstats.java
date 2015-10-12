@@ -370,9 +370,11 @@ public class CallStatsAuthenticator {
 				int responseStatus = response.getStatusLine().getStatusCode();
 				AuthorizeResponse authorizeResponseMessage;
 				try {
+					
 					String responseString = EntityUtils.toString(response.getEntity());
-					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);	
 					logger.info("Auth response "+responseString);
+					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);	
+					
 				} catch (ParseException e) {	
 					isAuthenticationInProgress = false;
 					e.printStackTrace();

@@ -5,59 +5,59 @@ package io.callstats.sdk;
  */
 public class BridgeStatusInfo {
 	
-	/** The cpu usage. */
-	private float cpuUsage;
+	/** measurementInterval: Interval since the last status measurement, measured in milliseconds.*/
+	private int measurementInterval;
 	
-	/** The memory usage. */
+	/** cpuUsage: The cpu usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
+	private float cpuUsage;
+
+	/** memoryUage: The memory usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
 	private float memoryUsage;
 	
-	/** The total memory of the machine. */
+	/** totalMemory: The total memory available to the endpoint. */
 	private float totalMemory;
 	
-	/** The number of Java threads that the video bridge is using. */
+	/** threadCount: The number of Java threads that the bridge is using. This is optional, The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
 	private int threadCount;
 	
-	/** The sent bytes. */
-	private long sentBytes;
+	/** intervalSentBytes: The sent bytes in the last measurement interval. */
+	private long intervalSentBytes;
 	
-	/** The received bytes. */
-	private long receivedBytes;
+	/** intervalReceivedBytes: The received bytes in the last measurement interval. */
+	private long intervalReceivedBytes;
 	
-	/** The interval loss. */
-	private float intervalLoss;
+	/** intervalRtpFractionLoss: The packet loss observed in the last measurement interval. It is the fraction of the RTP packets lost, and the RTP packets lost and received in the last measurement interval. The value is between 0.0 and 1.0. */
+	private float intervalRtpFractionLoss;
 	
-	/** The total loss. */
+	/** totalLoss: The total cumulative packets lost. */
 	private float totalLoss;
 	
-	/** The avg interval rtt. */
+	/** avgIntervalRtt: The avg RTT observed in the last measurement interval. */
 	private float avgIntervalRtt;
 	
-	/** The avg interval jitter. */
+	/** avgIntervalJitter: The avg interval jitter in the last measurement interval. */
 	private float avgIntervalJitter;
 	
-	/** Download bit rate for the video bridge in kilobits per second.*/
-	private int downloadBitRate;
+	/** intervalDownloadBitRate: Download bit rate for the endpoints in kilobits per second measured over the last measurement interval.*/
+	private int intervalDownloadBitRate;
 	
-	/** Upload bit rate for the video bridge in kilobits per second.*/
-	private int uploadBitRate;
+	/** intervalUploadBitRate: Upload bit rate for the video bridge in kilobits per second measured over the last measurement interval.*/
+	private int intervalUploadBitRate;
 	
-	/** The value is between 0 and 1 and represents the RTP packet loss for the video bridge. */
-	private float rtpLoss;
+	/** The cumulative fraction loss, measured as the ratio of the cumulative RTP packets lost, and cumulative sum of packets lost and received. The value is between 0.0 and 1.0. */
+	// private float totalRtpFractionLoss;
 	
-	/** Number of audio channels. */
-	private int audioChannelsCount;
+	/** audioFabricCount: Current number of open/active 5 tuples that use audio. */
+	private int audioFabricCount;
 	
-	/** Number of video channels. */
-	private int videoChannelsCount;
+	/** videoFabricCount: Current number of open/active 5-tuples that use video. */
+	private int videoFabricCount;
 	
-	/** Number of video conferences. */
+	/** conferenceCount: Current number of multimedia conferences. */
 	private int conferenceCount;
 	
-	/** Number of video participants. */
-	private int participantsCount;	
-	
-	/** Interval from the last status submission*/
-	private int measurementInterval;
+	/** participantsCount: Current number of multimedia participants cumulative over all ongoing conferences. */
+	private int participantsCount;
 	
 	/**
 	 * Instantiates a new bridge status info.
@@ -70,27 +70,36 @@ public class BridgeStatusInfo {
 		this.memoryUsage = builder.getMemoryUsage();
 		this.totalMemory = builder.getTotalMemory();
 		this.threadCount = builder.getThreadCount();
-		this.sentBytes = builder.getSentBytes();
-		this.receivedBytes = builder.getReceivedBytes();
-		this.intervalLoss = builder.getIntervalLoss();
+		this.intervalSentBytes = builder.getIntervalSentBytes();
+		this.intervalReceivedBytes = builder.getIntervalReceivedBytes();
+		this.intervalRtpFractionLoss = builder.getIntervalRtpFractionLoss();
 		this.totalLoss = builder.getTotalLoss();
 		this.avgIntervalRtt = builder.getAvgIntervalRtt();
 		this.avgIntervalJitter = builder.getAvgIntervalJitter();
-		this.downloadBitRate = builder.getDownloadBitRate();
-		this.uploadBitRate = builder.getUploadBitRate();
-		this.rtpLoss = builder.getRtpLoss();
-		this.audioChannelsCount = builder.getAudioChannelsCount();
-		this.videoChannelsCount = builder.getVideoChannelsCount();
+		this.intervalDownloadBitRate = builder.getIntervalDownloadBitRate();
+		this.intervalUploadBitRate = builder.getIntervalUploadBitRate();
+		this.audioFabricCount = builder.getAudioFabricCount();
+		this.videoFabricCount = builder.getVideoFabricCount();
 		this.conferenceCount = builder.getConferenceCount();
 		this.participantsCount = builder.getParticipantsCount();
 		this.measurementInterval = builder.getMeasurementInterval();
 	}
 
 	
+	/**
+	 * Gets the measurement interval.
+	 *
+	 * @return the measurement interval
+	 */
 	public int getMeasurementInterval() {
 		return measurementInterval;
 	}
 
+	/**
+	 * Sets the measurement interval.
+	 *
+	 * @param measurementInterval the new measurement interval
+	 */
 	public void setMeasurementInterval(int measurementInterval) {
 		this.measurementInterval = measurementInterval;
 	}
@@ -136,17 +145,17 @@ public class BridgeStatusInfo {
 	 *
 	 * @return the sent bytes
 	 */
-	public long getSentBytes() {
-		return sentBytes;
+	public long getIntervalSentBytes() {
+		return intervalSentBytes;
 	}
 	
 	/**
 	 * Sets the sent bytes.
 	 *
-	 * @param sentBytes the new sent bytes
+	 * @param intervalSentBytes the new interval sent bytes
 	 */
-	public void setSentBytes(long sentBytes) {
-		this.sentBytes = sentBytes;
+	public void setIntervalSentBytes(long intervalSentBytes) {
+		this.intervalSentBytes = intervalSentBytes;
 	}
 	
 	/**
@@ -154,17 +163,17 @@ public class BridgeStatusInfo {
 	 *
 	 * @return the received bytes
 	 */
-	public long getReceivedBytes() {
-		return receivedBytes;
+	public long getIntervalReceivedBytes() {
+		return intervalReceivedBytes;
 	}
 	
 	/**
 	 * Sets the received bytes.
 	 *
-	 * @param receivedBytes the new received bytes
+	 * @param intervalReceivedBytes the new received bytes
 	 */
-	public void setReceivedBytes(long receivedBytes) {
-		this.receivedBytes = receivedBytes;
+	public void setReceivedBytes(long intervalReceivedBytes) {
+		this.intervalReceivedBytes = intervalReceivedBytes;
 	}
 	
 	/**
@@ -172,17 +181,17 @@ public class BridgeStatusInfo {
 	 *
 	 * @return the interval loss
 	 */
-	public float getIntervalLoss() {
-		return intervalLoss;
+	public float getIntervalRtpFractionLoss() {
+		return intervalRtpFractionLoss;
 	}
 	
 	/**
 	 * Sets the interval loss.
 	 *
-	 * @param intervalLoss the new interval loss
+	 * @param intervalRtpFractionLoss the new interval rtp fraction loss
 	 */
-	public void setIntervalLoss(float intervalLoss) {
-		this.intervalLoss = intervalLoss;
+	public void setIntervalRtpFractionLoss(float intervalRtpFractionLoss) {
+		this.intervalRtpFractionLoss = intervalRtpFractionLoss;
 	}
 	
 	/**
@@ -280,17 +289,17 @@ public class BridgeStatusInfo {
 	 *
 	 * @return the download bit rate
 	 */
-	public int getDownloadBitRate() {
-		return downloadBitRate;
+	public int getIntervalDownloadBitRate() {
+		return intervalDownloadBitRate;
 	}
 
 	/**
 	 * Sets the download bit rate.
 	 *
-	 * @param downloadBitRate the new download bit rate
+	 * @param intervalDownloadBitRate the new interval download bit rate
 	 */
-	public void setDownloadBitRate(int downloadBitRate) {
-		this.downloadBitRate = downloadBitRate;
+	public void setIntervalDownloadBitRate(int intervalDownloadBitRate) {
+		this.intervalDownloadBitRate = intervalDownloadBitRate;
 	}
 
 	/**
@@ -298,53 +307,36 @@ public class BridgeStatusInfo {
 	 *
 	 * @return the upload bit rate
 	 */
-	public int getUploadBitRate() {
-		return uploadBitRate;
+	public int getIntervalUploadBitRate() {
+		return intervalUploadBitRate;
 	}
 
 	/**
 	 * Sets the upload bit rate.
 	 *
-	 * @param uploadBitRate the new upload bit rate
+	 * @param intervalUploadBitRate the new interval upload bit rate
 	 */
-	public void setUploadBitRate(int uploadBitRate) {
-		this.uploadBitRate = uploadBitRate;
+	public void setIntervalUploadBitRate(int intervalUploadBitRate) {
+		this.intervalUploadBitRate = intervalUploadBitRate;
 	}
 
-	/**
-	 * Gets the rtp loss.
-	 *
-	 * @return the rtp loss
-	 */
-	public float getRtpLoss() {
-		return rtpLoss;
-	}
-
-	/**
-	 * Sets the rtp loss.
-	 *
-	 * @param rtpLoss the new rtp loss
-	 */
-	public void setRtpLoss(float rtpLoss) {
-		this.rtpLoss = rtpLoss;
-	}
 
 	/**
 	 * Gets the audio channels count.
 	 *
 	 * @return the audio channels count
 	 */
-	public int getAudioChannelsCount() {
-		return audioChannelsCount;
+	public int getAudioFabricCount() {
+		return audioFabricCount;
 	}
 
 	/**
 	 * Sets the audio channels count.
 	 *
-	 * @param audioChannelsCount the new audio channels count
+	 * @param audioFabricCount the new audio fabric count
 	 */
-	public void setAudioChannelsCount(int audioChannelsCount) {
-		this.audioChannelsCount = audioChannelsCount;
+	public void setAudioFabricCount(int audioFabricCount) {
+		this.audioFabricCount = audioFabricCount;
 	}
 
 	/**
@@ -352,17 +344,17 @@ public class BridgeStatusInfo {
 	 *
 	 * @return the video channels count
 	 */
-	public int getVideoChannelsCount() {
-		return videoChannelsCount;
+	public int getVideoFabricCount() {
+		return videoFabricCount;
 	}
 
 	/**
 	 * Sets the video channels count.
 	 *
-	 * @param videoChannelsCount the new video channels count
+	 * @param videoFabricCount the new video fabric count
 	 */
-	public void setVideoChannelsCount(int videoChannelsCount) {
-		this.videoChannelsCount = videoChannelsCount;
+	public void setVideoFabricCount(int videoFabricCount) {
+		this.videoFabricCount = videoFabricCount;
 	}
 
 	/**

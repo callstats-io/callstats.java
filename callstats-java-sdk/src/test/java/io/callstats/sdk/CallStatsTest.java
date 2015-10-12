@@ -28,7 +28,7 @@ public class CallStatsTest{
 	int appId = 1234567;
 	
 	/** The app secret. */
-	String appSecret = "appSecret";
+	String appSecret = "appsecret";
 	
 	/**
 	 * Sets the up.
@@ -139,7 +139,7 @@ public class CallStatsTest{
 	 */
 	@Test
 	public void initializeTestWithSendCallStatsEvent() {
-		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+		callstatslib.initialize(appId, appSecret, "jit.si.345",serverInfo,listener);
 
 		try {
 			Thread.sleep(2000);
@@ -150,15 +150,15 @@ public class CallStatsTest{
 		String msg = "SDK authentication successful";
 		verify(listener).onInitialized(msg);
 		
-		//for (int i=0;i<1000;i++) {
+		for (int i=0;i<1000;i++) {
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
 												.avgIntervalJitter(2)
 												.cpuUsage(33)
-												.intervalLoss(2)
+												.intervalRtpFractionLoss(2)
 												.build();						
-			callstatslib.sendCallStatsBridgeEvent(bridgeStatusInfo);
-		//}
+			callstatslib.sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
+		}
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
