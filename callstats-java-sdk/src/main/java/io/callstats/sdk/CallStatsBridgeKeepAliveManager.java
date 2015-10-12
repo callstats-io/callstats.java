@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * The Class CallStatsBridgeKeepAliveManager.
@@ -148,6 +149,10 @@ public class CallStatsBridgeKeepAliveManager {
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw new RuntimeException(e);					
+				} catch (JsonSyntaxException e) {
+					logger.error("Json Syntax Exception "+e.getMessage(),e);
+					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 				if(responseStatus == 200) {
 					logger.info("Response status is "+keepAliveResponse.getStatus()+":"+keepAliveResponse.getReason());

@@ -2,8 +2,8 @@ package io.callstats.sdk;
 
 import java.io.IOException;
 
-import io.callstats.sdk.messages.BridgeEventMessage;
-import io.callstats.sdk.messages.BridgeEventResponse;
+import io.callstats.sdk.messages.BridgeStatusUpdateMessage;
+import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
-
+import com.google.gson.JsonSyntaxException;
 
 /**
  * The Class CallStats.
@@ -53,6 +53,7 @@ public class CallStats {
 	private boolean isInitialized;
 			
 	
+	/** The bridge keep alive manager. */
 	private CallStatsBridgeKeepAliveManager bridgeKeepAliveManager;
 	
 	/**
@@ -135,31 +136,36 @@ public class CallStats {
 	}
 	
 	
+
 	/**
-	 * Send call stats bridge event.
+	 * Send call stats bridge status update.
 	 *
 	 * @param bridgeStatusInfo the bridge status info
 	 */
-	public void sendCallStatsBridgeEvent(BridgeStatusInfo bridgeStatusInfo) {	
+	public void sendCallStatsBridgeStatusUpdate(BridgeStatusInfo bridgeStatusInfo) {	
 		if (isInitialized()) {			 
 			long epoch = System.currentTimeMillis()/1000;				
-			BridgeEventMessage eventMessage = new BridgeEventMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), bridgeStatusInfo, serverInfo);
+			BridgeStatusUpdateMessage eventMessage = new BridgeStatusUpdateMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), bridgeStatusInfo, serverInfo);
 			String requestMessageString = gson.toJson(eventMessage);
 			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
 				public void onResponse(HttpResponse response) {
 					
 					int responseStatus = response.getStatusLine().getStatusCode();
 					logger.debug("Response "+response.toString()+":"+responseStatus);
-					BridgeEventResponse eventResponseMessage;
+					BridgeStatusUpdateResponse eventResponseMessage;
 					try {
 						String responseString = EntityUtils.toString(response.getEntity());
-						eventResponseMessage  = gson.fromJson(responseString,BridgeEventResponse.class);	
+						eventResponseMessage  = gson.fromJson(responseString,BridgeStatusUpdateResponse.class);	
 					} catch (ParseException e) {						
 						logger.error("ParseException "+e.getMessage(),e);
 						throw new RuntimeException(e);
 					} catch (IOException e) {
 						logger.error("IO Execption "+e.getMessage(),e);
 						throw new RuntimeException(e);					
+					} catch (JsonSyntaxException e) {
+						logger.error("Json Syntax Exception "+e.getMessage(),e);
+						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 					if(responseStatus == 200) {
 						logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());

@@ -3,7 +3,7 @@ package io.callstats.sdk.messages;
 /**
  * The Class BridgeEventResponse.
  */
-public class BridgeEventResponse {
+public class BridgeStatusUpdateResponse {
 	
 	/** The app id. */
 	private int appID;
@@ -23,7 +23,7 @@ public class BridgeEventResponse {
 	/**
 	 * Instantiates a new bridge event response.
 	 */
-	public BridgeEventResponse() {
+	public BridgeStatusUpdateResponse() {
 		eventData = new CallStatsEventResponseData();
 	}
 

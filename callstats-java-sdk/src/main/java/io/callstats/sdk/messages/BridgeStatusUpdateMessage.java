@@ -8,7 +8,7 @@ import io.callstats.sdk.TrafficStatusData;
 /**
  * The Class BridgeEventMessage.
  */
-public class BridgeEventMessage {
+public class BridgeStatusUpdateMessage {
 	
 	/** The Constant MSG_TYPE. */
 	private static final String MSG_TYPE = "CallStatsBridgeEvent";
@@ -46,7 +46,7 @@ public class BridgeEventMessage {
 	 * @param bridgeStatusInfo the bridge status info
 	 * @param endpointInfo the endpoint info
 	 */
-	public BridgeEventMessage(int appID, String bridgeID, String version,
+	public BridgeStatusUpdateMessage(int appID, String bridgeID, String version,
 		String endpointType, String apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
 		super();
 		this.appID = appID;
@@ -75,15 +75,26 @@ public class BridgeEventMessage {
 		
 		healthStatusData.setCpuUsage(bridgeStatusInfo.getCpuUsage());
 		healthStatusData.setMemoryUsage(bridgeStatusInfo.getMemoryUsage());
+		healthStatusData.setThreadCount(bridgeStatusInfo.getThreadCount());
+		healthStatusData.setTotalMemory(bridgeStatusInfo.getTotalMemory());
 		
 		trafficStatusData.setAvgIntervalJitter(bridgeStatusInfo.getAvgIntervalJitter());
 		trafficStatusData.setAvgIntervalRtt(bridgeStatusInfo.getAvgIntervalRtt());
-		trafficStatusData.setIntervalLoss(bridgeStatusInfo.getIntervalLoss());
-		trafficStatusData.setReceivedBytes(bridgeStatusInfo.getReceivedBytes());
-		trafficStatusData.setSentBytes(bridgeStatusInfo.getSentBytes());
 		trafficStatusData.setTotalLoss(bridgeStatusInfo.getTotalLoss());
+		trafficStatusData.setAudioFabricCount(bridgeStatusInfo.getAudioFabricCount());
+		trafficStatusData.setVideoFabricCount(bridgeStatusInfo.getVideoFabricCount());
+		trafficStatusData.setConferenceCount(bridgeStatusInfo.getConferenceCount());
+		trafficStatusData.setIntervalDownloadBitRate(bridgeStatusInfo.getIntervalDownloadBitRate());
+		trafficStatusData.setIntervalUploadBitRate(bridgeStatusInfo.getIntervalUploadBitRate());
+		trafficStatusData.setParticipantsCount(bridgeStatusInfo.getParticipantsCount());
+		trafficStatusData.setIntervalReceivedBytes(bridgeStatusInfo.getIntervalReceivedBytes());
+		trafficStatusData.setIntervalSentBytes(bridgeStatusInfo.getIntervalSentBytes());
+		trafficStatusData.setIntervalRtpFractionLoss(bridgeStatusInfo.getIntervalRtpFractionLoss());
 		
 		
+		
+		
+		data.setMeasurementInterval(bridgeStatusInfo.getMeasurementInterval());
 		data.setHealthStatusData(healthStatusData);
 		data.setTrafficStatusData(trafficStatusData);
 		event.setEventData(data);
@@ -226,6 +237,16 @@ public class BridgeEventMessage {
 		/** The traffic status data. */
 		TrafficStatusData trafficStatusData;
 		
+		int measurementInterval;
+		
+		public int getMeasurementInterval() {
+			return measurementInterval;
+		}
+
+		public void setMeasurementInterval(int submissionInterval) {
+			this.measurementInterval = submissionInterval;
+		}
+
 		/**
 		 * Instantiates a new event data.
 		 */

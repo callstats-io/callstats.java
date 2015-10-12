@@ -1,49 +1,51 @@
 package io.callstats.sdk;
 
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class TrafficStatusData.
  */
 public class TrafficStatusData {
 	
-	/** The sent bytes. */
-	private long sentBytes;
+	/** intervalSentBytes: The sent bytes in the last measurement interval. */
+	private long intervalSentBytes;
 	
-	/** The received bytes. */
-	private long receivedBytes;
+	/** intervalReceivedBytes: The received bytes in the last measurement interval. */
+	private long intervalReceivedBytes;
 	
-	/** The interval loss. */
-	private float intervalLoss;
+	/** intervalRtpFractionLoss: The packet loss observed in the last measurement interval. It is the fraction of the RTP packets lost, and the RTP packets lost and received in the last measurement interval. The value is between 0.0 and 1.0. */
+	private float intervalRtpFractionLoss;
 	
-	/** The total loss. */
+	/** totalLoss: The total cumulative packets lost. */
 	private float totalLoss;
 	
-	/** The avg interval rtt. */
+	/** avgIntervalRtt: The avg RTT observed in the last measurement interval. */
 	private float avgIntervalRtt;
 	
-	/** The avg interval jitter. */
+	/** avgIntervalJitter: The avg interval jitter in the last measurement interval. */
 	private float avgIntervalJitter;
 	
-	/** Download bit rate for the video bridge in kilobits per second.*/
-	private int downloadBitRate;
+	/** intervalDownloadBitRate: Download bit rate for the endpoints in kilobits per second measured over the last measurement interval.*/
+	private int intervalDownloadBitRate;
 	
-	/** Upload bit rate for the video bridge in kilobits per second.*/
-	private int uploadBitRate;
+	/** intervalUploadBitRate: Upload bit rate for the video bridge in kilobits per second measured over the last measurement interval.*/
+	private int intervalUploadBitRate;
 	
-	/** The value is between 0 and 1 and represents the RTP packet loss for the video bridge. */
-	private float rtpLoss;
+	/** The cumulative fraction loss, measured as the ratio of the cumulative RTP packets lost, and cumulative sum of packets lost and received. The value is between 0.0 and 1.0. */
+	// private float totalRtpFractionLoss;
 	
-	/** Number of audio channels. */
-	private int audioChannelsCount;
+	/** audioFabricCount: Current number of open/active 5 tuples that use audio. */
+	private int audioFabricCount;
 	
-	/** Number of video channels. */
-	private int videoChannelsCount;
+	/** videoFabricCount: Current number of open/active 5-tuples that use video. */
+	private int videoFabricCount;
 	
-	/** Number of video conferences. */
+	/** conferenceCount: Current number of multimedia conferences. */
 	private int conferenceCount;
 	
-	/** Number of video participants. */
+	/** participantsCount: Current number of multimedia participants cumulative over all ongoing conferences. */
 	private int participantsCount;
+	
 	
 	/**
 	 * Instantiates a new traffic status data.
@@ -53,94 +55,143 @@ public class TrafficStatusData {
 	}
 	
 	/**
-	 * Gets the download bit rate.
+	 * Gets the interval sent bytes.
 	 *
-	 * @return the download bit rate
+	 * @return the interval sent bytes
 	 */
-	public int getDownloadBitRate() {
-		return downloadBitRate;
+	public long getIntervalSentBytes() {
+		return intervalSentBytes;
 	}
 
-	/**
-	 * Sets the download bit rate.
-	 *
-	 * @param downloadBitRate the new download bit rate
-	 */
-	public void setDownloadBitRate(int downloadBitRate) {
-		this.downloadBitRate = downloadBitRate;
-	}
 
 	/**
-	 * Gets the upload bit rate.
+	 * Sets the interval sent bytes.
 	 *
-	 * @return the upload bit rate
+	 * @param intervalSentBytes the new interval sent bytes
 	 */
-	public int getUploadBitRate() {
-		return uploadBitRate;
+	public void setIntervalSentBytes(long intervalSentBytes) {
+		this.intervalSentBytes = intervalSentBytes;
 	}
 
-	/**
-	 * Sets the upload bit rate.
-	 *
-	 * @param uploadBitRate the new upload bit rate
-	 */
-	public void setUploadBitRate(int uploadBitRate) {
-		this.uploadBitRate = uploadBitRate;
-	}
 
 	/**
-	 * Gets the rtp loss.
+	 * Gets the interval received bytes.
 	 *
-	 * @return the rtp loss
+	 * @return the interval received bytes
 	 */
-	public float getRtpLoss() {
-		return rtpLoss;
+	public long getIntervalReceivedBytes() {
+		return intervalReceivedBytes;
 	}
 
-	/**
-	 * Sets the rtp loss.
-	 *
-	 * @param rtpLoss the new rtp loss
-	 */
-	public void setRtpLoss(float rtpLoss) {
-		this.rtpLoss = rtpLoss;
-	}
 
 	/**
-	 * Gets the audio channels count.
+	 * Sets the interval received bytes.
 	 *
-	 * @return the audio channels count
+	 * @param intervalReceivedBytes the new interval received bytes
 	 */
-	public int getAudioChannelsCount() {
-		return audioChannelsCount;
+	public void setIntervalReceivedBytes(long intervalReceivedBytes) {
+		this.intervalReceivedBytes = intervalReceivedBytes;
 	}
 
-	/**
-	 * Sets the audio channels count.
-	 *
-	 * @param audioChannelsCount the new audio channels count
-	 */
-	public void setAudioChannelsCount(int audioChannelsCount) {
-		this.audioChannelsCount = audioChannelsCount;
-	}
 
 	/**
-	 * Gets the video channels count.
+	 * Gets the interval rtp fraction loss.
 	 *
-	 * @return the video channels count
+	 * @return the interval rtp fraction loss
 	 */
-	public int getVideoChannelsCount() {
-		return videoChannelsCount;
+	public float getIntervalRtpFractionLoss() {
+		return intervalRtpFractionLoss;
 	}
 
+
 	/**
-	 * Sets the video channels count.
+	 * Sets the interval rtp fraction loss.
 	 *
-	 * @param videoChannelsCount the new video channels count
+	 * @param intervalRtpFractionLoss the new interval rtp fraction loss
 	 */
-	public void setVideoChannelsCount(int videoChannelsCount) {
-		this.videoChannelsCount = videoChannelsCount;
+	public void setIntervalRtpFractionLoss(float intervalRtpFractionLoss) {
+		this.intervalRtpFractionLoss = intervalRtpFractionLoss;
 	}
+
+
+	/**
+	 * Gets the interval download bit rate.
+	 *
+	 * @return the interval download bit rate
+	 */
+	public int getIntervalDownloadBitRate() {
+		return intervalDownloadBitRate;
+	}
+
+
+	/**
+	 * Sets the interval download bit rate.
+	 *
+	 * @param intervalDownloadBitRate the new interval download bit rate
+	 */
+	public void setIntervalDownloadBitRate(int intervalDownloadBitRate) {
+		this.intervalDownloadBitRate = intervalDownloadBitRate;
+	}
+
+
+	/**
+	 * Gets the interval upload bit rate.
+	 *
+	 * @return the interval upload bit rate
+	 */
+	public int getIntervalUploadBitRate() {
+		return intervalUploadBitRate;
+	}
+
+
+	/**
+	 * Sets the interval upload bit rate.
+	 *
+	 * @param intervalUploadBitRate the new interval upload bit rate
+	 */
+	public void setIntervalUploadBitRate(int intervalUploadBitRate) {
+		this.intervalUploadBitRate = intervalUploadBitRate;
+	}
+
+
+	/**
+	 * Gets the audio fabric count.
+	 *
+	 * @return the audio fabric count
+	 */
+	public int getAudioFabricCount() {
+		return audioFabricCount;
+	}
+
+
+	/**
+	 * Sets the audio fabric count.
+	 *
+	 * @param audioFabricCount the new audio fabric count
+	 */
+	public void setAudioFabricCount(int audioFabricCount) {
+		this.audioFabricCount = audioFabricCount;
+	}
+
+
+	/**
+	 * Gets the video fabric count.
+	 *
+	 * @return the video fabric count
+	 */
+	public int getVideoFabricCount() {
+		return videoFabricCount;
+	}
+
+
+	/**
+	 * Sets the video fabric count.
+	 *
+	 * @param videoFabricCount the new video fabric count
+	 */
+	public void setVideoFabricCount(int videoFabricCount) {
+		this.videoFabricCount = videoFabricCount;
+	}	
 
 	/**
 	 * Gets the conference count.
@@ -176,61 +227,6 @@ public class TrafficStatusData {
 	 */
 	public void setParticipantsCount(int participantsCount) {
 		this.participantsCount = participantsCount;
-	}
-
-	
-	/**
-	 * Gets the sent bytes.
-	 *
-	 * @return the sent bytes
-	 */
-	public long getSentBytes() {
-		return sentBytes;
-	}
-	
-	/**
-	 * Sets the sent bytes.
-	 *
-	 * @param sentBytes the new sent bytes
-	 */
-	public void setSentBytes(long sentBytes) {
-		this.sentBytes = sentBytes;
-	}
-	
-	/**
-	 * Gets the received bytes.
-	 *
-	 * @return the received bytes
-	 */
-	public long getReceivedBytes() {
-		return receivedBytes;
-	}
-	
-	/**
-	 * Sets the received bytes.
-	 *
-	 * @param receivedBytes the new received bytes
-	 */
-	public void setReceivedBytes(long receivedBytes) {
-		this.receivedBytes = receivedBytes;
-	}
-	
-	/**
-	 * Gets the interval loss.
-	 *
-	 * @return the interval loss
-	 */
-	public float getIntervalLoss() {
-		return intervalLoss;
-	}
-	
-	/**
-	 * Sets the interval loss.
-	 *
-	 * @param intervalLoss the new interval loss
-	 */
-	public void setIntervalLoss(float intervalLoss) {
-		this.intervalLoss = intervalLoss;
 	}
 	
 	/**
