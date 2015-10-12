@@ -5,60 +5,59 @@ package io.callstats.sdk;
  */
 public class BridgeStatusInfoBuilder {
 	
-	/** The cpu usage. */
-	private float cpuUsage;
-
-	/** The memory usage. */
-	private float memoryUsage;
-	
-	/** The total memory of the machine. */
-	private float totalMemory;
-	
-	/** The number of Java threads that the video bridge is using. */
-	private int threadCount;
-	
-	/** The sent bytes. */
-	private long sentBytes;
-	
-	/** The received bytes. */
-	private long receivedBytes;
-	
-	/** The interval loss. */
-	private float intervalLoss;
-	
-	/** The total loss. */
-	private float totalLoss;
-	
-	/** The avg interval rtt. */
-	private float avgIntervalRtt;
-	
-	/** The avg interval jitter. */
-	private float avgIntervalJitter;
-	
-	/** Download bit rate for the video bridge in kilobits per second.*/
-	private int downloadBitRate;
-	
-	/** Upload bit rate for the video bridge in kilobits per second.*/
-	private int uploadBitRate;
-	
-	/** The value is between 0 and 1 and represents the RTP packet loss for the video bridge. */
-	private float rtpLoss;
-	
-	/** Number of audio channels. */
-	private int audioChannelsCount;
-	
-	/** Number of video channels. */
-	private int videoChannelsCount;
-	
-	/** Number of video conferences. */
-	private int conferenceCount;
-	
-	/** Number of video participants. */
-	private int participantsCount;
-	
-	/** Interval from the last status submission*/
+	/** measurementInterval: Interval since the last status measurement, measured in milliseconds.*/
 	private int measurementInterval;
 	
+	/** cpuUsage: The cpu usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
+	private float cpuUsage;
+
+	/** memoryUage: The memory usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
+	private float memoryUsage;
+	
+	/** totalMemory: The total memory available to the endpoint. */
+	private float totalMemory;
+	
+	/** threadCount: The number of Java threads that the bridge is using. This is optional, The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
+	private int threadCount;
+	
+	/** sentBytes: The cumulative sent bytes. */
+	private long sentBytes;
+	
+	/** receivedBytes: The cumulative received bytes. */
+	private long receivedBytes;
+	
+	/** intervalRtpFractionLoss: The packet loss observed in the last measurement interval. It is the fraction of the RTP packets lost, and the RTP packets lost and received in the last measurement interval. The value is between 0.0 and 1.0. */
+	private float intervalRtpFractionLoss;
+	
+	/** totalLoss: The total cumulative packets lost. */
+	private float totalLoss;
+	
+	/** avgIntervalRtt: The avg RTT observed in the last measurement interval. */
+	private float avgIntervalRtt;
+	
+	/** avgIntervalJitter: The avg interval jitter in the last measurement interval. */
+	private float avgIntervalJitter;
+	
+	/** intervalDownloadBitRate: Download bit rate for the endpoints in kilobits per second measured over the last measurement interval.*/
+	private int intervalDownloadBitRate;
+	
+	/** intervalUploadBitRate: Upload bit rate for the video bridge in kilobits per second measured over the last measurement interval.*/
+	private int intervalUploadBitRate;
+	
+	/** The cumulative fraction loss, measured as the ratio of the cumulative RTP packets lost, and cumulative sum of packets lost and received. The value is between 0.0 and 1.0. */
+	// private float totalRtpFractionLoss;
+	
+	/** audioFabricCount: Current number of open/active 5 tuples that use audio. */
+	private int audioFabricCount;
+	
+	/** videoFabricCount: Current number of open/active 5-tuples that use video. */
+	private int videoFabricCount;
+	
+	/** conferenceCount: Current number of multimedia conferences. */
+	private int conferenceCount;
+	
+	/** participantsCount: Current number of multimedia participants cumulative over all ongoing conferences. */
+	private int participantsCount;
 	
 	public int getMeasurementInterval() {
 		return measurementInterval;
