@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * The Class CallStatsAuthenticator.
@@ -207,6 +208,7 @@ public class CallStatsAuthenticator {
 				isAuthenticationInProgress = false;
 				int responseStatus = response.getStatusLine().getStatusCode();
 				ChallengeResponse challengeResponseMessage;
+				
 				try {
 					String responseString = EntityUtils.toString(response.getEntity());
 					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponse.class);							
@@ -216,7 +218,11 @@ public class CallStatsAuthenticator {
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw new RuntimeException(e);					
+				} catch (JsonSyntaxException e) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
+				
 				logger.info("Response status "+responseStatus);
 				if (responseStatus == RESPONSE_STATUS_SUCCESS) {
 					if (challengeResponseMessage.getStatus().equals("OK")) {
@@ -375,7 +381,12 @@ public class CallStatsAuthenticator {
 					isAuthenticationInProgress = false;
 					e.printStackTrace();
 					throw new RuntimeException(e);
+				} catch (JsonSyntaxException e) {
+					isAuthenticationInProgress = false;
+					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
+				
 				if (responseStatus == RESPONSE_STATUS_SUCCESS) {
 					if (authorizeResponseMessage.getStatus().equals("OK")) {
 						challenge = authorizeResponseMessage.getChallenge();

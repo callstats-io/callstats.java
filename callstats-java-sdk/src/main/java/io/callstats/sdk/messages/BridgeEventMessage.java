@@ -83,7 +83,7 @@ public class BridgeEventMessage {
 		trafficStatusData.setSentBytes(bridgeStatusInfo.getSentBytes());
 		trafficStatusData.setTotalLoss(bridgeStatusInfo.getTotalLoss());
 		
-		
+		data.setMeasurementInterval(bridgeStatusInfo.getMeasurementInterval());
 		data.setHealthStatusData(healthStatusData);
 		data.setTrafficStatusData(trafficStatusData);
 		event.setEventData(data);
@@ -226,6 +226,16 @@ public class BridgeEventMessage {
 		/** The traffic status data. */
 		TrafficStatusData trafficStatusData;
 		
+		int measurementInterval;
+		
+		public int getMeasurementInterval() {
+			return measurementInterval;
+		}
+
+		public void setMeasurementInterval(int submissionInterval) {
+			this.measurementInterval = submissionInterval;
+		}
+
 		/**
 		 * Instantiates a new event data.
 		 */

@@ -56,7 +56,14 @@ public class BridgeStatusInfoBuilder {
 	/** Number of video participants. */
 	private int participantsCount;
 	
+	/** Interval from the last status submission*/
+	private int measurementInterval;
 	
+	
+	public int getMeasurementInterval() {
+		return measurementInterval;
+	}
+
 	public float getCpuUsage() {
 		return cpuUsage;
 	}
@@ -264,6 +271,11 @@ public class BridgeStatusInfoBuilder {
 	
 	public BridgeStatusInfoBuilder participantsCount(int participantsCount) {
 		this.participantsCount = participantsCount;
+		return this;
+	}
+	
+	public BridgeStatusInfoBuilder measurementInterval(int measurementInterval) {
+		this.measurementInterval = measurementInterval;
 		return this;
 	}
 	

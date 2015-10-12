@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -160,6 +161,10 @@ public class CallStats {
 					} catch (IOException e) {
 						logger.error("IO Execption "+e.getMessage(),e);
 						throw new RuntimeException(e);					
+					} catch (JsonSyntaxException e) {
+						logger.error("Json Syntax Exception "+e.getMessage(),e);
+						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 					if(responseStatus == 200) {
 						logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());

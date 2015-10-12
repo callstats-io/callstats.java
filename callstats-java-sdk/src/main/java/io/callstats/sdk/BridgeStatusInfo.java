@@ -56,6 +56,9 @@ public class BridgeStatusInfo {
 	/** Number of video participants. */
 	private int participantsCount;	
 	
+	/** Interval from the last status submission*/
+	private int measurementInterval;
+	
 	/**
 	 * Instantiates a new bridge status info.
 	 *
@@ -80,6 +83,16 @@ public class BridgeStatusInfo {
 		this.videoChannelsCount = builder.getVideoChannelsCount();
 		this.conferenceCount = builder.getConferenceCount();
 		this.participantsCount = builder.getParticipantsCount();
+		this.measurementInterval = builder.getMeasurementInterval();
+	}
+
+	
+	public int getMeasurementInterval() {
+		return measurementInterval;
+	}
+
+	public void setMeasurementInterval(int measurementInterval) {
+		this.measurementInterval = measurementInterval;
 	}
 
 	/**
