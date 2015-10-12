@@ -150,7 +150,7 @@ public class CallStatsTest{
 		String msg = "SDK authentication successful";
 		verify(listener).onInitialized(msg);
 		
-		for (int i=0;i<1000;i++) {
+		//for (int i=0;i<1000;i++) {
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
 												.avgIntervalJitter(2)
@@ -158,7 +158,7 @@ public class CallStatsTest{
 												.intervalRtpFractionLoss(2)
 												.build();						
 			callstatslib.sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
-		}
+		//}
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
