@@ -125,6 +125,7 @@ public class CallStats {
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
+				logger.info("SDK Initialization Failed "+errMsg);
 				listener.onError(error, errMsg);;				
 			}
 		});		
@@ -148,32 +149,33 @@ public class CallStats {
 			BridgeStatusUpdateMessage eventMessage = new BridgeStatusUpdateMessage(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, ""+epoch, authenticator.getToken(), bridgeStatusInfo, serverInfo);
 			String requestMessageString = gson.toJson(eventMessage);
 			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-				public void onResponse(HttpResponse response) {
-					
+				public void onResponse(HttpResponse response) {					
 					int responseStatus = response.getStatusLine().getStatusCode();
 					logger.debug("Response "+response.toString()+":"+responseStatus);
-					BridgeStatusUpdateResponse eventResponseMessage;
-					try {
-						String responseString = EntityUtils.toString(response.getEntity());
-						eventResponseMessage  = gson.fromJson(responseString,BridgeStatusUpdateResponse.class);	
-					} catch (ParseException e) {						
-						logger.error("ParseException "+e.getMessage(),e);
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						logger.error("IO Execption "+e.getMessage(),e);
-						throw new RuntimeException(e);					
-					} catch (JsonSyntaxException e) {
-						logger.error("Json Syntax Exception "+e.getMessage(),e);
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-					if(responseStatus == 200) {
+					if(responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+						BridgeStatusUpdateResponse eventResponseMessage;
+						try {
+							String responseString = EntityUtils.toString(response.getEntity());
+							eventResponseMessage  = gson.fromJson(responseString,BridgeStatusUpdateResponse.class);	
+						} catch (ParseException e) {						
+							logger.error("ParseException "+e.getMessage(),e);
+							throw new RuntimeException(e);
+						} catch (IOException e) {
+							logger.error("IO Execption "+e.getMessage(),e);
+							throw new RuntimeException(e);					
+						} catch (JsonSyntaxException e) {
+							logger.error("Json Syntax Exception "+e.getMessage(),e);
+							e.printStackTrace();
+							throw new RuntimeException(e);
+						}
 						logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
 						if (eventResponseMessage.getStatus().equals("Error") && eventResponseMessage.getReason().contains(CallStatsErrors.INVALID_TOKEN_ERROR.getReason())) {
 							//logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
 							bridgeKeepAliveManager.stopKeepAliveSender();
 							authenticator.doAuthentication();
 						}						
+					} else {
+						
 					}
 				}
 				

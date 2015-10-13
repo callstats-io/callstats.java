@@ -33,22 +33,7 @@ public class CallStatsAuthenticator {
 
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsAuthenticator");
-	
-	/** The Constant RESPONSE_STATUS_SUCCESS. */
-	private static final int RESPONSE_STATUS_SUCCESS = 200;
-	
-	/** The Constant SERVER_ERROR. */
-	private static final int SERVER_ERROR = 500;
-	
-	/** The Constant INVALID_PROTO_FORMAT_ERROR. */
-	private static final int INVALID_PROTO_FORMAT_ERROR = 400;
-	
-	/** The Constant INVALID_PARAM_ERROR. */
-	private static final int INVALID_PARAM_ERROR = 403;
-	
-	/** The Constant GATEWAY_ERROR. */
-	private static final int GATEWAY_ERROR = 502;
-	
+		
 	/** The Constant challengeUrl. */
 	private static final String challengeUrl = "/o/challenge";
 	
@@ -207,24 +192,22 @@ public class CallStatsAuthenticator {
 			public void onResponse(HttpResponse response) {
 				isAuthenticationInProgress = false;
 				int responseStatus = response.getStatusLine().getStatusCode();
-				ChallengeResponse challengeResponseMessage;
-				
-				try {
-					String responseString = EntityUtils.toString(response.getEntity());
-					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponse.class);							
-				} catch (ParseException e) {						
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);					
-				} catch (JsonSyntaxException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-				
 				logger.info("Response status "+responseStatus);
-				if (responseStatus == RESPONSE_STATUS_SUCCESS) {
+				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+					ChallengeResponse challengeResponseMessage;
+					try {
+						String responseString = EntityUtils.toString(response.getEntity());
+						challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponse.class);							
+					} catch (ParseException e) {						
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);					
+					} catch (JsonSyntaxException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
 					if (challengeResponseMessage.getStatus().equals("OK")) {
 						logger.info("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());
 						expires = challengeResponseMessage.getExpires();
@@ -239,10 +222,10 @@ public class CallStatsAuthenticator {
 							scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
 						}
 					}
-				} else if (responseStatus == GATEWAY_ERROR) {
+				} else if (responseStatus == CallStatsResponseStatus.GATEWAY_ERROR ) {
 					scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
 					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
-				} else if (responseStatus == INVALID_PROTO_FORMAT_ERROR) {
+				} else if (responseStatus == CallStatsResponseStatus.INVALID_PROTO_FORMAT_ERROR) {
 					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
 				} else {
 					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
@@ -367,29 +350,26 @@ public class CallStatsAuthenticator {
 		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
 				String challenge;
-				int responseStatus = response.getStatusLine().getStatusCode();
-				AuthorizeResponse authorizeResponseMessage;
-				try {
-					
-					String responseString = EntityUtils.toString(response.getEntity());
-					logger.info("Auth response "+responseString);
-					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);	
-					
-				} catch (ParseException e) {	
-					isAuthenticationInProgress = false;
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				} catch (IOException e) {
-					isAuthenticationInProgress = false;
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				} catch (JsonSyntaxException e) {
-					isAuthenticationInProgress = false;
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-				
-				if (responseStatus == RESPONSE_STATUS_SUCCESS) {
+				int responseStatus = response.getStatusLine().getStatusCode(); 										
+				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+					AuthorizeResponse authorizeResponseMessage;
+					try {
+						String responseString = EntityUtils.toString(response.getEntity());
+						logger.info("Auth response "+responseStatus);
+						authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);							
+					} catch (ParseException e) {	
+						isAuthenticationInProgress = false;
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						isAuthenticationInProgress = false;
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					} catch (JsonSyntaxException e) {
+						isAuthenticationInProgress = false;
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
 					if (authorizeResponseMessage.getStatus().equals("OK")) {
 						challenge = authorizeResponseMessage.getChallenge();
 						logger.info("Challenge "+challenge);		
@@ -400,11 +380,11 @@ public class CallStatsAuthenticator {
 						logger.info("Authentication Request Error");
 						listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
 					}
-				} else if (responseStatus == SERVER_ERROR || responseStatus == GATEWAY_ERROR) {
+				} else if (responseStatus == CallStatsResponseStatus.SERVER_ERROR || responseStatus == CallStatsResponseStatus.GATEWAY_ERROR) {
 					isAuthenticationInProgress = false;
 					scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
 					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
-				} else if (responseStatus == INVALID_PROTO_FORMAT_ERROR) {
+				} else if (responseStatus == CallStatsResponseStatus.INVALID_PROTO_FORMAT_ERROR) {
 					isAuthenticationInProgress = false;
 					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
 				} else {

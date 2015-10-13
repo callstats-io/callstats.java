@@ -136,25 +136,24 @@ public class CallStatsBridgeKeepAliveManager {
 		String requestMessageString = gson.toJson(message);
 		httpClient.sendAsyncHttpRequest(keepAliveEventUrl,CallStatsConst.httpPostMethod, requestMessageString,new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
-				
 				int responseStatus = response.getStatusLine().getStatusCode();
-				logger.info("Response "+response.toString()+":"+responseStatus);
-				BridgeKeepAliveResponse keepAliveResponse;
-				try {
-					String responseString = EntityUtils.toString(response.getEntity());
-					keepAliveResponse  = gson.fromJson(responseString,BridgeKeepAliveResponse.class);	
-				} catch (ParseException e) {						
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);					
-				} catch (JsonSyntaxException e) {
-					logger.error("Json Syntax Exception "+e.getMessage(),e);
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-				if(responseStatus == 200) {
+				logger.info("Response "+response.toString()+":"+responseStatus);			
+				if(responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+					BridgeKeepAliveResponse keepAliveResponse;
+					try {
+						String responseString = EntityUtils.toString(response.getEntity());
+						keepAliveResponse  = gson.fromJson(responseString,BridgeKeepAliveResponse.class);	
+					} catch (ParseException e) {						
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);					
+					} catch (JsonSyntaxException e) {
+						logger.error("Json Syntax Exception "+e.getMessage(),e);
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
 					logger.info("Response status is "+keepAliveResponse.getStatus()+":"+keepAliveResponse.getReason());
 					if (keepAliveResponse.getStatus().equals("Error") && keepAliveResponse.getReason().contains("Invalid client token")) {
 						stopKeepAliveSender();
