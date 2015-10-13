@@ -11,7 +11,7 @@ public class BridgeStatusInfo {
 	/** cpuUsage: The cpu usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
 	private float cpuUsage;
 
-	/** memoryUage: The memory usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
+	/** memoryUsage: The memory usage for the endpoint. The value is defined in https://github.com/jitsi/jitsi-videobridge/blob/master/doc/using_statistics.md */
 	private float memoryUsage;
 	
 	/** totalMemory: The total memory available to the endpoint. */
