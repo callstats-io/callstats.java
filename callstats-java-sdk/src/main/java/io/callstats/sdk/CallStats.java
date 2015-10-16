@@ -120,7 +120,7 @@ public class CallStats {
 						}
 					});
 				}
-				bridgeKeepAliveManager.startKeepAliveSender();
+				bridgeKeepAliveManager.startKeepAliveSender(authenticator.getToken());
 				listener.onInitialized(msg);
 			}
 			
