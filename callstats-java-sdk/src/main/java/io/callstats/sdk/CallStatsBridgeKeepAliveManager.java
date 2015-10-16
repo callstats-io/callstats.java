@@ -111,8 +111,9 @@ public class CallStatsBridgeKeepAliveManager {
 	/**
 	 * Start keep alive sender.
 	 */
-	public void startKeepAliveSender() {
+	public void startKeepAliveSender(String authToken) {
 		logger.info("Starting keepAlive Sender");
+		this.token  = authToken;
 		future = scheduler.scheduleAtFixedRate(new Runnable() {			
 			public void run() {
 				sendKeepAliveBridgeMessage(appId,bridgeId,token,httpClient);
@@ -129,7 +130,7 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param token the token
 	 * @param httpClient the http client
 	 */
-	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, CallStatsHttpClient httpClient) {
+	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient) {
 		long epoch = System.currentTimeMillis()/1000;	
 		String apiTS = ""+epoch;
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
@@ -159,11 +160,16 @@ public class CallStatsBridgeKeepAliveManager {
 						stopKeepAliveSender();
 						keepAliveStatusListener.onKeepAliveError(CallStatsErrors.AUTH_ERROR,keepAliveResponse.getReason() );
 					}	
+					httpClient.setDisrupted(false);
+					keepAliveStatusListener.onSuccess();
+				} else {
+					httpClient.setDisrupted(true);
 				}
 			}
 			
 			public void onFailure(Exception e) {
 				logger.info("Response exception"+e.toString());
+				httpClient.setDisrupted(true);
 			}
 			
 		});	

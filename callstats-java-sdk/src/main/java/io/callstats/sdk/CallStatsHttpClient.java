@@ -55,6 +55,16 @@ public class CallStatsHttpClient {
 	/** The so time out. */
 	private int soTimeOut;
 	
+	private boolean isDisrupted;
+	
+	public boolean isDisrupted() {
+		return isDisrupted;
+	}
+
+	public void setDisrupted(boolean isDisrupted) {
+		this.isDisrupted = isDisrupted;
+	}
+
 	/**
 	 * Gets the httpclient.
 	 *
@@ -279,6 +289,7 @@ public class CallStatsHttpClient {
 				
 				public void failed(Exception e) {					
 					logger.info("failed "+e.toString());
+					isDisrupted = true;
 					listener.onFailure(e);
 				}
 				
@@ -290,6 +301,7 @@ public class CallStatsHttpClient {
 				public void cancelled() {
 					Exception e = new Exception("http request execute cancelled");
 					logger.info("cancelled ");	
+					isDisrupted = true;
 					listener.onFailure(e);
 				}
 			});

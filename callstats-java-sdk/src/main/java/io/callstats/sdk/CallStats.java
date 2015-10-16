@@ -51,6 +51,8 @@ public class CallStats {
 	
 	/** The is initialized. */
 	private boolean isInitialized;
+	
+	private BridgeStatusInfoQueue bridgeStatusInfoQueue;
 			
 	
 	/** The bridge keep alive manager. */
@@ -79,6 +81,7 @@ public class CallStats {
 	 */
 	public CallStats() {
 		gson = new Gson();
+		bridgeStatusInfoQueue = new BridgeStatusInfoQueue();
 	}
 	
 	/**
@@ -118,9 +121,13 @@ public class CallStats {
 								authenticator.doAuthentication();
 							}							
 						}
+
+						public void onSuccess() {
+							sendCallStatsBridgeStatusUpdateFromQueue();
+						}
 					});
 				}
-				bridgeKeepAliveManager.startKeepAliveSender();
+				bridgeKeepAliveManager.startKeepAliveSender(authenticator.getToken());
 				listener.onInitialized(msg);
 			}
 			
@@ -173,20 +180,32 @@ public class CallStats {
 							//logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
 							bridgeKeepAliveManager.stopKeepAliveSender();
 							authenticator.doAuthentication();
-						}						
+						}
+						httpClient.setDisrupted(false);
+						sendCallStatsBridgeStatusUpdateFromQueue();
 					} else {
-						
+						httpClient.setDisrupted(true);
 					}
 				}
 				
 				public void onFailure(Exception e) {
 					logger.error("Response exception"+e.getMessage(),e);
+					httpClient.setDisrupted(true);
 				}
 				
 			});	
 		} else {
 			// TODO retransmission queue
-			throw new UnsupportedOperationException("queueing not implemented yet");
+			//throw new UnsupportedOperationException("queueing not implemented yet");
+			bridgeStatusInfoQueue.push(bridgeStatusInfo);
+		}
+	}
+	
+	
+	public void sendCallStatsBridgeStatusUpdateFromQueue() {
+		if (bridgeStatusInfoQueue.getLength() > 0) {
+			BridgeStatusInfo bridgeStatusInfo = bridgeStatusInfoQueue.pop();
+			sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
 		}
 	}
 	
