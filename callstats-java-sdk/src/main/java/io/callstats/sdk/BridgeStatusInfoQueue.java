@@ -3,8 +3,6 @@ package io.callstats.sdk;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class BridgeStatusInfoQueue {
 	
 	private List<BridgeStatusInfo> bridgeStatusInfoList;

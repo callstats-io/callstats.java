@@ -202,8 +202,11 @@ public class CallStats {
 	}
 	
 	
-	public void sendCallStatsBridgeStatusUpdateFromQueue() {
-		if (bridgeStatusInfoQueue.getLength() > 0) {
+	public synchronized void sendCallStatsBridgeStatusUpdateFromQueue() {
+		if (bridgeStatusInfoQueue.getLength() < 1)
+			return;
+		
+		while (bridgeStatusInfoQueue.getLength() > 0) {
 			BridgeStatusInfo bridgeStatusInfo = bridgeStatusInfoQueue.pop();
 			sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
 		}
