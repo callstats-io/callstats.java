@@ -39,7 +39,6 @@ public class CallStatsAsyncHttpClient {
 		Properties prop = new Properties();
 		InputStream input = null;
 	     
-    
 		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 		if (input !=null){
 			try {
@@ -84,14 +83,12 @@ public class CallStatsAsyncHttpClient {
 	    httpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
 
 			public Response onCompleted(Response response) throws Exception {
-				// TODO Auto-generated method stub
-				logger.info("Response is "+response.getResponseBody());
+				logger.info("Response is " + response.getResponseBody());
 				listener.onResponse(response);
 				return null;
 			}
 			
 			public void onThrowable(Throwable e) {
-				// TODO Auto-generated method stub
 				listener.onFailure((Exception)e);
 			}
 		});

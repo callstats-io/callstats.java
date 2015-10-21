@@ -9,5 +9,8 @@ public interface CallStatsBridgeKeepAliveStatusListener {
 	 * @param errMsg the err msg
 	 */
 	void onKeepAliveError(CallStatsErrors error, String errMsg);
+	
+	
+	void onSuccess();
 
 }

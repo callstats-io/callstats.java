@@ -1,11 +1,13 @@
 package io.callstats.sdk;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+
+import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -25,10 +27,12 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	int appId = 1234567;
+	public static int appId = 1234567;
 	
 	/** The app secret. */
-	String appSecret = "appsecret";
+	public static String appSecret = "app secret=";
+	
+	public static String bridgeId = "jit.si.345";
 	
 	/**
 	 * Sets the up.
@@ -40,8 +44,8 @@ public class CallStatsTest{
 		serverInfo.setOs("LINUX");
 		serverInfo.setVer("4.4");		
 		System.out.println("Setup completed");
-		callstatslib = new CallStats();
-		listener = mock(CallStatsInitListener.class);
+		callstatslib = PowerMockito.spy(new CallStats());
+		listener = Mockito.mock(CallStatsInitListener.class);
 	}
 	
 	/**
@@ -50,8 +54,7 @@ public class CallStatsTest{
 	@Test
 	public void initializeTest() {
 
-		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
-
+		callstatslib.initialize(appId, appSecret, "jit.si.345",serverInfo,listener);
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
@@ -59,7 +62,7 @@ public class CallStatsTest{
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
-		verify(listener).onInitialized(msg);
+		Mockito.verify(listener).onInitialized(msg);
 	}
 	
 	/**
@@ -78,7 +81,7 @@ public class CallStatsTest{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		verify(listener).onError(error, errMsg);
+		Mockito.verify(listener).onError(error, errMsg);
 	}
 	
 	/**
@@ -139,8 +142,8 @@ public class CallStatsTest{
 	 */
 	@Test
 	public void initializeTestWithSendCallStatsEvent() {
-		callstatslib.initialize(appId, appSecret, "jit.si.345",serverInfo,listener);
-
+		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+		Random randomGenerator = new Random();
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -148,23 +151,35 @@ public class CallStatsTest{
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
-		verify(listener).onInitialized(msg);
+		Mockito.verify(listener).onInitialized(msg);
 		
-		//for (int i=0;i<1000;i++) {
+		//for (int i = 0; i < 50; i++) {
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
-			BridgeStatusInfo bridgeStatusInfo= bridgeStatusInfoBuilder
-												.avgIntervalJitter(2)
-												.cpuUsage(33)
-												.intervalRtpFractionLoss(2)
-												.build();						
+			BridgeStatusInfo bridgeStatusInfo = bridgeStatusInfoBuilder				
+					.cpuUsage(randomGenerator.nextInt(100))
+					.threadCount(randomGenerator.nextInt(1000))
+					.memoryUsage(randomGenerator.nextInt(5000))
+					.intervalRtpFractionLoss(randomGenerator.nextFloat())
+					.avgIntervalJitter(randomGenerator.nextFloat())
+					.avgIntervalRtt(randomGenerator.nextFloat())
+					.conferenceCount(randomGenerator.nextInt(100))
+					.participantsCount(randomGenerator.nextInt(5000))
+					.videoFabricCount(randomGenerator.nextInt(1000))
+					.audioFabricCount(randomGenerator.nextInt(1000))
+					.intervalDownloadBitRate(randomGenerator.nextInt(100))
+					.intervalUploadBitRate(randomGenerator.nextInt(100))
+					.totalLoss(randomGenerator.nextInt(100))
+					.intervalSentBytes(randomGenerator.nextInt(10000))
+					.intervalReceivedBytes(randomGenerator.nextInt(10000))
+					.build();
 			callstatslib.sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
 		//}
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(15000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
+
 }

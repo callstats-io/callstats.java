@@ -55,6 +55,16 @@ public class CallStatsHttpClient {
 	/** The so time out. */
 	private int soTimeOut;
 	
+	private boolean isDisrupted;
+	
+	public boolean isDisrupted() {
+		return isDisrupted;
+	}
+
+	public void setDisrupted(boolean isDisrupted) {
+		this.isDisrupted = isDisrupted;
+	}
+
 	/**
 	 * Gets the httpclient.
 	 *
@@ -87,13 +97,12 @@ public class CallStatsHttpClient {
 	 * Instantiates a new call stats http client.
 	 */
 	public CallStatsHttpClient() {
-		super();  
+		super();
 		Properties prop = new Properties();
 		InputStream input = null;
-	     
-    
+
 		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-		if (input != null){
+		if (input != null) {
 			try {
 				prop.load(input);
 				BASE_URL = prop.getProperty("CallStats.BaseURL");
@@ -105,17 +114,13 @@ public class CallStatsHttpClient {
 			}
 		}
 
-		
-		logger.info("Base URL is "+BASE_URL);
-        // Create I/O reactor configuration
-        IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-                .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-                .setConnectTimeout(connectionTimeOut)
-                .setSoTimeout(soTimeOut)
-                .build();
+		logger.info("Base URL is " + BASE_URL);
+		// Create I/O reactor configuration
+		IOReactorConfig ioReactorConfig = IOReactorConfig.custom().setIoThreadCount(Runtime.getRuntime().availableProcessors())
+				.setConnectTimeout(connectionTimeOut).setSoTimeout(soTimeOut).build();
 
-        // Create a custom I/O reactort
-        ConnectingIOReactor ioReactor;
+		// Create a custom I/O reactort
+		ConnectingIOReactor ioReactor;
 		try {
 			ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
 		} catch (IOReactorException e) {
@@ -123,18 +128,13 @@ public class CallStatsHttpClient {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-        
-        
+
 		PoolingHttpClientConnectionManager mgr = new PoolingHttpClientConnectionManager();
 		mgr.setDefaultMaxPerRoute(10);
-		httpclient = HttpClients.custom()
-	            .setConnectionManager(mgr)
-	            .build();
-		
+		httpclient = HttpClients.custom().setConnectionManager(mgr).build();
+
 		PoolingNHttpClientConnectionManager asyncMgr = new PoolingNHttpClientConnectionManager(ioReactor);
-		httpAsyncClient = HttpAsyncClients.custom()
-				.setConnectionManager(asyncMgr)
-	            .build();
+		httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(asyncMgr).build();
 	}
 	
 	/**
@@ -168,7 +168,7 @@ public class CallStatsHttpClient {
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new IllegalStateException("Invalid URL:"+url, e);
+			throw new IllegalStateException("Invalid URL:" + url, e);
 		}
 		return uri;
 	}
@@ -188,7 +188,7 @@ public class CallStatsHttpClient {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		entity.setContentType("application/json");		
+		entity.setContentType("application/json");
 		return entity;
 	}
 		
@@ -202,11 +202,11 @@ public class CallStatsHttpClient {
 	 * @throws IOException 
 	 */
 	public HttpResponse sendHttpRequest(String url, String httpMethodType, String body) throws IOException {
-		
-		if(StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body)) {
+
+		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body)) {
 			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
-	
+
 		HttpUriRequest request = null;
 		String apiUrl = url.toLowerCase();
 		StringBuilder sb = new StringBuilder();
@@ -217,19 +217,19 @@ public class CallStatsHttpClient {
 			sb.append("/");
 		}
 		sb.append(url);
-		
+
 		url = sb.toString();
 		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
-			request = generateHttpPostRequest(url,body);
+			request = generateHttpPostRequest(url, body);
 		}
-		
-		if(request != null) {
+
+		if (request != null) {
 			request.addHeader(new BasicHeader("Accept", "application/json"));
 			request.addHeader(new BasicHeader("Accept-Charset", "utf-8"));
 			HttpResponse response;
 			try {
 				response = httpclient.execute(request);
-				logger.info("Response is "+response);
+				logger.info("Response is " + response);
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 				throw new ClientProtocolException(e);
@@ -237,7 +237,7 @@ public class CallStatsHttpClient {
 				e.printStackTrace();
 				throw new IOException(e);
 			}
-		}		
+		}
 		return null;
 	}
 	
@@ -251,10 +251,10 @@ public class CallStatsHttpClient {
 	 * @param listener the listener
 	 */
 	public void sendAsyncHttpRequest(String url, String httpMethodType, String body, final CallStatsHttpResponseListener listener) {
-		if(StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body) || listener == null) {
+		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body) || listener == null) {
 			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
-		
+
 		HttpUriRequest request = null;
 		String apiUrl = url.toLowerCase();
 		StringBuilder sb = new StringBuilder();
@@ -265,31 +265,33 @@ public class CallStatsHttpClient {
 			sb.append("/");
 		}
 		sb.append(url);
-		
+
 		url = sb.toString();
 		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
 			request = generateHttpPostRequest(url, body);
 		}
-		
+
 		if (request != null) {
 			request.addHeader(new BasicHeader("Accept", "application/json"));
 			request.addHeader(new BasicHeader("Accept-Charset", "utf-8"));
 			((CloseableHttpAsyncClient) httpAsyncClient).start();
 			httpAsyncClient.execute(request, new FutureCallback<HttpResponse>() {
-				
-				public void failed(Exception e) {					
-					logger.info("failed "+e.toString());
+
+				public void failed(Exception e) {
+					logger.info("failed " + e.toString());
+					isDisrupted = true;
 					listener.onFailure(e);
 				}
-				
+
 				public void completed(HttpResponse response) {
 					logger.info("HTTP Req Completed, received response ");
 					listener.onResponse(response);
 				}
-				
+
 				public void cancelled() {
 					Exception e = new Exception("http request execute cancelled");
-					logger.info("cancelled ");	
+					logger.info("cancelled ");
+					isDisrupted = true;
 					listener.onFailure(e);
 				}
 			});
