@@ -112,7 +112,8 @@ public class CallStatsBridgeKeepAliveManager {
 	public void startKeepAliveSender(String authToken) {
 		logger.info("Starting keepAlive Sender");
 		this.token = authToken;
-		future = scheduler.scheduleAtFixedRate(new Runnable() {
+		future = scheduler.scheduleAtFixedRate(new Runnable() {			
+
 			public void run() {
 				sendKeepAliveBridgeMessage(appId, bridgeId, token, httpClient);
 			}
