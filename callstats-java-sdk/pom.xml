@@ -5,7 +5,9 @@
   <packaging>jar</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <name>callstats-java-sdk</name>
-  
+  <properties>
+    <powermock.version>1.6.3</powermock.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -32,13 +34,7 @@
       <artifactId>junit</artifactId>
       <version>4.8.1</version>
       <scope>test</scope>
-    </dependency>    
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.8.4</version>
-      <scope>test</scope>
-    </dependency>   
+    </dependency>       
     <dependency>
 	  <groupId>com.google.code.gson</groupId>
 	  <artifactId>gson</artifactId>
@@ -69,6 +65,18 @@
       <artifactId>slf4j-simple</artifactId>
       <version>1.6.1</version>
 	</dependency>
+	<dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+   </dependency>
+   <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+   </dependency>  
   </dependencies>
 
    <build>

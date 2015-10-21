@@ -138,7 +138,7 @@ public class BridgeStatusInfo {
 	 */
 	public void setCpuUsage(float cpuUsage) {
 		this.cpuUsage = cpuUsage;
-	}		
+	}
 	
 	/**
 	 * Gets the sent bytes.

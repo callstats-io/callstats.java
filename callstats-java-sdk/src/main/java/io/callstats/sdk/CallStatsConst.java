@@ -19,4 +19,10 @@ public class CallStatsConst {
 	
 	/** The Constant httpPostMethod. */
 	public static final String httpPostMethod = "POST";
+	
+	public static final String ERROR = "Error";
+	
+	public static final String SUCCESS = "OK";
+	
+	public static final String INVALID_TOKEN = "Invalid client token";
 }
