@@ -1,4 +1,4 @@
-package io.callstats.sdk;
+package io.callstats.sdk.internal;
 
 /**
  * The Class CallStatsConst.
@@ -16,6 +16,8 @@ public class CallStatsConst {
 	
 	/** The Constant bridgeEventUrl. */
 	public static final String bridgeEventUrl = "/o/callStatsBridgeEvent";
+
+	public static final String conferenceEventUrl = "/o/bridgeConfereceEvents";
 	
 	/** The Constant httpPostMethod. */
 	public static final String httpPostMethod = "POST";

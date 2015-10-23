@@ -2,8 +2,25 @@ package io.callstats.sdk;
 
 import java.io.IOException;
 
+import io.callstats.sdk.data.BridgeStatusInfo;
+import io.callstats.sdk.data.ConferenceInfo;
+import io.callstats.sdk.data.ServerInfo;
+import io.callstats.sdk.data.UserInfo;
+import io.callstats.sdk.httpclient.CallStatsHttpClient;
+import io.callstats.sdk.internal.BridgeStatusInfoQueue;
+import io.callstats.sdk.internal.CallStatsAuthenticator;
+import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
+import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
+import io.callstats.sdk.internal.CallStatsConst;
+import io.callstats.sdk.internal.CallStatsResponseStatus;
+import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
+import io.callstats.sdk.listeners.CallStatsInitListener;
+import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
 import io.callstats.sdk.messages.BridgeStatusUpdateMessage;
 import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
+import io.callstats.sdk.messages.CallStatsEventMessage;
+import io.callstats.sdk.messages.CallStatsEventResponseMessage;
+import io.callstats.sdk.messages.EventInfo;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -179,7 +196,7 @@ public class CallStats {
 							logger.error("ParseException " + e.getMessage(), e);
 							throw new RuntimeException(e);
 						} catch (IOException e) {
-							logger.error("IO Execption " + e.getMessage(), e);
+							logger.error("IO Exception " + e.getMessage(), e);
 							throw new RuntimeException(e);
 						} catch (JsonSyntaxException e) {
 							logger.error("Json Syntax Exception " + e.getMessage(), e);
@@ -224,6 +241,117 @@ public class CallStats {
 			BridgeStatusInfo bridgeStatusInfo = bridgeStatusInfoQueue.pop();
 			sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
 		}
+	}
+
+	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, ConferenceInfo conferenceInfo,
+			final CallStatsStartConferenceListener listener) {
+		long epoch = System.currentTimeMillis() / 1000;
+		String apiTS = "" + epoch;
+		String token = getToken();
+		EventInfo event = new EventInfo(eventType.getMessageType(), "{}");
+		if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP) {
+
+			CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
+					conferenceInfo.getConfID(), apiTS, token, bridgeId, conferenceInfo.getInitiatorID(), event);
+			sendCallStatsConferenceEventMessage(eventMessage, listener);
+		}
+	}
+
+	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, UserInfo userInfo) {
+		long epoch = System.currentTimeMillis() / 1000;
+		String apiTS = "" + epoch;
+		String token = getToken();
+		EventInfo event = new EventInfo(eventType.getMessageType(), "{}");
+
+		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
+				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
+
+		sendCallStatsConferenceEventMessage(eventMessage, null);
+	}
+
+	private synchronized void sendCallStatsConferenceEventMessage(CallStatsEventMessage eventMessage,final CallStatsStartConferenceListener listener ) {
+		String requestMessageString = gson.toJson(eventMessage);
+		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
+			public void onResponse(HttpResponse response) {
+				int responseStatus = response.getStatusLine().getStatusCode();
+				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+					CallStatsEventResponseMessage eventResponseMessage;
+					try {
+						String responseString = EntityUtils.toString(response.getEntity());
+						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
+					} catch (ParseException e) {
+						logger.error("ParseException " + e.getMessage(), e);
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						logger.error("IO Exception " + e.getMessage(), e);
+						throw new RuntimeException(e);
+					} catch (JsonSyntaxException e) {
+						logger.error("Json Syntax Exception " + e.getMessage(), e);
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
+					logger.debug("conference event Response status is " + eventResponseMessage.getStatus() + ":"
+							+ eventResponseMessage.getConferenceID() + ":" + eventResponseMessage.getUcID());
+					if(listener != null) {
+						listener.onResponse(eventResponseMessage.getUcID());
+					}					
+					httpClient.setDisrupted(false);
+				} else {
+					httpClient.setDisrupted(true);
+				}
+			}
+
+			public void onFailure(Exception e) {
+				logger.error("Response exception" + e.getMessage(), e);
+				httpClient.setDisrupted(true);
+			}
+
+		});
+	}
+	
+	
+	public synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
+		long epoch = System.currentTimeMillis() / 1000;
+		String apiTS = "" + epoch;
+		String token = getToken();
+		EventInfo event = new EventInfo(CallStatsConferenceEvents.CONFERENCE_STATS.getMessageType(), stats);
+		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
+				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
+		String requestMessageString = gson.toJson(eventMessage);
+		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
+			public void onResponse(HttpResponse response) {
+				int responseStatus = response.getStatusLine().getStatusCode();
+				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+					CallStatsEventResponseMessage eventResponseMessage;
+					try {
+						String responseString = EntityUtils.toString(response.getEntity());
+						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
+					} catch (ParseException e) {
+						logger.error("ParseException " + e.getMessage(), e);
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						logger.error("IO Execption " + e.getMessage(), e);
+						throw new RuntimeException(e);
+					} catch (JsonSyntaxException e) {
+						logger.error("Json Syntax Exception " + e.getMessage(), e);
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
+					logger.debug("conference event Response status is " + eventResponseMessage.getStatus() + ":"
+							+ eventResponseMessage.getConferenceID() + ":" + eventResponseMessage.getUcID());
+					httpClient.setDisrupted(false);
+				} else {
+					httpClient.setDisrupted(true);
+				}
+			}
+	
+			public void onFailure(Exception e) {
+				logger.error("Response exception" + e.getMessage(), e);
+				httpClient.setDisrupted(true);
+			}
+	
+		});
+
 	}
 	
 }

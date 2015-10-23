@@ -1,10 +1,12 @@
 package io.callstats.sdk;
 
-import org.apache.http.client.HttpClient;
+import io.callstats.sdk.httpclient.CallStatsHttpClient;
+import io.callstats.sdk.internal.CallStatsAuthenticator;
+import io.callstats.sdk.listeners.CallStatsInitListener;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 
 public class CallStatsAuthenticatorTest {
 	

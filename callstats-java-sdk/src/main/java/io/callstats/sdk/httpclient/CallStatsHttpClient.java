@@ -1,4 +1,7 @@
-package io.callstats.sdk;
+package io.callstats.sdk.httpclient;
+
+import io.callstats.sdk.internal.CallStatsConst;
+import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 
 import java.io.IOException;
 import java.io.InputStream;

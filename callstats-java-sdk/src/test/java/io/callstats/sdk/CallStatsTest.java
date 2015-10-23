@@ -1,6 +1,14 @@
 package io.callstats.sdk;
 
 import static org.junit.Assert.assertTrue;
+import io.callstats.sdk.data.BridgeStatusInfo;
+import io.callstats.sdk.data.BridgeStatusInfoBuilder;
+import io.callstats.sdk.data.ConferenceInfo;
+import io.callstats.sdk.data.ServerInfo;
+import io.callstats.sdk.data.UserInfo;
+import io.callstats.sdk.listeners.CallStatsInitListener;
+import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
+import io.callstats.sdk.messages.CallStatsEventMessage;
 
 import java.util.Random;
 
@@ -27,10 +35,10 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	public static int appId = 1234567;
+	public static int appId = 123456;
 	
 	/** The app secret. */
-	public static String appSecret = "app secret=";
+	public static String appSecret = "appsecret=";
 	
 	public static String bridgeId = "jit.si.345";
 	
@@ -153,7 +161,7 @@ public class CallStatsTest{
 		String msg = "SDK authentication successful";
 		Mockito.verify(listener).onInitialized(msg);
 		
-		//for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 2; i++) {
 			BridgeStatusInfoBuilder bridgeStatusInfoBuilder = new BridgeStatusInfoBuilder();
 			BridgeStatusInfo bridgeStatusInfo = bridgeStatusInfoBuilder				
 					.cpuUsage(randomGenerator.nextInt(100))
@@ -173,13 +181,61 @@ public class CallStatsTest{
 					.intervalReceivedBytes(randomGenerator.nextInt(10000))
 					.build();
 			callstatslib.sendCallStatsBridgeStatusUpdate(bridgeStatusInfo);
-		//}
+		}
 		try {
 			Thread.sleep(15000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	
+	@Test
+	public void initializeTestWithSendCallStatsConferenceStartEvent() {
+		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String msg = "SDK authentication successful";
+		Mockito.verify(listener).onInitialized(msg);
+		
+		ConferenceInfo conferenceInfo = new ConferenceInfo("jackk", "2345");
+		
+		callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_SETUP, conferenceInfo, new CallStatsStartConferenceListener() {
+			
+			public void onResponse(String  ucid) {
+				// TODO Auto-generated method stub
+				System.out.println("UCID is "+ucid);
+				UserInfo userInfo = new UserInfo();
+				userInfo.setUcID(ucid);
+				userInfo.setUserID("2345");
+				userInfo.setConfID("jackk");
+				callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
+				
+				String stats = "{\"stats\": {\"streams\": {\"209773412\": {\"2345\": \"user-aaaa\",\"inbound\":   {\"k\":30,\"j\":40}}}}}";
+				callstatslib.sendCallStatsConferenceStats(stats,userInfo);
+			}
+			
+			public void onError(CallStatsErrors error, String errMsg) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
+		
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }

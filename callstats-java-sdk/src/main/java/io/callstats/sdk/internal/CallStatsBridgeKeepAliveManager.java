@@ -1,5 +1,8 @@
-package io.callstats.sdk;
+package io.callstats.sdk.internal;
 
+import io.callstats.sdk.CallStatsErrors;
+import io.callstats.sdk.httpclient.CallStatsHttpClient;
+import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 import io.callstats.sdk.messages.BridgeKeepAliveMessage;
 import io.callstats.sdk.messages.BridgeKeepAliveResponse;
 
@@ -137,7 +140,7 @@ public class CallStatsBridgeKeepAliveManager {
 		httpClient.sendAsyncHttpRequest(keepAliveEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
 				int responseStatus = response.getStatusLine().getStatusCode();
-				logger.info("Response " + response.toString() + ":" + responseStatus);
+				logger.debug("Response " + response.toString() + ":" + responseStatus);
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
 					BridgeKeepAliveResponse keepAliveResponse;
 					try {
@@ -154,7 +157,7 @@ public class CallStatsBridgeKeepAliveManager {
 						e.printStackTrace();
 						throw new RuntimeException(e);
 					}
-					logger.info("Response status is " + keepAliveResponse.getStatus() + ":" + keepAliveResponse.getReason());
+					//logger.info("Response status is " + keepAliveResponse.getStatus() + ":" + keepAliveResponse.getReason());
 					if (keepAliveResponse.getStatus().equals(CallStatsConst.ERROR) && keepAliveResponse.getReason().contains(CallStatsConst.INVALID_TOKEN)) {
 						stopKeepAliveSender();
 						keepAliveStatusListener.onKeepAliveError(CallStatsErrors.AUTH_ERROR, keepAliveResponse.getReason());
