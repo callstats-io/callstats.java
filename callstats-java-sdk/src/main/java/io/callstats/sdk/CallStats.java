@@ -245,6 +245,11 @@ public class CallStats {
 
 	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, ConferenceInfo conferenceInfo,
 			final CallStatsStartConferenceListener listener) {
+		if (eventType == null || conferenceInfo == null || listener == null) {
+			logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
+			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
+		}
+
 		long epoch = System.currentTimeMillis() / 1000;
 		String apiTS = "" + epoch;
 		String token = getToken();
@@ -254,10 +259,17 @@ public class CallStats {
 			CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
 					conferenceInfo.getConfID(), apiTS, token, bridgeId, conferenceInfo.getInitiatorID(), event);
 			sendCallStatsConferenceEventMessage(eventMessage, listener);
+		} else {
+			listener.onError(CallStatsErrors.CS_PROTO_ERROR, "Invaid Message type");
 		}
 	}
 
 	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, UserInfo userInfo) {
+		if (eventType == null || userInfo == null) {
+			logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
+			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
+		}		
+		
 		long epoch = System.currentTimeMillis() / 1000;
 		String apiTS = "" + epoch;
 		String token = getToken();
@@ -311,6 +323,11 @@ public class CallStats {
 	
 	
 	public synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
+		if (stats == null || userInfo == null) {
+			logger.error("sendCallStatsConferenceStats: Arguments cannot be null ");
+			throw new IllegalArgumentException("sendCallStatsConferenceStats: Arguments cannot be null");
+		}
+		
 		long epoch = System.currentTimeMillis() / 1000;
 		String apiTS = "" + epoch;
 		String token = getToken();
