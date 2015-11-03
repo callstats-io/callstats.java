@@ -1,4 +1,4 @@
-package io.callstats.sdk;
+package io.callstats.sdk.internal.listeners;
 
 import org.apache.http.HttpResponse;
 

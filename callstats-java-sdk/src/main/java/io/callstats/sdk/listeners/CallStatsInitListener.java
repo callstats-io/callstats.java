@@ -1,4 +1,6 @@
-package io.callstats.sdk;
+package io.callstats.sdk.listeners;
+
+import io.callstats.sdk.CallStatsErrors;
 
 /**
  * The listener interface for receiving callStatsInitialization events.

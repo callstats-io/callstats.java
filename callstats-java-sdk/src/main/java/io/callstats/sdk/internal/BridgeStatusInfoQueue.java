@@ -1,4 +1,6 @@
-package io.callstats.sdk;
+package io.callstats.sdk.internal;
+
+import io.callstats.sdk.data.BridgeStatusInfo;
 
 import java.util.ArrayList;
 import java.util.List;

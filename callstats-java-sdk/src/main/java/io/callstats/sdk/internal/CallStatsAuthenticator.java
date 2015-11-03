@@ -1,5 +1,9 @@
-package io.callstats.sdk;
+package io.callstats.sdk.internal;
 
+import io.callstats.sdk.CallStatsErrors;
+import io.callstats.sdk.httpclient.CallStatsHttpClient;
+import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
+import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.messages.AuthorizeRequest;
 import io.callstats.sdk.messages.AuthorizeResponse;
 import io.callstats.sdk.messages.ChallengeRequest;
@@ -29,7 +33,7 @@ import com.google.gson.JsonSyntaxException;
 /**
  * The Class CallStatsAuthenticator.
  */
-class CallStatsAuthenticator {
+public class CallStatsAuthenticator {
 
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsAuthenticator");

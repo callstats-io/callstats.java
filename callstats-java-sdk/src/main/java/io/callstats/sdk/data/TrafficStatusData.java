@@ -1,4 +1,4 @@
-package io.callstats.sdk;
+package io.callstats.sdk.data;
 
 
 // TODO: Auto-generated Javadoc

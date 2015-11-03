@@ -1,9 +1,9 @@
 package io.callstats.sdk.messages;
 
-import io.callstats.sdk.BridgeStatusInfo;
-import io.callstats.sdk.ServerInfo;
-import io.callstats.sdk.HealthStatusData;
-import io.callstats.sdk.TrafficStatusData;
+import io.callstats.sdk.data.BridgeStatusInfo;
+import io.callstats.sdk.data.HealthStatusData;
+import io.callstats.sdk.data.ServerInfo;
+import io.callstats.sdk.data.TrafficStatusData;
 
 /**
  * The Class BridgeEventMessage.

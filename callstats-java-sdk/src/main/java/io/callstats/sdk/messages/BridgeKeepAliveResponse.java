@@ -18,82 +18,13 @@ public class BridgeKeepAliveResponse {
 	private String endpointType;
 	
 	/** The keep alive response. */
-	private KeepAliveResponseData keepAliveResponse;
+	private CallStatsEventResponseData keepAliveResponse;
 	
 	/**
 	 * Instantiates a new bridge keep alive response.
 	 */
 	public BridgeKeepAliveResponse() {
-		keepAliveResponse = new KeepAliveResponseData();
-	}
-
-	/**
-	 * The Class KeepAliveResponseData.
-	 */
-	private class KeepAliveResponseData {
-		
-		/** The status. */
-		String status;
-		
-		/** The reason. */
-		String reason;
-		
-		/** The description. */
-		String description;
-		
-		/**
-		 * Gets the status.
-		 *
-		 * @return the status
-		 */
-		public String getStatus() {
-			return status;
-		}
-		
-		/**
-		 * Sets the status.
-		 *
-		 * @param status the new status
-		 */
-		public void setStatus(String status) {
-			this.status = status;
-		}
-		
-		/**
-		 * Gets the reason.
-		 *
-		 * @return the reason
-		 */
-		public String getReason() {
-			return reason;
-		}
-		
-		/**
-		 * Sets the reason.
-		 *
-		 * @param reason the new reason
-		 */
-		public void setReason(String reason) {
-			this.reason = reason;
-		}
-		
-		/**
-		 * Gets the description.
-		 *
-		 * @return the description
-		 */
-		public String getDescription() {
-			return description;
-		}
-		
-		/**
-		 * Sets the description.
-		 *
-		 * @param description the new description
-		 */
-		public void setDescription(String description) {
-			this.description = description;
-		}
+		keepAliveResponse = new CallStatsEventResponseData();
 	}
 	
 	
