@@ -6,11 +6,13 @@ public enum CallStatsConferenceEvents {
 	CONFERENCE_TERMINATED(2, "conferenceTerminated"),
 	USER_JOINED(3, "userJoined"),
 	USER_LEFT(4, "userLeft"),
-	AUDIO_MUTE(5, "audioMute"),
-	AUDIO_UNMUTE(6, "audioUnmute"),
-	VIDEO_PAUSE(7, "videoPause"),
-	VIDEO_RESUME(8, "videoResume"),
-	CONFERENCE_STATS(9, "conferenceStats");
+	FABRIC_HOLD(5,"fabricHold"),
+	FABRIC_RESUME(6,"fabricResume"),
+	AUDIO_MUTE(7, "audioMute"),
+	AUDIO_UNMUTE(8, "audioUnmute"),
+	VIDEO_PAUSE(9, "videoPause"),
+	VIDEO_RESUME(10, "videoResume"),
+	CONFERENCE_STATS(11, "conferenceStats");
 
 	private final int msgCode;
 	private final String msgType;

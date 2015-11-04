@@ -25,4 +25,12 @@ public class UserInfo {
 	public void setUcID(String ucID) {
 		this.ucID = ucID;
 	}
+	
+	public UserInfo(String confID, String userID, String ucID) {
+		super();
+		this.confID = confID;
+		this.userID = userID;
+		this.ucID = ucID;
+	}
+	
 }
