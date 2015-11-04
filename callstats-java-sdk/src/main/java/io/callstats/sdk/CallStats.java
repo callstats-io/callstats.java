@@ -80,7 +80,7 @@ public class CallStats {
 	private BridgeStatusInfoQueue bridgeStatusInfoQueue;
 	
 	
-	private Map<String, List<ConferenceStats>> confereneStatsMap = new HashMap<String,List<ConferenceStats>>();
+	private Map<String, List<ConferenceStats>> conferenceStatsMap = new HashMap<String,List<ConferenceStats>>();
 			
 	
 	/** The bridge keep alive manager. */
@@ -333,25 +333,29 @@ public class CallStats {
 	}
 	
 	
-	public synchronized void startStatsReportingForUser(String userID) {
-		if (userID == null) {
+	public synchronized void startStatsReportingForUser(String userID, String confID) {
+		if (userID == null || confID == null) {
 			logger.error("startStatsReportingForUser: Arguments cannot be null ");
 			throw new IllegalArgumentException("startStatsReportingForUser: Arguments cannot be null");
 		}
-		List<ConferenceStats> tempStats = confereneStatsMap.get(userID);
+		
+		String key = userID+":"+confID;
+		
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(userID);
 		if (tempStats == null) {
 			tempStats = new ArrayList<ConferenceStats>();
-			confereneStatsMap.put(userID, tempStats);
+			conferenceStatsMap.put(key, tempStats);
 		}
 	}
 
-	public synchronized void stopStatsReportingForUser(String userID) {
-		if (userID == null) {
+	public synchronized void stopStatsReportingForUser(String userID, String confID) {
+		if (userID == null || confID == null) {
 			logger.error("stopStatsReportingForUser: Arguments cannot be null ");
 			throw new IllegalArgumentException("stopStatsReportingForUser: Arguments cannot be null");
 		}
-		List<ConferenceStats> tempStats = confereneStatsMap.get(userID);
-
+		String key = userID+":"+confID;
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
+		
 		if (tempStats != null && tempStats.size() > 0) {
 			StreamStats streamStats;
 			StreamStatsData streamStatsData;
@@ -375,12 +379,13 @@ public class CallStats {
 			logger.error("sendConferenceStats: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendConferenceStats: Arguments cannot be null");
 		}
-		List<ConferenceStats> tempStats = confereneStatsMap.get(userID);
+		String key = userID+":"+stats.getConfID();
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
 		if (tempStats == null) {
 			tempStats = new ArrayList<ConferenceStats>();
 		}
 		tempStats.add(stats);
-		confereneStatsMap.put(userID, tempStats);
+		conferenceStatsMap.put(key, tempStats);
 	}
 	
 	

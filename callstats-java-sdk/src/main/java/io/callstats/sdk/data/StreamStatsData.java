@@ -5,7 +5,7 @@ public class StreamStatsData {
 	int rtt;
 	long packetsSent;
 	long bytesSent;
-	float jitter;
+	double jitter;
 	
 	public int getRtt() {
 		return rtt;
@@ -25,10 +25,10 @@ public class StreamStatsData {
 	public void setBytesSent(long bytesSent) {
 		this.bytesSent = bytesSent;
 	}
-	public float getJitter() {
+	public double getJitter() {
 		return jitter;
 	}
-	public void setJitter(float jitter) {
+	public void setJitter(double jitter) {
 		this.jitter = jitter;
 	}
 	

@@ -9,7 +9,7 @@ public class ConferenceStats {
 	int rtt;
 	long packetsSent;
 	long bytesSent;
-	float jitter;
+	double jitter;
 	String ucID;
 	String confID;
 	
@@ -73,10 +73,10 @@ public class ConferenceStats {
 	public void setBytesSent(long bytesSent) {
 		this.bytesSent = bytesSent;
 	}
-	public float getJitter() {
+	public double getJitter() {
 		return jitter;
 	}
-	public void setJitter(float jitter) {
+	public void setJitter(double jitter) {
 		this.jitter = jitter;
 	}	
 	

@@ -10,7 +10,7 @@ public class ConferenceStatsBuilder {
 	int rtt;
 	long packetsSent;
 	long bytesSent;
-	float jitter;
+	double jitter;
 	String ucID;
 	String confID;
 	
@@ -38,7 +38,7 @@ public class ConferenceStatsBuilder {
 	public long getBytesSent() {
 		return bytesSent;
 	}
-	public float getJitter() {
+	public double getJitter() {
 		return jitter;
 	}
 	public String getUcID() {
@@ -98,7 +98,7 @@ public class ConferenceStatsBuilder {
 		return this;
 	}
 	
-	public ConferenceStatsBuilder jitter(float  jitter) {
+	public ConferenceStatsBuilder jitter(double  jitter) {
 		this.jitter = jitter;
 		return this;
 	}

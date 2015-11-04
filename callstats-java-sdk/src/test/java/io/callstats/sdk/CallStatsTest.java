@@ -239,18 +239,18 @@ public class CallStatsTest{
 			public void onResponse(String  ucid) {
 				// TODO Auto-generated method stub
 				String userID = "2345";
-				
+				String confID = "jackk";
 				System.out.println("UCID is "+ucid);
-				UserInfo userInfo = new UserInfo("jackk", userID , ucid);
+				UserInfo userInfo = new UserInfo(confID, userID , ucid);
 				
 				callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
 							
-				callstatslib.startStatsReportingForUser(userID);
+				callstatslib.startStatsReportingForUser(userID,confID);
 				ConferenceStats conferenceStats = new ConferenceStatsBuilder()
 											.bytesSent(23456)
 											.packetsSent(34556)
 											.ssrc("34567898")
-											.confID("jackk")
+											.confID(confID)
 											.fromUserID("2345")
 											.localUserID("2345")
 											.toUserID("1234")
@@ -265,7 +265,7 @@ public class CallStatsTest{
 										.bytesSent(23456)
 										.packetsSent(34556)
 										.ssrc("34567899")
-										.confID("jackk")
+										.confID(confID)
 										.fromUserID("2345")
 										.localUserID("2345")
 										.toUserID("1234")
@@ -280,7 +280,7 @@ public class CallStatsTest{
 										.bytesSent(23456)
 										.packetsSent(34556)
 										.ssrc("34567890")
-										.confID("jackk")
+										.confID(confID)
 										.fromUserID("2345")
 										.localUserID("2345")
 										.toUserID("1234")
@@ -291,7 +291,7 @@ public class CallStatsTest{
 										.build();
 				callstatslib.sendConferenceStats(userID, conferenceStats);
 				
-				callstatslib.stopStatsReportingForUser(userID);
+				callstatslib.stopStatsReportingForUser(userID,confID);
 				
 			}
 			
