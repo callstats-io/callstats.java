@@ -42,12 +42,12 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	public static int appId = 1234567;
+	public static int appId = 1234567; // appId from callstats.io's dashboard.
 	
 	/** The app secret. */
-	public static String appSecret = "app_secret";
+	public static String appSecret = "app_secret"; // app secret from callstats.io's dashboard.
 	
-	public static String bridgeId = "jit.si.345";
+	public static String bridgeId = "winteriscoming"; // unique bridge name
 	
 	private Gson gson;
 	
