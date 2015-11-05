@@ -37,14 +37,12 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-
 	public static int appId = 1234567;
-
 	
 	/** The app secret. */
-	public static String appSecret = "app_secret"; // app secret from callstats.io's dashboard.
+	public static String appSecret = "app_secret";
 	
-	public static String bridgeId = "winteriscoming"; // unique bridge name
+	public static String bridgeId = "winteriscoming";
 	
 	
 	/**
@@ -53,7 +51,7 @@ public class CallStatsTest{
 	@Before
 	public void setUp() {	
 		serverInfo = new ServerInfo();
-		serverInfo.setName("JitSi");
+		serverInfo.setName("winter");
 		serverInfo.setOs("LINUX");
 		serverInfo.setVer("4.4");		
 		System.out.println("Setup completed");
