@@ -2,10 +2,10 @@ package io.callstats.sdk.data;
 
 public class ConferenceStats {
 	String localUserID;
-	String statsType; //inbound or outbound
+	String remoteUserID;
+	CallStatsStreamType statsType; //inbound or outbound
 	String ssrc;
 	String fromUserID;
-	String toUserID;
 	int rtt;
 	long packetsSent;
 	long bytesSent;
@@ -31,12 +31,6 @@ public class ConferenceStats {
 	public void setLocalUserID(String localUserID) {
 		this.localUserID = localUserID;
 	}
-	public String getStatsType() {
-		return statsType;
-	}
-	public void setStatsType(String statsType) {
-		this.statsType = statsType;
-	}
 	public String getSsrc() {
 		return ssrc;
 	}
@@ -48,12 +42,6 @@ public class ConferenceStats {
 	}
 	public void setFromUserID(String fromUserID) {
 		this.fromUserID = fromUserID;
-	}
-	public String getToUserID() {
-		return toUserID;
-	}
-	public void setToUserID(String toUserID) {
-		this.toUserID = toUserID;
 	}
 	public int getRtt() {
 		return rtt;
@@ -80,11 +68,25 @@ public class ConferenceStats {
 		this.jitter = jitter;
 	}	
 	
+	public CallStatsStreamType getStatsType() {
+		return statsType;
+	}
+	public void setStatsType(CallStatsStreamType statsType) {
+		this.statsType = statsType;
+	}
+	
+	public String getRemoteUserID() {
+		return remoteUserID;
+	}
+	public void setRemoteUserID(String remoteUserID) {
+		this.remoteUserID = remoteUserID;
+	}
+	
+	
 	public ConferenceStats(ConferenceStatsBuilder builder) {
 		this.localUserID = builder.getLocalUserID();
 		this.statsType = builder.getStatsType();
 		this.fromUserID = builder.getFromUserID();
-		this.toUserID = builder.getToUserID();
 		this.rtt = builder.getRtt();
 		this.packetsSent = builder.getPacketsSent();
 		this.bytesSent = builder.getBytesSent();
@@ -92,5 +94,6 @@ public class ConferenceStats {
 		this.ucID = builder.getUcID();
 		this.confID = builder.getConfID();
 		this.ssrc = builder.getSsrc();
+		this.remoteUserID = builder.getRemoteUserID();
 	}
 }

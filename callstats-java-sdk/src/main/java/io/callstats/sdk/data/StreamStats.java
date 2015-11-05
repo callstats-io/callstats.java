@@ -1,13 +1,17 @@
 package io.callstats.sdk.data;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gson.annotations.SerializedName;
+
 
 public class StreamStats {
 	String fromUserID;
-	String toUserID;
-	Map<String, StreamStatsData> type = new HashMap<String,StreamStatsData>();
-
+	String mappedSSRC;
+	
+	@SerializedName("inbound")
+	StreamStatsData inboundStatsData;
+	
+	@SerializedName("outbound")
+	StreamStatsData outboundStatsData;
 	
 	public String getFromUserID() {
 		return fromUserID;
@@ -15,17 +19,34 @@ public class StreamStats {
 	public void setFromUserID(String fromUserID) {
 		this.fromUserID = fromUserID;
 	}
-	public String getToUserID() {
-		return toUserID;
+	
+	public String getMappedSSRC() {
+		return mappedSSRC;
 	}
-	public void setToUserID(String toUserID) {
-		this.toUserID = toUserID;
+	public void setMappedSSRC(String mappedSSRC) {
+		this.mappedSSRC = mappedSSRC;
 	}
-		
-	public StreamStats(String fromUserID, String toUserID, String streamType, StreamStatsData data) {
+	public StreamStatsData getInboundStatsData() {
+		return inboundStatsData;
+	}
+	public void setInboundStatsData(StreamStatsData inboundStatsData) {
+		this.inboundStatsData = inboundStatsData;
+	}
+	public StreamStatsData getOutboundStatsData() {
+		return outboundStatsData;
+	}
+	public void setOutboundStatsData(StreamStatsData outboundStatsData) {
+		this.outboundStatsData = outboundStatsData;
+	}
+			
+	public StreamStats(String fromUserID, CallStatsStreamType type, StreamStatsData data) {
 		super();
-		this.fromUserID = fromUserID;
-		this.toUserID = toUserID;	
-		type.put(streamType, data);
+		this.fromUserID = fromUserID;	
+		
+		if(type == CallStatsStreamType.INBOUND) {
+			setInboundStatsData(data);
+		} else {
+			setOutboundStatsData(data);
+		}
 	}	
 }

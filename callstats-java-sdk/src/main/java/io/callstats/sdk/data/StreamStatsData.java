@@ -32,7 +32,7 @@ public class StreamStatsData {
 		this.jitter = jitter;
 	}
 	
-	public StreamStatsData(int rtt, long packetsSent, long bytesSent, float jitter) {
+	public StreamStatsData(int rtt, long packetsSent, long bytesSent, double jitter) {
 		super();
 		this.rtt = rtt;
 		this.packetsSent = packetsSent;

@@ -360,11 +360,11 @@ public class CallStats {
 			StreamStats streamStats;
 			StreamStatsData streamStatsData;
 			ConferenceStats conferenceStats = tempStats.get(0);
-			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID());
+			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID(),conferenceStats.getRemoteUserID());
 			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getLocalUserID(), conferenceStats.getUcID());
 			for (ConferenceStats stats : tempStats) {
 				streamStatsData = new StreamStatsData(stats.getRtt(), stats.getPacketsSent(), stats.getBytesSent(), stats.getJitter());
-				streamStats = new StreamStats(stats.getFromUserID(), stats.getToUserID(), stats.getStatsType(), streamStatsData);
+				streamStats = new StreamStats(stats.getFromUserID(), stats.getStatsType(), streamStatsData);
 				conferenceStatsData.addStreamStats(stats.getSsrc(), streamStats);
 			}
 

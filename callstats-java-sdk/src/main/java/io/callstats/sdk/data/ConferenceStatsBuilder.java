@@ -3,10 +3,10 @@ package io.callstats.sdk.data;
 public class ConferenceStatsBuilder {
 	
 	String localUserID;
-	String statsType; //inbound or outbound
+	String remoteUserID;
+	CallStatsStreamType statsType; //inbound or outbound
 	String ssrc;
 	String fromUserID;
-	String toUserID;
 	int rtt;
 	long packetsSent;
 	long bytesSent;
@@ -17,7 +17,7 @@ public class ConferenceStatsBuilder {
 	public String getLocalUserID() {
 		return localUserID;
 	}
-	public String getStatsType() {
+	public CallStatsStreamType getStatsType() {
 		return statsType;
 	}
 	public String getSsrc() {
@@ -25,9 +25,6 @@ public class ConferenceStatsBuilder {
 	}
 	public String getFromUserID() {
 		return fromUserID;
-	}
-	public String getToUserID() {
-		return toUserID;
 	}
 	public int getRtt() {
 		return rtt;
@@ -47,13 +44,16 @@ public class ConferenceStatsBuilder {
 	public String getConfID() {
 		return confID;
 	}
+	public String getRemoteUserID() {
+		return remoteUserID;
+	}
 	
 	public ConferenceStatsBuilder localUserID(String  localUserID) {
 		this.localUserID = localUserID;
 		return this;
 	}
 	
-	public ConferenceStatsBuilder statsType(String  statsType) {
+	public ConferenceStatsBuilder statsType(CallStatsStreamType  statsType) {
 		this.statsType = statsType;
 		return this;
 	}
@@ -68,8 +68,8 @@ public class ConferenceStatsBuilder {
 		return this;
 	}
 	
-	public ConferenceStatsBuilder toUserID(String  toUserID) {
-		this.toUserID = toUserID;
+	public ConferenceStatsBuilder remoteUserID(String  remoteUserID) {
+		this.remoteUserID = remoteUserID;
 		return this;
 	}
 	

@@ -5,11 +5,14 @@ import java.util.Map;
 
 public class ConferenceStatsData {
 	
-	String localUserID;
+	String localID;
+	String remoteID;
+	
 	Map<String, StreamStats> stats;
 	
-	public ConferenceStatsData(String localUserID) {
-		this.localUserID = localUserID;
+	public ConferenceStatsData(String localUserID,String remoteUserid) {
+		this.localID = localUserID;
+		this.remoteID = remoteUserid;
 		stats = new HashMap<String, StreamStats>();
 	}
 	

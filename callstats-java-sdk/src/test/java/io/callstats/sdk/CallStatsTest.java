@@ -3,6 +3,7 @@ package io.callstats.sdk;
 import static org.junit.Assert.assertTrue;
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.BridgeStatusInfoBuilder;
+import io.callstats.sdk.data.CallStatsStreamType;
 import io.callstats.sdk.data.ConferenceInfo;
 import io.callstats.sdk.data.ConferenceStats;
 import io.callstats.sdk.data.ConferenceStatsBuilder;
@@ -42,14 +43,13 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	public static int appId = 1234567;
+	public static int appId = 123456;
 	
 	/** The app secret. */
 	public static String appSecret = "app_secret";
 	
 	public static String bridgeId = "jit.si.345";
 	
-	private Gson gson;
 	
 	/**
 	 * Sets the up.
@@ -63,7 +63,6 @@ public class CallStatsTest{
 		System.out.println("Setup completed");
 		callstatslib = PowerMockito.spy(new CallStats());
 		listener = Mockito.mock(CallStatsInitListener.class);
-		gson = new Gson();
 	}
 	
 	/**
@@ -201,24 +200,6 @@ public class CallStatsTest{
 	}
 	
 	
-	@Test
-	public void chkJsonFormationForStats() {
-		ConferenceStatsData conferenceStatsData = new ConferenceStatsData("3456");
-		StreamStatsData data = new StreamStatsData(23, 200, 2345,3);
-		StreamStats streamStats = new StreamStats("1234", "2345", "inbound", data);
-		conferenceStatsData.addStreamStats("2345678", streamStats);
-		data = new StreamStatsData(28, 201, 2342,4);
-		streamStats = new StreamStats("1234", "2345", "outbound",data);
-		conferenceStatsData.addStreamStats("2345679", streamStats);
-		streamStats = new StreamStats("1234", "2345", "inbound", data);
-		conferenceStatsData.addStreamStats("2345675", streamStats);
-		streamStats = new StreamStats("1234", "2345", "inbound", data);
-		conferenceStatsData.addStreamStats("2345676", streamStats);
-		
-		String jsonString = gson.toJson(conferenceStatsData);
-		System.out.println("JSON is "+jsonString);
-	}
-	
 	
 	@Test
 	public void initializeTestWihSendCallStatsConferenceStartEvent() {
@@ -251,10 +232,9 @@ public class CallStatsTest{
 											.packetsSent(34556)
 											.ssrc("34567898")
 											.confID(confID)
-											.fromUserID("2345")
 											.localUserID("2345")
-											.toUserID("1234")
-											.statsType("inbound")
+											.remoteUserID("1234")
+											.statsType(CallStatsStreamType.INBOUND)
 											.jitter(3)
 											.rtt(34)
 											.ucID(ucid)
@@ -266,10 +246,9 @@ public class CallStatsTest{
 										.packetsSent(34556)
 										.ssrc("34567899")
 										.confID(confID)
-										.fromUserID("2345")
 										.localUserID("2345")
-										.toUserID("1234")
-										.statsType("inbound")
+										.remoteUserID("1234")
+										.statsType(CallStatsStreamType.INBOUND)
 										.jitter(3)
 										.rtt(34)
 										.ucID(ucid)
@@ -283,8 +262,8 @@ public class CallStatsTest{
 										.confID(confID)
 										.fromUserID("2345")
 										.localUserID("2345")
-										.toUserID("1234")
-										.statsType("outbound")
+										.remoteUserID("1234")
+										.statsType(CallStatsStreamType.OUTBOUND)
 										.jitter(3)
 										.rtt(34)
 										.ucID(ucid)
