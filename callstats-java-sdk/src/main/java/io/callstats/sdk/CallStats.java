@@ -374,7 +374,7 @@ public class CallStats {
 		}
 	}
 
-	public synchronized void sendConferenceStats(String userID, ConferenceStats stats) {
+	public synchronized void reportConferenceStats(String userID, ConferenceStats stats) {
 		if (stats == null || userID == null) {
 			logger.error("sendConferenceStats: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendConferenceStats: Arguments cannot be null");

@@ -7,23 +7,17 @@ import io.callstats.sdk.data.CallStatsStreamType;
 import io.callstats.sdk.data.ConferenceInfo;
 import io.callstats.sdk.data.ConferenceStats;
 import io.callstats.sdk.data.ConferenceStatsBuilder;
-import io.callstats.sdk.data.ConferenceStatsData;
 import io.callstats.sdk.data.ServerInfo;
-import io.callstats.sdk.data.StreamStats;
-import io.callstats.sdk.data.StreamStatsData;
 import io.callstats.sdk.data.UserInfo;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
 
 import java.util.Random;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-
-import com.google.gson.Gson;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -43,12 +37,14 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	public static int appId = 123456;
+
+	public static int appId = 1234567;
+
 	
 	/** The app secret. */
-	public static String appSecret = "app_secret";
+	public static String appSecret = "app_secret"; // app secret from callstats.io's dashboard.
 	
-	public static String bridgeId = "jit.si.345";
+	public static String bridgeId = "winteriscoming"; // unique bridge name
 	
 	
 	/**
@@ -239,7 +235,7 @@ public class CallStatsTest{
 											.rtt(34)
 											.ucID(ucid)
 											.build();
-				callstatslib.sendConferenceStats(userID, conferenceStats);
+				callstatslib.reportConferenceStats(userID, conferenceStats);
 				
 				conferenceStats = new ConferenceStatsBuilder()
 										.bytesSent(23456)
@@ -253,7 +249,7 @@ public class CallStatsTest{
 										.rtt(34)
 										.ucID(ucid)
 										.build();
-				callstatslib.sendConferenceStats(userID, conferenceStats);
+				callstatslib.reportConferenceStats(userID, conferenceStats);
 				
 				conferenceStats = new ConferenceStatsBuilder()
 										.bytesSent(23456)
@@ -268,7 +264,7 @@ public class CallStatsTest{
 										.rtt(34)
 										.ucID(ucid)
 										.build();
-				callstatslib.sendConferenceStats(userID, conferenceStats);
+				callstatslib.reportConferenceStats(userID, conferenceStats);
 				
 				callstatslib.stopStatsReportingForUser(userID,confID);
 				
