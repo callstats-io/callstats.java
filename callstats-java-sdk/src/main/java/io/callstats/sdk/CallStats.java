@@ -382,10 +382,12 @@ public class CallStats {
 		String key = userID+":"+stats.getConfID();
 		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
 		if (tempStats == null) {
-			tempStats = new ArrayList<ConferenceStats>();
-		}
-		tempStats.add(stats);
-		conferenceStatsMap.put(key, tempStats);
+			//tempStats = new ArrayList<ConferenceStats>();
+			throw new IllegalStateException("reportConferenceStats called without calling startStatsReportingForUser");
+		} else {
+			tempStats.add(stats);
+			conferenceStatsMap.put(key, tempStats);
+		}	
 	}
 	
 	
