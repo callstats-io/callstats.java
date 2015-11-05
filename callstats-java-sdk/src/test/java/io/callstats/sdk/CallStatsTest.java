@@ -3,12 +3,14 @@ package io.callstats.sdk;
 import static org.junit.Assert.assertTrue;
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.BridgeStatusInfoBuilder;
+import io.callstats.sdk.data.CallStatsStreamType;
 import io.callstats.sdk.data.ConferenceInfo;
+import io.callstats.sdk.data.ConferenceStats;
+import io.callstats.sdk.data.ConferenceStatsBuilder;
 import io.callstats.sdk.data.ServerInfo;
 import io.callstats.sdk.data.UserInfo;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
-import io.callstats.sdk.messages.CallStatsEventMessage;
 
 import java.util.Random;
 
@@ -35,12 +37,13 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	public static int appId = 123456;
+	public static int appId = 1234567;
 	
 	/** The app secret. */
-	public static String appSecret = "appsecret=";
+	public static String appSecret = "app_secret";
 	
-	public static String bridgeId = "jit.si.345";
+	public static String bridgeId = "winteriscoming";
+	
 	
 	/**
 	 * Sets the up.
@@ -48,7 +51,7 @@ public class CallStatsTest{
 	@Before
 	public void setUp() {	
 		serverInfo = new ServerInfo();
-		serverInfo.setName("JitSi");
+		serverInfo.setName("winter");
 		serverInfo.setOs("LINUX");
 		serverInfo.setVer("4.4");		
 		System.out.println("Setup completed");
@@ -191,8 +194,9 @@ public class CallStatsTest{
 	}
 	
 	
+	
 	@Test
-	public void initializeTestWithSendCallStatsConferenceStartEvent() {
+	public void initializeTestWihSendCallStatsConferenceStartEvent() {
 		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
 		try {
 			Thread.sleep(2000);
@@ -209,15 +213,59 @@ public class CallStatsTest{
 			
 			public void onResponse(String  ucid) {
 				// TODO Auto-generated method stub
+				String userID = "2345";
+				String confID = "jackk";
 				System.out.println("UCID is "+ucid);
-				UserInfo userInfo = new UserInfo();
-				userInfo.setUcID(ucid);
-				userInfo.setUserID("2345");
-				userInfo.setConfID("jackk");
-				callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
+				UserInfo userInfo = new UserInfo(confID, userID , ucid);
 				
-				String stats = "{\"stats\": {\"streams\": {\"209773412\": {\"2345\": \"user-aaaa\",\"inbound\":   {\"k\":30,\"j\":40}}}}}";
-				callstatslib.sendCallStatsConferenceStats(stats,userInfo);
+				callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
+							
+				callstatslib.startStatsReportingForUser(userID,confID);
+				ConferenceStats conferenceStats = new ConferenceStatsBuilder()
+											.bytesSent(23456)
+											.packetsSent(34556)
+											.ssrc("34567898")
+											.confID(confID)
+											.localUserID("2345")
+											.remoteUserID("1234")
+											.statsType(CallStatsStreamType.INBOUND)
+											.jitter(3)
+											.rtt(34)
+											.ucID(ucid)
+											.build();
+				callstatslib.reportConferenceStats(userID, conferenceStats);
+				
+				conferenceStats = new ConferenceStatsBuilder()
+										.bytesSent(23456)
+										.packetsSent(34556)
+										.ssrc("34567899")
+										.confID(confID)
+										.localUserID("2345")
+										.remoteUserID("1234")
+										.statsType(CallStatsStreamType.INBOUND)
+										.jitter(3)
+										.rtt(34)
+										.ucID(ucid)
+										.build();
+				callstatslib.reportConferenceStats(userID, conferenceStats);
+				
+				conferenceStats = new ConferenceStatsBuilder()
+										.bytesSent(23456)
+										.packetsSent(34556)
+										.ssrc("34567890")
+										.confID(confID)
+										.fromUserID("2345")
+										.localUserID("2345")
+										.remoteUserID("1234")
+										.statsType(CallStatsStreamType.OUTBOUND)
+										.jitter(3)
+										.rtt(34)
+										.ucID(ucid)
+										.build();
+				callstatslib.reportConferenceStats(userID, conferenceStats);
+				
+				callstatslib.stopStatsReportingForUser(userID,confID);
+				
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
@@ -226,9 +274,7 @@ public class CallStatsTest{
 			}
 		});
 		
-		
-		
-		
+			
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {

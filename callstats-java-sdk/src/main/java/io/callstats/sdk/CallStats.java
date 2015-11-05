@@ -1,10 +1,18 @@
 package io.callstats.sdk;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.ConferenceInfo;
+import io.callstats.sdk.data.ConferenceStats;
+import io.callstats.sdk.data.ConferenceStatsData;
 import io.callstats.sdk.data.ServerInfo;
+import io.callstats.sdk.data.StreamStats;
+import io.callstats.sdk.data.StreamStatsData;
 import io.callstats.sdk.data.UserInfo;
 import io.callstats.sdk.httpclient.CallStatsHttpClient;
 import io.callstats.sdk.internal.BridgeStatusInfoQueue;
@@ -70,6 +78,9 @@ public class CallStats {
 	private boolean isInitialized;
 	
 	private BridgeStatusInfoQueue bridgeStatusInfoQueue;
+	
+	
+	private Map<String, List<ConferenceStats>> conferenceStatsMap = new HashMap<String,List<ConferenceStats>>();
 			
 	
 	/** The bridge keep alive manager. */
@@ -322,7 +333,65 @@ public class CallStats {
 	}
 	
 	
-	public synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
+	public synchronized void startStatsReportingForUser(String userID, String confID) {
+		if (userID == null || confID == null) {
+			logger.error("startStatsReportingForUser: Arguments cannot be null ");
+			throw new IllegalArgumentException("startStatsReportingForUser: Arguments cannot be null");
+		}
+		
+		String key = userID+":"+confID;
+		
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(userID);
+		if (tempStats == null) {
+			tempStats = new ArrayList<ConferenceStats>();
+			conferenceStatsMap.put(key, tempStats);
+		}
+	}
+
+	public synchronized void stopStatsReportingForUser(String userID, String confID) {
+		if (userID == null || confID == null) {
+			logger.error("stopStatsReportingForUser: Arguments cannot be null ");
+			throw new IllegalArgumentException("stopStatsReportingForUser: Arguments cannot be null");
+		}
+		String key = userID+":"+confID;
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
+		
+		if (tempStats != null && tempStats.size() > 0) {
+			StreamStats streamStats;
+			StreamStatsData streamStatsData;
+			ConferenceStats conferenceStats = tempStats.get(0);
+			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID(),conferenceStats.getRemoteUserID());
+			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getLocalUserID(), conferenceStats.getUcID());
+			for (ConferenceStats stats : tempStats) {
+				streamStatsData = new StreamStatsData(stats.getRtt(), stats.getPacketsSent(), stats.getBytesSent(), stats.getJitter());
+				streamStats = new StreamStats(stats.getFromUserID(), stats.getStatsType(), streamStatsData);
+				conferenceStatsData.addStreamStats(stats.getSsrc(), streamStats);
+			}
+
+			String statsString = gson.toJson(conferenceStatsData);
+			logger.debug("Stats string is " + statsString);
+			sendCallStatsConferenceStats(statsString, info);
+		}
+	}
+
+	public synchronized void reportConferenceStats(String userID, ConferenceStats stats) {
+		if (stats == null || userID == null) {
+			logger.error("sendConferenceStats: Arguments cannot be null ");
+			throw new IllegalArgumentException("sendConferenceStats: Arguments cannot be null");
+		}
+		String key = userID+":"+stats.getConfID();
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
+		if (tempStats == null) {
+			//tempStats = new ArrayList<ConferenceStats>();
+			throw new IllegalStateException("reportConferenceStats called without calling startStatsReportingForUser");
+		} else {
+			tempStats.add(stats);
+			conferenceStatsMap.put(key, tempStats);
+		}	
+	}
+	
+	
+	private synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
 		if (stats == null || userInfo == null) {
 			logger.error("sendCallStatsConferenceStats: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendCallStatsConferenceStats: Arguments cannot be null");
