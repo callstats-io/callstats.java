@@ -3,6 +3,8 @@ package io.callstats.sdk.httpclient;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -104,19 +106,25 @@ public class CallStatsHttpClient {
 		Properties prop = new Properties();
 		InputStream input = null;
 
-		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-		if (input != null) {
-			try {
-				prop.load(input);
-				BASE_URL = prop.getProperty("CallStats.BaseURL");
-				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
-				soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+			if (input != null) {
+				try {
+					prop.load(input);
+					BASE_URL = prop.getProperty("CallStats.BaseURL");
+					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
+					soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-
+		
 		logger.info("Base URL is " + BASE_URL);
 		// Create I/O reactor configuration
 		IOReactorConfig ioReactorConfig = IOReactorConfig.custom().setIoThreadCount(Runtime.getRuntime().availableProcessors())

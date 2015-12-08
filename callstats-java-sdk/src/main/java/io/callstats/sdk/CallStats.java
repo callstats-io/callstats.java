@@ -1,11 +1,5 @@
 package io.callstats.sdk;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.ConferenceInfo;
 import io.callstats.sdk.data.ConferenceStats;
@@ -29,14 +23,17 @@ import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
 import io.callstats.sdk.messages.CallStatsEventMessage;
 import io.callstats.sdk.messages.CallStatsEventResponseMessage;
 import io.callstats.sdk.messages.EventInfo;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 

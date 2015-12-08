@@ -2,6 +2,8 @@ package io.callstats.sdk.httpclient;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.listeners.CallStatsAsyncHttpResponseListener;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -42,19 +44,25 @@ public class CallStatsAsyncHttpClient {
 		Properties prop = new Properties();
 		InputStream input = null;
 	     
-		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-		if (input !=null){
-			try {
-				prop.load(input);
-				BASE_URL = prop.getProperty("CallStats.BaseURL");
-				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
+		//input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 		
+		try {
+			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+			if (input !=null){
+				try {
+					prop.load(input);
+					BASE_URL = prop.getProperty("CallStats.BaseURL");
+					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+			
 		Builder builder = new AsyncHttpClientConfig.Builder();
 	    builder.setCompressionEnforced(true)
 	        .setAllowPoolingConnections(true)
