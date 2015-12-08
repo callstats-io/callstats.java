@@ -6,7 +6,7 @@ package io.callstats.sdk.internal;
 public class CallStatsConst {
 	
 	/** The Constant CallStatsJavaSDKPropertyFileName. */
-	public static final String CallStatsJavaSDKPropertyFileName = "callstats-java-sdk.properties";
+	public static final String CallStatsJavaSDKPropertyFileName = "config/callstats-java-sdk.properties";
 	
 	/** The Constant CS_VERSION. */
 	public static final String CS_VERSION = "0.1.0";	

@@ -6,6 +6,8 @@ import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 import io.callstats.sdk.messages.BridgeKeepAliveMessage;
 import io.callstats.sdk.messages.BridgeKeepAliveResponse;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -73,17 +75,21 @@ public class CallStatsBridgeKeepAliveManager {
 		Properties prop = new Properties();
 		InputStream input = null;
 
-		input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-		if (input != null) {
-			try {
+		//input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+		try {
+			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+			if (input != null) {
 				prop.load(input);
-				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));			
+			}	
+		} catch (FileNotFoundException e ) {
+			logger.error("Configuration file not found", e);
+			throw new RuntimeException("Configuration file not found");
+		} catch (IOException e ) {
+			logger.error("Configuration file read IO exception", e);
+			throw new RuntimeException("Configuration file read IO exception");
 		}
-
+	
 		this.appId = appId;
 		this.bridgeId = bridgeId;
 		this.token = token;
