@@ -53,11 +53,11 @@ public class CallStatsAsyncHttpClient {
 				BASE_URL = prop.getProperty("CallStats.BaseURL");
 				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
 			}
-		} catch (FileNotFoundException e ) {
-			e.printStackTrace();
+		}  catch (FileNotFoundException e ) {
+			logger.error("Configuration file not found", e);
 			throw new RuntimeException("Configuration file not found");
 		} catch (IOException e ) {
-			e.printStackTrace();
+			logger.error("Configuration file read IO exception", e);
 			throw new RuntimeException("Configuration file read IO exception");
 		}
 			

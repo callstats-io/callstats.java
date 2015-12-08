@@ -83,10 +83,10 @@ public class CallStatsBridgeKeepAliveManager {
 				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));			
 			}	
 		} catch (FileNotFoundException e ) {
-			e.printStackTrace();
+			logger.error("Configuration file not found", e);
 			throw new RuntimeException("Configuration file not found");
 		} catch (IOException e ) {
-			e.printStackTrace();
+			logger.error("Configuration file read IO exception", e);
 			throw new RuntimeException("Configuration file read IO exception");
 		}
 	
