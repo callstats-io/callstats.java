@@ -79,17 +79,15 @@ public class CallStatsBridgeKeepAliveManager {
 		try {
 			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 			if (input != null) {
-				try {
-					prop.load(input);
-					keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+				prop.load(input);
+				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));			
+			}	
+		} catch (FileNotFoundException e ) {
+			e.printStackTrace();
+			throw new RuntimeException("Configuration file not found");
+		} catch (IOException e ) {
+			e.printStackTrace();
+			throw new RuntimeException("Configuration file read IO exception");
 		}
 	
 		this.appId = appId;

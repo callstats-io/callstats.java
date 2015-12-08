@@ -49,18 +49,16 @@ public class CallStatsAsyncHttpClient {
 		try {
 			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 			if (input !=null){
-				try {
-					prop.load(input);
-					BASE_URL = prop.getProperty("CallStats.BaseURL");
-					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				prop.load(input);
+				BASE_URL = prop.getProperty("CallStats.BaseURL");
+				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
 			}
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (FileNotFoundException e ) {
+			e.printStackTrace();
+			throw new RuntimeException("Configuration file not found");
+		} catch (IOException e ) {
+			e.printStackTrace();
+			throw new RuntimeException("Configuration file read IO exception");
 		}
 			
 		Builder builder = new AsyncHttpClientConfig.Builder();
