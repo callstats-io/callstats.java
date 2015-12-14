@@ -29,7 +29,7 @@ public class CallStatsAsyncHttpClient {
 	private String BASE_URL;
 	
 	/** The connection time out. */
-	private int connectionTimeOut;
+	private int connectionTimeOut = CallStatsConst.CONNECTION_TIMEOUT;
 	
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsAsyncHttpClient");
@@ -51,7 +51,15 @@ public class CallStatsAsyncHttpClient {
 			if (input !=null){
 				prop.load(input);
 				BASE_URL = prop.getProperty("CallStats.BaseURL");
-				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
+				
+				if (prop.getProperty("CallStats.ConnectionTimeOut") != null) {
+					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
+				}
+				
+				if (BASE_URL == null) {
+					logger.error("Callstats BASE URL can not be null");
+					throw new RuntimeException("Callstats BASE URL can not be null");
+				}
 			}
 		}  catch (FileNotFoundException e ) {
 			logger.error("Configuration file not found", e);
