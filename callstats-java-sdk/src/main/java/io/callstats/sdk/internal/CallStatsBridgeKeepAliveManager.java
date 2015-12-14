@@ -31,7 +31,7 @@ import com.google.gson.JsonSyntaxException;
 public class CallStatsBridgeKeepAliveManager {
 
 	/** The Constant keepAliveEventUrl. */
-	private static final String keepAliveEventUrl = "/o/callStatsKeepAliveEvent";
+	private static final String keepAliveEventUrl = "/callStatsBridgeKeepAliveEvent";
 
 	/** The app id. */
 	private int appId;
