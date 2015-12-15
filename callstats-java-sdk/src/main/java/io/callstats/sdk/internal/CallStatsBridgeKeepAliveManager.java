@@ -31,7 +31,7 @@ import com.google.gson.JsonSyntaxException;
 public class CallStatsBridgeKeepAliveManager {
 
 	/** The Constant keepAliveEventUrl. */
-	private static final String keepAliveEventUrl = "/o/callStatsKeepAliveEvent";
+	private static final String keepAliveEventUrl = "/callStatsBridgeKeepAliveEvent";
 
 	/** The app id. */
 	private int appId;
@@ -58,7 +58,7 @@ public class CallStatsBridgeKeepAliveManager {
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsBridgeKeepAliveManager");
 
-	private int keepAliveInterval;
+	private int keepAliveInterval = CallStatsConst.KEEPALIVE_INTERVAL;
 
 	/**
 	 * Instantiates a new call stats bridge keep alive manager.
@@ -80,7 +80,9 @@ public class CallStatsBridgeKeepAliveManager {
 			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 			if (input != null) {
 				prop.load(input);
-				keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));			
+				if(prop.getProperty("CallStats.keepAliveInterval") != null) {
+					keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
+				}
 			}	
 		} catch (FileNotFoundException e ) {
 			logger.error("Configuration file not found", e);

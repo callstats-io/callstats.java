@@ -14,10 +14,12 @@ public class CallStatsConst {
 	/** The Constant END_POINT_TYPE. */
 	public static final String END_POINT_TYPE = "VideoBridge";
 	
+	public static final String AUTH_TYPE = "BasicAuth";
+	
 	/** The Constant bridgeEventUrl. */
-	public static final String bridgeEventUrl = "/o/callStatsBridgeEvent";
+	public static final String bridgeEventUrl = "/callStatsBridgeEvent";
 
-	public static final String conferenceEventUrl = "/o/bridgeConfereceEvents";
+	public static final String conferenceEventUrl = "/callStatsBridgeConfereceEvents";
 	
 	/** The Constant httpPostMethod. */
 	public static final String httpPostMethod = "POST";
@@ -27,4 +29,10 @@ public class CallStatsConst {
 	public static final String SUCCESS = "OK";
 	
 	public static final String INVALID_TOKEN = "Invalid client token";
+	
+	public static final int CONNECTION_TIMEOUT = 30000;
+			
+	public static final int SO_TIMEOUT = 30000;
+	
+	public static final int KEEPALIVE_INTERVAL = 1000;
 }

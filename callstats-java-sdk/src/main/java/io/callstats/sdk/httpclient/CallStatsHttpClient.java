@@ -55,10 +55,10 @@ public class CallStatsHttpClient {
 	private HttpAsyncClient httpAsyncClient;
 	
 	/** The connection time out. */
-	private int connectionTimeOut;
+	private int connectionTimeOut = CallStatsConst.CONNECTION_TIMEOUT;
 	
 	/** The so time out. */
-	private int soTimeOut;
+	private int soTimeOut = CallStatsConst.SO_TIMEOUT;
 	
 	private boolean isDisrupted;
 	
@@ -111,10 +111,20 @@ public class CallStatsHttpClient {
 			if (input != null) {
 				prop.load(input);
 				BASE_URL = prop.getProperty("CallStats.BaseURL");
-				connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
-				soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));				
-			}
-			
+				
+				if (prop.getProperty("CallStats.ConnectionTimeOut") != null) {
+					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
+				}
+				
+				if (prop.getProperty("CallStats.SOTimeOut") != null) { 
+					soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));	
+				}
+				
+				if (BASE_URL == null) {
+					logger.error("Callstats BASE URL can not be null");
+					throw new RuntimeException("Callstats BASE URL can not be null");
+				}
+			}									
 		}  catch (FileNotFoundException e ) {
 			logger.error("Configuration file not found", e);
 			throw new RuntimeException("Configuration file not found");

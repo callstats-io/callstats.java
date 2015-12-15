@@ -1,5 +1,7 @@
 package io.callstats.sdk.messages;
 
+import io.callstats.sdk.internal.CallStatsConst;
+
 /**
  * The Class ChallengeRequest.
  *
@@ -18,6 +20,8 @@ public class ChallengeRequest {
 	
 	/** The endpoint type. */
 	private String endpointType;
+	
+	private String authType = CallStatsConst.AUTH_TYPE;
 	
 	/** The challenge. */
 	private ChallengeRequestBody challenge;
@@ -157,5 +161,13 @@ public class ChallengeRequest {
 	 */
 	public void setResponse(String response) {
 		challenge.setResponse(response);
+	}
+	
+	public String getAuthType() {
+		return authType;
+	}
+
+	public void setAuthType(String authType) {
+		this.authType = authType;
 	}
 }

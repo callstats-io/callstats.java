@@ -1,5 +1,8 @@
 package io.callstats.sdk.messages;
 
+import io.callstats.sdk.internal.CallStatsConst;
+
+
 /**
  * The Class AuthorizeRequest.
  *
@@ -19,6 +22,8 @@ public class AuthorizeRequest {
 	/** The endpoint type. */
 	private String endpointType;
 	
+	private String authType = CallStatsConst.AUTH_TYPE;
+
 	/**
 	 * Instantiates a new authorize request.
 	 *
@@ -107,4 +112,12 @@ public class AuthorizeRequest {
 	public void setEndpointType(String endpointType) {
 		this.endpointType = endpointType;
 	}	
+	
+	public String getAuthType() {
+		return authType;
+	}
+
+	public void setAuthType(String authType) {
+		this.authType = authType;
+	}
 }
