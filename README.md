@@ -4,7 +4,7 @@ A java library for integrating infrastructure components like the jitsi-videobri
 Bridge Metrics -  http://www.callstats.io/bridge-metrics/
 
 
-VM arguemnts
+VM arguemnts (mandatory)
 
   -Dlog4j.configurationFile=config/log4j2.xml  #Log4j2 xml configuration file path
   -Dcallstats.configurationFile=config/callstats-java-sdk.properties #callstats java config file path
