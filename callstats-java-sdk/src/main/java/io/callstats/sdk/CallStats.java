@@ -107,6 +107,12 @@ public class CallStats {
 	public CallStats() {
 		gson = new Gson();
 		bridgeStatusInfoQueue = new BridgeStatusInfoQueue();
+		if (System.getProperty("callstats.configurationFile") != null) {
+			CallStatsConst.CallStatsJavaSDKPropertyFileName = System.getProperty("callstats.configurationFile");
+		}
+		
+		logger.info("config file path is "+System.getProperty("callstats.configurationFile"));
+		
 	}
 	
 	private String getToken() {
