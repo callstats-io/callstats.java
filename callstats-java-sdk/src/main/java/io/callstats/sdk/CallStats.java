@@ -247,7 +247,7 @@ public class CallStats {
 	}
 	
 	
-	public synchronized void sendCallStatsBridgeStatusUpdateFromQueue() {
+	private synchronized void sendCallStatsBridgeStatusUpdateFromQueue() {
 		if (bridgeStatusInfoQueue.getLength() < 1)
 			return;
 
