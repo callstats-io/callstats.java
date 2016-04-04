@@ -5,7 +5,7 @@ public class CallStatsEventMessage {
 	private int appID;
 	private String endpointType;
 	private String conferenceID;
-	private String apiTS;
+	private long apiTS;
 	private String token;
 	private String localID;
 	private String remoteID;
@@ -43,10 +43,10 @@ public class CallStatsEventMessage {
 	public void setConferenceID(String conferenceID) {
 		this.conferenceID = conferenceID;
 	}
-	public String getApiTS() {
+	public long getApiTS() {
 		return apiTS;
 	}
-	public void setApiTS(String apiTS) {
+	public void setApiTS(long apiTS) {
 		this.apiTS = apiTS;
 	}
 	public String getToken() {
@@ -80,7 +80,7 @@ public class CallStatsEventMessage {
 		this.event = event;
 	}
 	
-	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, String apiTS, String token, String localID,
+	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
 			String remoteID, EventInfo event) {
 		super();
 		this.version = version;
@@ -94,7 +94,7 @@ public class CallStatsEventMessage {
 		this.event = event;
 	}	
 	
-	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, String apiTS, String token, String localID,
+	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
 			String remoteID, String ucID, EventInfo event) {
 		super();
 		this.version = version;

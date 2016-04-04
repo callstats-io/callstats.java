@@ -26,7 +26,7 @@ public class BridgeStatusUpdateMessage {
 	private String endpointType;
 	
 	/** The api ts. */
-	private String apiTS;
+	private long apiTS;
 	
 	/** The token. */
 	private String token;
@@ -47,7 +47,7 @@ public class BridgeStatusUpdateMessage {
 	 * @param endpointInfo the endpoint info
 	 */
 	public BridgeStatusUpdateMessage(int appID, String bridgeID, String version,
-		String endpointType, String apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
+		String endpointType, long apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
 		super();
 		this.appID = appID;
 		this.bridgeID = bridgeID;
@@ -177,7 +177,7 @@ public class BridgeStatusUpdateMessage {
 	 *
 	 * @return the api ts
 	 */
-	public String getApiTS() {
+	public long getApiTS() {
 		return apiTS;
 	}
 
@@ -186,7 +186,7 @@ public class BridgeStatusUpdateMessage {
 	 *
 	 * @param apiTS the new api ts
 	 */
-	public void setApiTS(String apiTS) {
+	public void setApiTS(long apiTS) {
 		this.apiTS = apiTS;
 	}
 

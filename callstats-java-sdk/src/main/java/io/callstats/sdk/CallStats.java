@@ -190,11 +190,11 @@ public class CallStats {
 	 */
 	public void sendCallStatsBridgeStatusUpdate(BridgeStatusInfo bridgeStatusInfo) {
 		if (isInitialized()) {
-			long epoch = System.currentTimeMillis() / 1000;
+			long epoch = System.currentTimeMillis();
 			String token = getToken();
 			BridgeStatusUpdateMessage eventMessage = new BridgeStatusUpdateMessage(
 					appId, bridgeId, CallStatsConst.CS_VERSION,
-					CallStatsConst.END_POINT_TYPE, "" + epoch, token,
+					CallStatsConst.END_POINT_TYPE, epoch, token,
 					bridgeStatusInfo, serverInfo);
 			String requestMessageString = gson.toJson(eventMessage);
 			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
@@ -264,8 +264,7 @@ public class CallStats {
 			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
 		}
 
-		long epoch = System.currentTimeMillis() / 1000;
-		String apiTS = "" + epoch;
+		long apiTS = System.currentTimeMillis();
 		String token = getToken();
 		EventInfo event = new EventInfo(eventType.getMessageType(), "{}");
 		if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP) {
@@ -284,8 +283,7 @@ public class CallStats {
 			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
 		}		
 		
-		long epoch = System.currentTimeMillis() / 1000;
-		String apiTS = "" + epoch;
+		long apiTS = System.currentTimeMillis();
 		String token = getToken();
 		EventInfo event = new EventInfo(eventType.getMessageType(), "{}");
 
@@ -400,8 +398,7 @@ public class CallStats {
 			throw new IllegalArgumentException("sendCallStatsConferenceStats: Arguments cannot be null");
 		}
 		
-		long epoch = System.currentTimeMillis() / 1000;
-		String apiTS = "" + epoch;
+		long apiTS = System.currentTimeMillis();
 		String token = getToken();
 		EventInfo event = new EventInfo(CallStatsConferenceEvents.CONFERENCE_STATS.getMessageType(), stats);
 		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
