@@ -374,7 +374,8 @@ public class CallStats {
 			String statsString = gson.toJson(conferenceStatsData);
 			logger.debug("Stats string is " + statsString);
 			sendCallStatsConferenceStats(statsString, info);
-		}
+			conferenceStatsMap.remove(key);
+		}		
 	}
 
 	public synchronized void reportConferenceStats(String userID, ConferenceStats stats) {
