@@ -33,6 +33,9 @@ public class ChallengeRequest {
 		
 		/** The response. */
 		String response;
+		
+		/** The original challenge */
+		private String challenge;
 
 		/**
 		 * Gets the response.
@@ -51,6 +54,22 @@ public class ChallengeRequest {
 		public void setResponse(String response) {
 			this.response = response;
 		}
+
+		/**
+		 * Gets the challenge.
+		 * @return challenge
+		 */
+		public String getChallenge() {
+			return challenge;
+		}
+		
+		/**
+		 * Sets the challenge
+		 * @param challenge the new challenge
+		 */
+		public void setChallenge(String challenge) {
+			this.challenge = challenge;
+		}
 	}
 	
 	/**
@@ -63,7 +82,7 @@ public class ChallengeRequest {
 	 * @param response the response
 	 */
 	public ChallengeRequest(int appID, String userID, String version,
-			String endpointType, String response) {
+			String endpointType, String response, String originalChallenge) {
 		super();
 		this.appID = appID;
 		this.userID = userID;
@@ -71,6 +90,7 @@ public class ChallengeRequest {
 		this.endpointType = endpointType;
 		challenge = new ChallengeRequestBody();
 		challenge.setResponse(response);
+		challenge.setChallenge(originalChallenge);
 	}
 	
 	/**
@@ -161,6 +181,24 @@ public class ChallengeRequest {
 	 */
 	public void setResponse(String response) {
 		challenge.setResponse(response);
+	}
+	
+	/**
+	 * Gets the challenge.
+	 *
+	 * @return the challenge
+	 */
+	public String getChallenge() {
+		return challenge.getChallenge();
+	}
+
+	/**
+	 * Sets the challenge.
+	 *
+	 * @param originalChallenge the new challenge
+	 */
+	public void setChallenge(String originalChallenge) {
+		challenge.setChallenge(originalChallenge);
 	}
 	
 	public String getAuthType() {

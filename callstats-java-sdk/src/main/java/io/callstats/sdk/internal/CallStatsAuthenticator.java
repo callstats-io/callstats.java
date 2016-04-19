@@ -201,7 +201,7 @@ public class CallStatsAuthenticator {
 		String response = getHmacResponse(challenge, appSecret);
 		ChallengeRequest requestMessage = new ChallengeRequest(appId, bridgeId,
 				CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE,
-				response);
+				response, challenge);
 		String requestMessageString = gson.toJson(requestMessage);
 
 		httpClient.sendAsyncHttpRequest(challengeUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
