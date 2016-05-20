@@ -9,7 +9,7 @@ public class CallStatsConst {
 	public static String CallStatsJavaSDKPropertyFileName = "config/callstats-java-sdk.properties";
 	
 	/** The Constant CS_VERSION. */
-	public static final String CS_VERSION = "0.1.0";	
+	public static String CS_VERSION;
 	
 	/** The Constant END_POINT_TYPE. */
 	public static final String END_POINT_TYPE = "VideoBridge";
