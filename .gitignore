@@ -13,5 +13,8 @@
 .settings/
 .project
 
+release/.m2/settings.xml
+release/.m2/repository/
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
