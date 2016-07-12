@@ -12,7 +12,7 @@ public class CallStatsConst {
 	public static String CS_VERSION;
 	
 	/** The Constant END_POINT_TYPE. */
-	public static final String END_POINT_TYPE = "VideoBridge";
+	public static final String END_POINT_TYPE = "middlebox";
 	
 	public static final String AUTH_TYPE = "BasicAuth";
 	
@@ -35,4 +35,9 @@ public class CallStatsConst {
 	public static final int SO_TIMEOUT = 30000;
 	
 	public static final int KEEPALIVE_INTERVAL = 1000;
+	
+	public static final String STATS_CLIENT_URL = "CallStats.BaseURL";
+	
+	public static final String AUTH_CLIENT_URL = "CallStats.BaseURL";
+	
 }

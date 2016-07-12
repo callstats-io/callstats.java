@@ -113,15 +113,6 @@ public class CallStatsTest{
 		
 		try {
 
-			callstatslib.initialize(appId, null, "jit.si.345",serverInfo,listener);
-
-		} catch (Throwable e1) {
-				e = e1;
-		}
-		assertTrue(e instanceof IllegalArgumentException);
-		
-		try {
-
 			callstatslib.initialize(appId, appSecret, null,serverInfo,listener);
 
 		} catch (Throwable e1) {

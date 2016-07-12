@@ -15,6 +15,8 @@ import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.CallStatsResponseStatus;
+import io.callstats.sdk.internal.CallStatsUrls;
+import io.callstats.sdk.internal.TokenGeneratorHs256;
 import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
@@ -82,6 +84,10 @@ public class CallStats {
 	
 	/** The bridge keep alive manager. */
 	private CallStatsBridgeKeepAliveManager bridgeKeepAliveManager;
+
+	private ICallStatsTokenGenerator tokenGenerator;
+
+	private CallStatsHttpClient authHttpClient;
 	
 	/**
 	 * Checks if is initialized.
@@ -102,7 +108,7 @@ public class CallStats {
 	}
 
 	/**
-	 * Instantiates a new call stats.
+	 * Instantiates a new callstats.
 	 */
 	public CallStats() {
 		gson = new Gson();
@@ -132,21 +138,41 @@ public class CallStats {
 	public void initialize(final int appId, final String appSecret,
 			final String bridgeId, final ServerInfo serverInfo,
 			final CallStatsInitListener callStatsInitListener) {
-		if (appId <= 0 || StringUtils.isBlank(appSecret)
-				|| StringUtils.isBlank(bridgeId) || serverInfo == null
+		if (StringUtils.isBlank(appSecret)) {
+			logger.error("intialize: Arguments cannot be null ");
+			throw new IllegalArgumentException("intialize: Arguments cannot be null");
+		}
+		initialize(appId, new TokenGeneratorHs256(appSecret.toCharArray(), appId, bridgeId), bridgeId, serverInfo, callStatsInitListener);
+	}
+	
+	/**
+	 * Initialize callstats.
+	 *
+	 * @param appId the app id
+	 * @param tokenGenerator token generator
+	 * @param bridgeId the bridge id
+	 * @param serverInfo the server info
+	 * @param callStatsInitListener the call stats init listener
+	 */
+
+	public void initialize(final int appId, ICallStatsTokenGenerator tokenGenerator,
+			final String bridgeId, final ServerInfo serverInfo,
+			final CallStatsInitListener callStatsInitListener) {
+		if (appId <= 0 || StringUtils.isBlank(bridgeId) || serverInfo == null
 				|| callStatsInitListener == null) {
 			logger.error("intialize: Arguments cannot be null ");
 			throw new IllegalArgumentException("intialize: Arguments cannot be null");
 		}
 
 		this.appId = appId;
-		this.appSecret = appSecret;
+		this.tokenGenerator = tokenGenerator;
 		this.bridgeId = bridgeId;
 		this.listener = callStatsInitListener;
 		this.serverInfo = serverInfo;
 		
 		httpClient = new CallStatsHttpClient();
-		authenticator = new CallStatsAuthenticator(appId, this.appSecret, bridgeId, httpClient, new CallStatsInitListener() {
+		authHttpClient = new CallStatsHttpClient(CallStatsUrls.AUTH_BASE);
+		authenticator = new CallStatsAuthenticator(appId, tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
 			public void onInitialized(String msg) {
 				setInitialized(true);
 				logger.info("SDK Initialized " + msg);

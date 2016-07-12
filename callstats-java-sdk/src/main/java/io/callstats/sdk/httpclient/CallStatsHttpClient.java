@@ -1,6 +1,7 @@
 package io.callstats.sdk.httpclient;
 
 import io.callstats.sdk.internal.CallStatsConst;
+import io.callstats.sdk.internal.CallStatsUrls;
 import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 
 import java.io.FileInputStream;
@@ -10,12 +11,15 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.concurrent.FutureCallback;
@@ -99,9 +103,18 @@ public class CallStatsHttpClient {
 	}
 	
 	/**
+	 * Backwards compatibility
+	 */
+	
+	public CallStatsHttpClient() {
+		this(CallStatsUrls.STATS_SUBMIT_BASE);
+	}
+	
+	
+	/**
 	 * Instantiates a new call stats http client.
 	 */
-	public CallStatsHttpClient() {
+	public CallStatsHttpClient(CallStatsUrls url) {
 		super();
 		Properties prop = new Properties();
 		InputStream input = null;
@@ -110,7 +123,7 @@ public class CallStatsHttpClient {
 			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 			if (input != null) {
 				prop.load(input);
-				BASE_URL = prop.getProperty("CallStats.BaseURL");
+				BASE_URL = prop.getProperty(url.toString());
 				
 				if (prop.getProperty("CallStats.ConnectionTimeOut") != null) {
 					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
@@ -121,8 +134,7 @@ public class CallStatsHttpClient {
 				}
 				
 				if (BASE_URL == null) {
-					logger.error("Callstats BASE URL can not be null");
-					throw new RuntimeException("Callstats BASE URL can not be null");
+					BASE_URL = url.getDefaultUrl();
 				}
 			}									
 		}  catch (FileNotFoundException e ) {
@@ -175,12 +187,43 @@ public class CallStatsHttpClient {
 	}
 	
 	/**
+	 * Generate http post request from form
+	 *
+	 * @param url the url
+	 * @param body the body
+	 * @return the http post
+	 */
+	private HttpPost generateHttpPostRequest(String url, UrlEncodedFormEntity form) {
+		URI uri = generateURI(url);
+
+		HttpPost post = new HttpPost(uri);
+		post.setHeader("Content-type", "application/x-www-form-urlencoded");
+	    post.setHeader("Accept", "application/json");
+		post.setEntity(form);
+		return post;
+	}
+	
+	/**
 	 * Generate uri.
 	 *
 	 * @param url the url
 	 * @return the uri
 	 */
 	private URI generateURI(String url) {
+		if (!url.startsWith("http")) {
+			String apiUrl = url.toLowerCase();
+			StringBuilder sb = new StringBuilder();
+	
+			sb.append(getBaseUrl());
+	
+			if (!apiUrl.startsWith("/")) {
+				sb.append("/");
+			}
+			sb.append(url);
+	
+			url = sb.toString();
+		}
+		
 		URI uri;
 		try {
 			uri = new URI(url);
@@ -273,8 +316,15 @@ public class CallStatsHttpClient {
 		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body) || listener == null) {
 			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
-
-		HttpUriRequest request = null;
+		
+		HttpPost request = null;
+		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
+			request = generateHttpPostRequest(url, body);
+		}
+		sendAsyncHttpRequest(url, httpMethodType, request, listener);
+	}
+	
+	protected void sendAsyncHttpRequest(String url, String httpMethodType, HttpUriRequest request, final CallStatsHttpResponseListener listener) {
 		String apiUrl = url.toLowerCase();
 		StringBuilder sb = new StringBuilder();
 
@@ -286,9 +336,6 @@ public class CallStatsHttpClient {
 		sb.append(url);
 
 		url = sb.toString();
-		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
-			request = generateHttpPostRequest(url, body);
-		}
 
 		if (request != null) {
 			request.addHeader(new BasicHeader("Accept", "application/json"));
@@ -315,6 +362,31 @@ public class CallStatsHttpClient {
 				}
 			});
 		}
+	}
+	
+	/**
+	 * Send async http request.
+	 *
+	 * @param url the url
+	 * @param httpMethodType the http method type
+	 * @param body the body
+	 * @param listener the listener
+	 */
+	public void sendAsyncHttpRequest(String url, String httpMethodType, List<NameValuePair> paramList , final CallStatsHttpResponseListener listener) {
+		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || paramList == null || paramList.size() == 0 || listener == null) {
+			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
+		}
+
+		HttpUriRequest request = null;
+
+		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
+			try {
+				request = generateHttpPostRequest(url, new UrlEncodedFormEntity(paramList));
+			} catch (UnsupportedEncodingException e) {
+				throw new IllegalArgumentException("sendHttpRequest: Unsupported encoding", e);
+			}
+		}
+		sendAsyncHttpRequest(url, httpMethodType, request, listener);
 	}
 	
 }
