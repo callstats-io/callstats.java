@@ -342,7 +342,7 @@ public class CallStats {
 		
 		String key = userID+":"+confID;
 		
-		List<ConferenceStats> tempStats = conferenceStatsMap.get(userID);
+		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
 		if (tempStats == null) {
 			tempStats = new ArrayList<ConferenceStats>();
 			conferenceStatsMap.put(key, tempStats);
