@@ -1,18 +1,25 @@
 package io.callstats.sdk.internal;
 
 import io.callstats.sdk.CallStatsErrors;
+import io.callstats.sdk.ICallStatsTokenGenerator;
 import io.callstats.sdk.httpclient.CallStatsHttpClient;
 import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 import io.callstats.sdk.listeners.CallStatsInitListener;
-import io.callstats.sdk.messages.AuthorizeRequest;
-import io.callstats.sdk.messages.AuthorizeResponse;
-import io.callstats.sdk.messages.ChallengeRequest;
-import io.callstats.sdk.messages.ChallengeResponse;
+import io.callstats.sdk.messages.AuthenticateErrorAction;
+import io.callstats.sdk.messages.AuthenticateErrorActionDeserializer;
+import io.callstats.sdk.messages.AuthenticateErrorActionType;
+import io.callstats.sdk.messages.AuthenticateErrorCode;
+import io.callstats.sdk.messages.AuthenticateRequest;
+import io.callstats.sdk.messages.AuthenticateResponse;
+import io.callstats.sdk.messages.AuthenticateResponseError;
+import io.callstats.sdk.messages.AuthenticateRetryActionParams;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,12 +29,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 /**
@@ -43,6 +53,9 @@ public class CallStatsAuthenticator {
 	
 	/** The Constant authorizeUrl. */
 	private static final String authorizeUrl = "/o/authorize";
+	
+	/** The Constant authorizeUrl. */
+	private static final String authenticateUrl = "/authenticate";
 	
 	/** The listener. */
 	private CallStatsInitListener listener;
@@ -80,7 +93,11 @@ public class CallStatsAuthenticator {
 	
 	
 	
-	private boolean isAuthenticationInProgress = false;
+	private Boolean isAuthenticationInProgress = false;
+
+	private ICallStatsTokenGenerator tokenGenerator;
+
+	private boolean forcenewtoken = false;
 	
 	/**
 	 * Gets the token.
@@ -135,7 +152,31 @@ public class CallStatsAuthenticator {
 		this.appSecret = appSecret;
 		this.bridgeId = bridgeId;
 		this.httpClient = httpClient;
-		gson = new Gson();
+		gson = new GsonBuilder()
+				.registerTypeAdapter(AuthenticateErrorAction.class, new AuthenticateErrorActionDeserializer())
+				.create();
+	}
+	
+	/**
+	 * Instantiates a new call stats authenticator.
+	 *
+	 * @param appId the app id
+	 * @param tokenGenerator tokken generator
+	 * @param bridgeId the bridge id
+	 * @param httpClient the http client
+	 * @param listener the listener
+	 */
+	public CallStatsAuthenticator(final int appId, ICallStatsTokenGenerator tokenGenerator,
+			final String bridgeId, final CallStatsHttpClient httpClient,
+			CallStatsInitListener listener) {
+		this.tokenGenerator = tokenGenerator;
+		this.listener = listener;
+		this.appId = appId;
+		this.bridgeId = bridgeId;
+		this.httpClient = httpClient;
+		gson = new GsonBuilder()
+				.registerTypeAdapter(AuthenticateErrorAction.class, new AuthenticateErrorActionDeserializer())
+				.create();
 	}
 	
 	/**
@@ -143,185 +184,10 @@ public class CallStatsAuthenticator {
 	 */
 	public void doAuthentication() {
 		if (!isAuthenticationInProgress) {
-			sendAsyncAuthenticationRequest(appId, appSecret, bridgeId,
+			sendAsyncAuthenticationRequest(appId, bridgeId,
 					httpClient);
 		}
 	}
-	
-	
-//	/**
-//	 * Do authentication.
-//	 *
-//	 * @param appId the app id
-//	 * @param appSecret the app secret
-//	 * @param bridgeId the bridge id
-//	 * @param httpClient the http client
-//	 */
-//	public void doAuthentication(final int appId,final String appSecret,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
-//		sendAsyncAuthenticationRequest(appId,appSecret,bridgeId,httpClient);
-//	}
-	
-	/**
-	 * Gets the hmac response.
-	 *
-	 * @param challenge the challenge
-	 * @param appSecret the app secret
-	 * @return the hmac response
-	 */
-	private String getHmacResponse(String challenge, String appSecret) {
-		String HMAC_SHA1_ALGORITHM = "HmacSHA1";
-		String response = null;
-		try {
-			Key signingKey = new SecretKeySpec(appSecret.getBytes(),
-					HMAC_SHA1_ALGORITHM);
-			Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
-			mac.init(signingKey);
-			byte[] rawHmac = mac.doFinal(challenge.getBytes());
-			response = Base64.encodeBase64String(rawHmac);
-		} catch (NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
-		} catch (InvalidKeyException e1) {
-			e1.printStackTrace();
-		}
-		return response;
-	}
-	
-	/**
-	 * Handle authentication challenge.
-	 *
-	 * @param appId the app id
-	 * @param appSecret the app secret
-	 * @param challenge the challenge
-	 * @param bridgeId the bridge id
-	 * @param httpClient the http client
-	 */
-	private void handleAuthenticationChallenge(final int appId,
-			final String appSecret, final String challenge,
-			final String bridgeId, final CallStatsHttpClient httpClient) {
-		String response = getHmacResponse(challenge, appSecret);
-		ChallengeRequest requestMessage = new ChallengeRequest(appId, bridgeId,
-				CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE,
-				response, challenge);
-		String requestMessageString = gson.toJson(requestMessage);
-
-		httpClient.sendAsyncHttpRequest(challengeUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
-				isAuthenticationInProgress = false;
-				int responseStatus = response.getStatusLine()
-						.getStatusCode();
-				logger.info("Response status " + responseStatus);
-				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-					ChallengeResponse challengeResponseMessage;
-					try {
-						String responseString = EntityUtils.toString(response.getEntity());
-						challengeResponseMessage = gson.fromJson(responseString, ChallengeResponse.class);
-					} catch (ParseException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					} catch (JsonSyntaxException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-					if (challengeResponseMessage.getStatus().equals(CallStatsConst.SUCCESS)) {
-						logger.info("Challenge response "
-								+ responseStatus + " "
-								+ challengeResponseMessage.getExpires()
-								+ " "
-								+ challengeResponseMessage.getToken());
-						expires = challengeResponseMessage.getExpires();
-						token = challengeResponseMessage.getToken();
-						listener.onInitialized(authSuccessString);
-					} else {
-						// if its proto error , callback to inform the
-						// error
-						if (challengeResponseMessage.getReason().equals(CallStatsErrors.CS_PROTO_ERROR.getReason())) {
-							listener.onError(CallStatsErrors.CS_PROTO_ERROR, authErrString);
-						} else {
-							scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
-						}
-					}
-				} else if (responseStatus == CallStatsResponseStatus.GATEWAY_ERROR) {
-					scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
-					listener.onError(
-							CallStatsErrors.APP_CONNECTIVITY_ERROR, authErrString);
-				} else if (responseStatus == CallStatsResponseStatus.INVALID_PROTO_FORMAT_ERROR) {
-					listener.onError(CallStatsErrors.AUTH_ERROR, authErrString);
-				} else {
-					listener.onError(CallStatsErrors.HTTP_ERROR, authErrString);
-				}
-			}
-
-			public void onFailure(Exception e) {
-				isAuthenticationInProgress = false;
-				listener.onError(CallStatsErrors.HTTP_ERROR,
-						e.getMessage());
-			}
-		});
-	}
-	
-	
-//	/**
-//	 * Handle authentication challenge.
-//	 *
-//	 * @param appId the app id
-//	 * @param appSecret the app secret
-//	 * @param challenge the challenge
-//	 * @param bridgeId the bridge id
-//	 * @param httpClient the http client
-//	 */
-//	private void handleAuthenticationChallenge(final int appId,final String appSecret,final String challenge,final String bridgeId,final CallStatsAsyncHttpClient httpClient) {
-//		String response = getHmacResponse(challenge,appSecret);
-//		ChallengeRequest requestMessage = new ChallengeRequest(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE, response);		
-//		String requestMessageString = gson.toJson(requestMessage);
-//		
-//		httpClient.sendAsyncHttpRequest(challengeUrl, CallStatsConst.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {		
-//			public void onResponse(Response response) {
-//				int responseStatus = response.getStatusCode();
-//				ChallengeResponse challengeResponseMessage;
-//				try {
-//					String responseString = response.getResponseBody();
-//					challengeResponseMessage  = gson.fromJson(responseString,ChallengeResponse.class);							
-//				} catch (ParseException e) {						
-//					e.printStackTrace();
-//					throw new RuntimeException(e);
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					throw new RuntimeException(e);					
-//				}
-//				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
-//					if(challengeResponseMessage.getStatus().equals("OK")) {
-//						logger.info("Challenge response "+responseStatus+" "+challengeResponseMessage.getExpires()+" "+challengeResponseMessage.getToken());
-//						expires = challengeResponseMessage.getExpires();
-//						token = challengeResponseMessage.getToken();
-//						listener.onInitialized("SDK authentication successful");
-//					}
-//					else {
-//						//if its proto error , callback to inform the error
-//						if(challengeResponseMessage.getReason().equals(CallStatsErrors.CS_PROTO_ERROR.getReason())) {
-//							listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
-//						} else {
-//							scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
-//						}
-//					}
-//				} else if(responseStatus == GATEWAY_ERROR) {
-//					scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
-//					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
-//				} else if(responseStatus == INVALID_PROTO_FORMAT_ERROR) {
-//					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
-//				} else {
-//					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
-//				}
-//			}
-//
-//			public void onFailure(Exception e) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//		});
-//	}
 	
 	/**
 	 * Schedule authentication.
@@ -331,31 +197,13 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void scheduleAuthentication(final int appId, final String appSecret, final String bridgeId, final CallStatsHttpClient httpClient) {
+	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
 		scheduler.schedule(new Runnable() {
 			public void run() {
-				sendAsyncAuthenticationRequest(appId, appSecret, bridgeId, httpClient);
+				sendAsyncAuthenticationRequest(appId, bridgeId, httpClient);
 			}
 		}, authenticationRetryTimeout, TimeUnit.MILLISECONDS);
 	}
-	
-	
-//	/**
-//	 * Schedule authentication.
-//	 *
-//	 * @param appId the app id
-//	 * @param appSecret the app secret
-//	 * @param bridgeId the bridge id
-//	 * @param httpClient the http client
-//	 */
-//	private void scheduleAuthentication(final int appId,final String appSecret,final String bridgeId, final CallStatsAsyncHttpClient httpClient) {
-//		scheduler.schedule(new Runnable() {
-//			
-//			public void run() {
-//				sendAsyncAuthenticationRequest(appId, appSecret, bridgeId,httpClient);
-//			}
-//		}, authenticationRetryTimeout, TimeUnit.MILLISECONDS);
-//	}
 	
 	
 	/**
@@ -366,53 +214,73 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void sendAsyncAuthenticationRequest(final int appId, final String appSecret, final String bridgeId, final CallStatsHttpClient httpClient) {
-		AuthorizeRequest requestMessage = new AuthorizeRequest(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE);
-		String requestMessageString = gson.toJson(requestMessage);
-		isAuthenticationInProgress = true;
-		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
+	private void sendAsyncAuthenticationRequest(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
+		synchronized (isAuthenticationInProgress) {
+			if (isAuthenticationInProgress)
+				return;
+			isAuthenticationInProgress = true;
+			
+		}
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("client_id", bridgeId+"@"+appId));
+		params.add(new BasicNameValuePair("code", tokenGenerator.generateToken(forcenewtoken)));
+		params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+		
+		httpClient.sendAsyncHttpRequest(authenticateUrl, CallStatsConst.httpPostMethod, params, new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
-				String challenge;
-				int responseStatus = response.getStatusLine().getStatusCode();
+				isAuthenticationInProgress = false;
+				int responseStatus = response.getStatusLine()
+						.getStatusCode();
+				logger.info("Response status " + responseStatus);
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-					AuthorizeResponse authorizeResponseMessage;
+					AuthenticateResponse authResponseMessage;
+					String responseString;
 					try {
-						String responseString = EntityUtils.toString(response.getEntity());
-						logger.info("Auth response " + responseStatus);
-						authorizeResponseMessage = gson.fromJson(responseString, AuthorizeResponse.class);
-					} catch (ParseException e) {
-						isAuthenticationInProgress = false;
+						responseString = EntityUtils.toString(response.getEntity());
+						authResponseMessage = gson.fromJson(responseString, AuthenticateResponse.class);
+					} catch (Exception e) {
 						e.printStackTrace();
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						isAuthenticationInProgress = false;
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					} catch (JsonSyntaxException e) {
-						isAuthenticationInProgress = false;
-						e.printStackTrace();
-						throw new RuntimeException(e);
+						listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());
+						scheduleAuthentication(appId, bridgeId, httpClient);
+						return;
 					}
-					if (authorizeResponseMessage.getStatus().equals(CallStatsConst.SUCCESS)) {
-						challenge = authorizeResponseMessage.getChallenge();
-						logger.info("Challenge " + challenge);
-						handleAuthenticationChallenge(appId, appSecret, challenge, bridgeId, httpClient);
-					} else {
-						isAuthenticationInProgress = false;
-						logger.info("Authentication Request Error");
-						listener.onError(CallStatsErrors.CS_PROTO_ERROR, authErrString);
-					}
-				} else if (responseStatus == CallStatsResponseStatus.SERVER_ERROR || responseStatus == CallStatsResponseStatus.GATEWAY_ERROR) {
-					isAuthenticationInProgress = false;
-					scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
-					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, authErrString);
+					logger.info("Authentication response "
+								+ responseStatus + " "
+								+ authResponseMessage.getToken());
+					//expires = authResponseMessage.getAuthenticateBody().getExpires();
+					token = authResponseMessage.getToken();
+					listener.onInitialized(authSuccessString);
 				} else if (responseStatus == CallStatsResponseStatus.INVALID_PROTO_FORMAT_ERROR) {
-					isAuthenticationInProgress = false;
+					AuthenticateResponseError authResponseMessageError;
+					String responseString;
+					try {
+						responseString = EntityUtils.toString(response.getEntity());
+						authResponseMessageError = gson.fromJson(responseString, AuthenticateResponseError.class);
+					} catch (Exception e) {
+						e.printStackTrace();
+						listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());
+						scheduleAuthentication(appId, bridgeId, httpClient);
+						return;
+					}
+					for (AuthenticateErrorAction action : authResponseMessageError.getErrorActions()) {
+						if (action.getAction() == AuthenticateErrorActionType.GET_NEW_TOKEN) {
+							forcenewtoken = true;
+						} else if (action.getAction() == AuthenticateErrorActionType.RETRY) {
+							authenticationRetryTimeout = ((AuthenticateRetryActionParams)action.getParams()).getTimeout();
+							scheduleAuthentication(appId, bridgeId, httpClient);
+						}
+					}
 					listener.onError(CallStatsErrors.AUTH_ERROR, authErrString);
+				} else if (responseStatus == CallStatsResponseStatus.GATEWAY_ERROR) {
+					scheduleAuthentication(appId,  bridgeId, httpClient);
+					listener.onError(
+							CallStatsErrors.APP_CONNECTIVITY_ERROR, authErrString);
 				} else {
-					isAuthenticationInProgress = false;
+					scheduleAuthentication(appId, bridgeId, httpClient);
 					listener.onError(CallStatsErrors.HTTP_ERROR, authErrString);
 				}
+			
+				
 			}
 
 			public void onFailure(Exception e) {
@@ -424,57 +292,4 @@ public class CallStatsAuthenticator {
 	}
 	
 	
-//	/**
-//	 * Send async authentication request.
-//	 *
-//	 * @param appId the app id
-//	 * @param appSecret the app secret
-//	 * @param bridgeId the bridge id
-//	 * @param httpClient the http client
-//	 */
-//	private void sendAsyncAuthenticationRequest(final int appId, final String appSecret, final String bridgeId, final CallStatsAsyncHttpClient httpClient) {
-//		AuthorizeRequest requestMessage = new AuthorizeRequest(appId, bridgeId, CallStatsConst.CS_VERSION, CallStatsConst.END_POINT_TYPE);	
-//		String requestMessageString = gson.toJson(requestMessage);
-//		httpClient.sendAsyncHttpRequest(authorizeUrl, CallStatsConst.httpPostMethod, requestMessageString,new CallStatsAsyncHttpResponseListener() {
-//			
-//			public void onResponse(Response response) {
-//				// TODO Auto-generated method stub
-//				String challenge;
-//				int responseStatus = response.getStatusCode();
-//				AuthorizeResponse authorizeResponseMessage;
-//				try {
-//					String responseString = response.getResponseBody();
-//					authorizeResponseMessage = gson.fromJson(responseString,AuthorizeResponse.class);							
-//				} catch (ParseException e) {						
-//					e.printStackTrace();
-//					throw new RuntimeException(e);
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					throw new RuntimeException(e);
-//				}
-//				if(responseStatus == RESPONSE_STATUS_SUCCESS) {
-//					if(authorizeResponseMessage.getStatus().equals("OK")) {
-//						challenge = authorizeResponseMessage.getChallenge();
-//						logger.info("Challenge "+challenge);		
-//						handleAuthenticationChallenge(appId,appSecret,challenge,bridgeId,httpClient);
-//					}
-//					else {
-//						listener.onError(CallStatsErrors.CS_PROTO_ERROR, "SDK Authentication Error");
-//					}
-//				} else if(responseStatus == SERVER_ERROR || responseStatus == GATEWAY_ERROR) {
-//					scheduleAuthentication(appId, appSecret, bridgeId,httpClient);
-//					listener.onError(CallStatsErrors.APP_CONNECTIVITY_ERROR, "SDK Authentication Error");
-//				} else if(responseStatus == INVALID_PROTO_FORMAT_ERROR) {
-//					listener.onError(CallStatsErrors.AUTH_ERROR, "SDK Authentication Error");
-//				} else {
-//					listener.onError(CallStatsErrors.HTTP_ERROR, "SDK Authentication Error");
-//				}
-//			}
-//			
-//			public void onFailure(Exception e) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//		}); 
-//	}
 }
