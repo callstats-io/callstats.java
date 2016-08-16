@@ -197,7 +197,7 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void scheduleAuthentication(final int appId, final String appSecret, final String bridgeId, final CallStatsHttpClient httpClient) {
+	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
 		scheduler.schedule(new Runnable() {
 			public void run() {
 				sendAsyncAuthenticationRequest(appId, bridgeId, httpClient);
@@ -241,7 +241,7 @@ public class CallStatsAuthenticator {
 					} catch (Exception e) {
 						e.printStackTrace();
 						listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());
-						scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
+						scheduleAuthentication(appId, bridgeId, httpClient);
 						return;
 					}
 					logger.info("Authentication response "
@@ -259,7 +259,7 @@ public class CallStatsAuthenticator {
 					} catch (Exception e) {
 						e.printStackTrace();
 						listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());
-						scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
+						scheduleAuthentication(appId, bridgeId, httpClient);
 						return;
 					}
 					for (AuthenticateErrorAction action : authResponseMessageError.getErrorActions()) {
@@ -267,16 +267,16 @@ public class CallStatsAuthenticator {
 							forcenewtoken = true;
 						} else if (action.getAction() == AuthenticateErrorActionType.RETRY) {
 							authenticationRetryTimeout = ((AuthenticateRetryActionParams)action.getParams()).getTimeout();
-							scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
+							scheduleAuthentication(appId, bridgeId, httpClient);
 						}
 					}
 					listener.onError(CallStatsErrors.AUTH_ERROR, authErrString);
 				} else if (responseStatus == CallStatsResponseStatus.GATEWAY_ERROR) {
-					scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
+					scheduleAuthentication(appId,  bridgeId, httpClient);
 					listener.onError(
 							CallStatsErrors.APP_CONNECTIVITY_ERROR, authErrString);
 				} else {
-					scheduleAuthentication(appId, appSecret, bridgeId, httpClient);
+					scheduleAuthentication(appId, bridgeId, httpClient);
 					listener.onError(CallStatsErrors.HTTP_ERROR, authErrString);
 				}
 			
