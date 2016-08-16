@@ -34,7 +34,7 @@ public class CallStatsConst {
 			
 	public static final int SO_TIMEOUT = 30000;
 	
-	public static final int KEEPALIVE_INTERVAL = 1000;
+	public static final int KEEPALIVE_INTERVAL = 30000;
 	
 	public static final String STATS_CLIENT_URL = "CallStats.BaseURL";
 	
