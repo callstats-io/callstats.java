@@ -181,7 +181,7 @@ public class CallStatsHttpClient {
 
 		HttpPost post = new HttpPost(uri);
 		post.setHeader("Content-type", "application/json");
-	    post.setHeader("Accept", "application/json");
+		post.setHeader("Accept", "application/json");
 		post.setEntity(entity);
 		return post;
 	}
