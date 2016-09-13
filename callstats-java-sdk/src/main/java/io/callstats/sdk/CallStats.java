@@ -5,8 +5,6 @@ import io.callstats.sdk.data.ConferenceInfo;
 import io.callstats.sdk.data.ConferenceStats;
 import io.callstats.sdk.data.ConferenceStatsData;
 import io.callstats.sdk.data.ServerInfo;
-import io.callstats.sdk.data.StreamStats;
-import io.callstats.sdk.data.StreamStatsData;
 import io.callstats.sdk.data.UserInfo;
 import io.callstats.sdk.httpclient.CallStatsHttpClient;
 import io.callstats.sdk.internal.BridgeStatusInfoQueue;
@@ -118,7 +116,7 @@ public class CallStats {
 		}
 		
 		logger.info("config file path is "+System.getProperty("callstats.configurationFile"));
-		CallStatsConst.CS_VERSION = getClass().getPackage().getImplementationVersion();	
+		CallStatsConst.CS_VERSION = getClass().getPackage().getImplementationVersion();
 	}
 	
 	private String getToken() {
@@ -176,22 +174,7 @@ public class CallStats {
 			public void onInitialized(String msg) {
 				setInitialized(true);
 				logger.info("SDK Initialized " + msg);
-				if (bridgeKeepAliveManager == null) {
-					bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient, new CallStatsBridgeKeepAliveStatusListener() {
-						public void onKeepAliveError(
-								CallStatsErrors error,
-								String errMsg) {
-							if (error == CallStatsErrors.AUTH_ERROR) {
-								authenticator.doAuthentication();
-							}
-						}
-
-						public void onSuccess() {
-							sendCallStatsBridgeStatusUpdateFromQueue();
-						}
-					});
-				}
-				bridgeKeepAliveManager.startKeepAliveSender(authenticator.getToken());
+				startKeepAliveThread();
 				listener.onInitialized(msg);
 			}
 
@@ -292,7 +275,9 @@ public class CallStats {
 
 		long apiTS = System.currentTimeMillis();
 		String token = getToken();
-		EventInfo event = new EventInfo(eventType.getMessageType(), "{}");
+		String eventData = "{\"fromUserID\":\""+conferenceInfo.getInitiatorID()+"\"}";
+		logger.debug("eventa data is "+eventData);
+		EventInfo event = new EventInfo(eventType.getMessageType(), eventData);
 		if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP) {
 
 			CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
@@ -311,7 +296,8 @@ public class CallStats {
 		
 		long apiTS = System.currentTimeMillis();
 		String token = getToken();
-		EventInfo event = new EventInfo(eventType.getMessageType(), "{}");
+		String eventData = "{ \"fromUserID\":\""+userInfo.getUserID()+"\"}";
+		EventInfo event = new EventInfo(eventType.getMessageType(), eventData);
 
 		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
 				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
@@ -321,6 +307,7 @@ public class CallStats {
 
 	private synchronized void sendCallStatsConferenceEventMessage(CallStatsEventMessage eventMessage,final CallStatsStartConferenceListener listener ) {
 		String requestMessageString = gson.toJson(eventMessage);
+		logger.info("message sending is "+requestMessageString);
 		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
 			public void onResponse(HttpResponse response) {
 				int responseStatus = response.getStatusLine().getStatusCode();
@@ -328,6 +315,7 @@ public class CallStats {
 					CallStatsEventResponseMessage eventResponseMessage;
 					try {
 						String responseString = EntityUtils.toString(response.getEntity());
+						logger.debug("received response "+responseString);
 						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
 					} catch (ParseException e) {
 						logger.error("ParseException " + e.getMessage(), e);
@@ -384,15 +372,12 @@ public class CallStats {
 		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
 		
 		if (tempStats != null && tempStats.size() > 0) {
-			StreamStats streamStats;
-			StreamStatsData streamStatsData;
 			ConferenceStats conferenceStats = tempStats.get(0);
-			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID(),conferenceStats.getRemoteUserID());
+			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID(),conferenceStats.getRemoteUserID(),
+					conferenceStats.getUcID(), conferenceStats.getConfID());
 			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getLocalUserID(), conferenceStats.getUcID());
 			for (ConferenceStats stats : tempStats) {
-				streamStatsData = new StreamStatsData(stats.getRtt(), stats.getPacketsSent(), stats.getBytesSent(), stats.getJitter());
-				streamStats = new StreamStats(stats.getFromUserID(), stats.getStatsType(), streamStatsData);
-				conferenceStatsData.addStreamStats(stats.getSsrc(), streamStats);
+				conferenceStatsData.addStats(stats);
 			}
 
 			String statsString = gson.toJson(conferenceStatsData);
@@ -416,6 +401,25 @@ public class CallStats {
 			tempStats.add(stats);
 			conferenceStatsMap.put(key, tempStats);
 		}	
+	}
+	
+	private synchronized void startKeepAliveThread() {
+		if (bridgeKeepAliveManager == null) {
+			bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient, new CallStatsBridgeKeepAliveStatusListener() {
+				public void onKeepAliveError(
+						CallStatsErrors error,
+						String errMsg) {
+					if (error == CallStatsErrors.AUTH_ERROR) {
+						authenticator.doAuthentication();
+					}
+				}
+
+				public void onSuccess() {
+					sendCallStatsBridgeStatusUpdateFromQueue();
+				}
+			});
+		}
+		bridgeKeepAliveManager.startKeepAliveSender(authenticator.getToken());
 	}
 	
 	

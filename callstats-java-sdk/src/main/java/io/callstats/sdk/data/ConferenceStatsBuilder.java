@@ -4,20 +4,60 @@ public class ConferenceStatsBuilder {
 	
 	String localUserID;
 	String remoteUserID;
-	CallStatsStreamType statsType; //inbound or outbound
+	String statsType; //inbound or outbound
 	String ssrc;
 	String fromUserID;
-	int rtt;
-	long packetsSent;
-	long bytesSent;
-	double jitter;
 	String ucID;
 	String confID;
+		
+	long packetsSent;
+	long packetsReceived;
+	long packetsLost;
+	long packetsDuplicated;
+	long packetsDiscarded;
+	long packetsRepaired;
+	
+	long bytesSent;
+	long bytesReceived;
+	long bytesDuplicated;
+	long bytesDiscarded;
+	long bytesRepaired;
+	
+	long burstPacketsLost;
+	long burstLossIntervalCount;
+	long burstPacketsDiscarded;
+	long burstDiscardIntervalCount;
+	
+	double gapLossRate;
+	double gapDiscardRate;
+	
+	double fractionalPacketLost;
+	double fractionalPacketDiscarded;
+	
+	long framesSent;
+	long framesReceived;
+	long framesLost;
+	long framesDropped;
+	long framesCorrupted;
+	
+	int rtt;
+	double jitter;
+	
+	double currentPlayoutDelay;
+	double maxPlayoutDelay;
+	double minPlayoutDelay;
+	
+	double currentJBDelay;
+	double highWatermarkJBDelay;
+	double lowWatermarkJBDelay;
+	double maxJBDelay;
+	double minJBDelay;
+	double avsync;
 	
 	public String getLocalUserID() {
 		return localUserID;
 	}
-	public CallStatsStreamType getStatsType() {
+	public String getStatsType() {
 		return statsType;
 	}
 	public String getSsrc() {
@@ -54,7 +94,7 @@ public class ConferenceStatsBuilder {
 	}
 	
 	public ConferenceStatsBuilder statsType(CallStatsStreamType  statsType) {
-		this.statsType = statsType;
+		this.statsType = statsType.getMessageType();
 		return this;
 	}
 	
@@ -83,23 +123,153 @@ public class ConferenceStatsBuilder {
 		return this;
 	}
 	
-	public ConferenceStatsBuilder packetsSent(long  packetsSent) {
+		
+	public ConferenceStatsBuilder  packetsSent(long  packetsSent) {
 		this.packetsSent = packetsSent;
 		return this;
 	}
+	public ConferenceStatsBuilder packetsReceived(long packetsReceived) {
+		this.packetsReceived = packetsReceived;
+		return this;
+	}
+	public ConferenceStatsBuilder packetsLost(long packetsLost) {
+		this.packetsLost = packetsLost;
+		return this;
+	}
+	public ConferenceStatsBuilder packetsDuplicated(long packetsDuplicated) {
+		this.packetsDuplicated = packetsDuplicated;
+		return this;
+	}
+	public ConferenceStatsBuilder packetsDiscarded(long packetsDiscarded) {
+		this.packetsDiscarded = packetsDiscarded;
+		return this;
+	}
+	public ConferenceStatsBuilder packetsRepaired(long packetsRepaired) {
+		this.packetsRepaired = packetsRepaired;
+		return this;
+	}
 	
-	public ConferenceStatsBuilder bytesSent(long  bytesSent) {
+	public ConferenceStatsBuilder bytesSent(long bytesSent) {
 		this.bytesSent = bytesSent;
 		return this;
 	}
-	
-	public ConferenceStatsBuilder rtt(int  rtt) {
-		this.rtt = rtt;
+	public ConferenceStatsBuilder bytesReceived(long bytesReceived) {
+		this.bytesReceived = bytesReceived;
+		return this;
+	}
+	public ConferenceStatsBuilder bytesDuplicated(long bytesDuplicated) {
+		this.bytesDuplicated = bytesDuplicated;
+		return this;
+	}
+	public ConferenceStatsBuilder bytesDiscarded(long bytesDiscarded) {
+		this.bytesDiscarded = bytesDiscarded;
+		return this;
+	}
+	public ConferenceStatsBuilder bytesRepaired(long bytesRepaired) {
+		this.bytesRepaired = bytesRepaired;
 		return this;
 	}
 	
-	public ConferenceStatsBuilder jitter(double  jitter) {
+	public ConferenceStatsBuilder burstPacketsLost(long burstPacketsLost) {
+		this.burstPacketsLost = burstPacketsLost;
+		return this;
+	}
+	public ConferenceStatsBuilder burstLossIntervalCount(long burstLossIntervalCount) {
+		this.burstLossIntervalCount = burstLossIntervalCount;
+		return this;
+	}
+	public ConferenceStatsBuilder burstPacketsDiscarded(long burstPacketsDiscarded) {
+		this.burstPacketsDiscarded = burstPacketsDiscarded;
+		return this;
+	}
+	public ConferenceStatsBuilder burstDiscardIntervalCount(long burstDiscardIntervalCount) {
+		this.burstDiscardIntervalCount = burstDiscardIntervalCount;
+		return this;
+	}
+	
+	public ConferenceStatsBuilder gapLossRate(double gapLossRate) {
+		this.gapLossRate = gapLossRate;
+		return this;
+	}
+	public ConferenceStatsBuilder gapDiscardRate(double gapDiscardRate) {
+		this.gapDiscardRate = gapDiscardRate;
+		return this;
+	}
+	
+	public ConferenceStatsBuilder fractionalPacketLost(double fractionalPacketLost) {
+		this.fractionalPacketLost = fractionalPacketLost;
+		return this;
+	}
+	public ConferenceStatsBuilder fractionalPacketDiscarded(double fractionalPacketDiscarded) {
+		this.fractionalPacketDiscarded = fractionalPacketDiscarded;
+		return this;
+	}
+	
+	public ConferenceStatsBuilder framesSent(long framesSent) {
+		this.framesSent = framesSent;
+		return this;
+	}
+	public ConferenceStatsBuilder framesReceived(long framesReceived) {
+		this.framesReceived = framesReceived;
+		return this;
+	}
+	public ConferenceStatsBuilder framesLost(long framesLost) {
+		this.framesLost = framesLost;
+		return this;
+	}
+	public ConferenceStatsBuilder framesDropped(long framesDropped) {
+		this.framesDropped = framesDropped;
+		return this;
+	}
+	public ConferenceStatsBuilder framesCorrupted(long framesCorrupted) {
+		this.framesCorrupted = framesCorrupted;
+		return this;
+	}
+	
+	public ConferenceStatsBuilder rtt(int rtt) {
+		this.rtt = rtt;
+		return this;
+	}
+	public ConferenceStatsBuilder jitter(double jitter) {
 		this.jitter = jitter;
+		return this;
+	}
+	
+	public ConferenceStatsBuilder currentPlayoutDelay(double currentPlayoutDelay) {
+		this.currentPlayoutDelay = currentPlayoutDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder maxPlayoutDelay(double maxPlayoutDelay) {
+		this.maxPlayoutDelay = maxPlayoutDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder minPlayoutDelay(double minPlayoutDelay) {
+		this.minPlayoutDelay = minPlayoutDelay;
+		return this;
+	}
+	
+	public ConferenceStatsBuilder currentJBDelay(double currentJBDelay) {
+		this.currentJBDelay = currentJBDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder highWatermarkJBDelay(double highWatermarkJBDelay) {
+		this.highWatermarkJBDelay = highWatermarkJBDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder lowWatermarkJBDelay(double lowWatermarkJBDelay) {
+		this.lowWatermarkJBDelay = lowWatermarkJBDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder maxJBDelay(double maxJBDelay) {
+		this.maxJBDelay = maxJBDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder minJBDelay( double minJBDelay) {
+		this.minJBDelay = minJBDelay;
+		return this;
+	}
+	public ConferenceStatsBuilder avsync(double avsync) {
+		this.avsync = avsync;
 		return this;
 	}
 	
