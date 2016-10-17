@@ -9,16 +9,15 @@ public class CallStatsEventMessage {
 	private String token;
 	private String localID;
 	private String remoteID;
-	private String pcID;
 	private String ucID;
 	private EventInfo event;
-	
+
 	public String getUcID() {
 		return ucID;
 	}
 	public void setUcID(String ucID) {
 		this.ucID = ucID;
-	}	
+	}
 	public String getVersion() {
 		return version;
 	}
@@ -67,19 +66,13 @@ public class CallStatsEventMessage {
 	public void setRemoteID(String remoteID) {
 		this.remoteID = remoteID;
 	}
-	public String getPcID() {
-		return pcID;
-	}
-	public void setPcID(String pcID) {
-		this.pcID = pcID;
-	}
 	public EventInfo getEvent() {
 		return event;
 	}
 	public void setEvent(EventInfo event) {
 		this.event = event;
 	}
-	
+
 	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
 			String remoteID, EventInfo event) {
 		super();
@@ -92,8 +85,8 @@ public class CallStatsEventMessage {
 		this.localID = localID;
 		this.remoteID = remoteID;
 		this.event = event;
-	}	
-	
+	}
+
 	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
 			String remoteID, String ucID, EventInfo event) {
 		super();
@@ -107,7 +100,6 @@ public class CallStatsEventMessage {
 		this.remoteID = remoteID;
 		this.event = event;
 		this.ucID = ucID;
-	}	
-	
-	
+	}
+
 }

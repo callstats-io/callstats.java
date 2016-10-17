@@ -15,7 +15,7 @@ public class BridgeKeepAliveMessage {
 	private String version;
 	
 	/** The api ts. */
-	private String apiTS;
+	private long apiTS;
 	
 	/** The token. */
 	private String token;
@@ -30,7 +30,7 @@ public class BridgeKeepAliveMessage {
 	 * @param token the token
 	 */
 	public BridgeKeepAliveMessage(int appID, String bridgeID,
-			String version, String apiTS, String token) {
+			String version, long apiTS, String token) {
 		super();
 		this.appID = appID;
 		this.bridgeID = bridgeID;
@@ -98,7 +98,7 @@ public class BridgeKeepAliveMessage {
 	 *
 	 * @return the api ts
 	 */
-	public String getApiTS() {
+	public long getApiTS() {
 		return apiTS;
 	}
 	
@@ -107,7 +107,7 @@ public class BridgeKeepAliveMessage {
 	 *
 	 * @param apiTS the new api ts
 	 */
-	public void setApiTS(String apiTS) {
+	public void setApiTS(long apiTS) {
 		this.apiTS = apiTS;
 	}
 	

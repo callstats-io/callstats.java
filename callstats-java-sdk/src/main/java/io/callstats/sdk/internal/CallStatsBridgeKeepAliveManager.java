@@ -105,8 +105,10 @@ public class CallStatsBridgeKeepAliveManager {
 	 * Stop keep alive sender.
 	 */
 	public void stopKeepAliveSender() {
-		logger.info("Stoping keepAlive Sender");
-		future.cancel(true);
+		if (future != null) {
+			logger.info("Stoping keepAlive Sender");
+			future.cancel(true);
+		}
 	}
 
 	/**
@@ -121,8 +123,10 @@ public class CallStatsBridgeKeepAliveManager {
 	 * Start keep alive sender.
 	 */
 	public void startKeepAliveSender(String authToken) {
+		this.token = authToken;		
+		stopKeepAliveSender();
+		
 		logger.info("Starting keepAlive Sender");
-		this.token = authToken;
 		future = scheduler.scheduleAtFixedRate(new Runnable() {			
 
 			public void run() {
@@ -141,8 +145,7 @@ public class CallStatsBridgeKeepAliveManager {
 	 *            
 	 */
 	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient) {
-		long epoch = System.currentTimeMillis() / 1000;
-		String apiTS = "" + epoch;
+		long apiTS = System.currentTimeMillis();
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
 		String requestMessageString = gson.toJson(message);
 		httpClient.sendAsyncHttpRequest(keepAliveEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {

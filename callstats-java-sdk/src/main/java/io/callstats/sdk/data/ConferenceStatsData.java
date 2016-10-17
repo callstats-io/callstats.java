@@ -1,26 +1,31 @@
 package io.callstats.sdk.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
 
 public class ConferenceStatsData {
 	
-	String localID;
-	String remoteID;
+	transient String localID;
+	transient String remoteID;
+	transient String ucID;
+	transient String confID;
 	
-	Map<String, StreamStats> stats;
+	@SerializedName("streams")
+	List<ConferenceStats> conferenceStatsList = new ArrayList<ConferenceStats>();
 	
-	public ConferenceStatsData(String localUserID,String remoteUserid) {
+	public ConferenceStatsData(String localUserID,String remoteUserid, String ucID, String confID) {
 		this.localID = localUserID;
 		this.remoteID = remoteUserid;
-		stats = new HashMap<String, StreamStats>();
+		this.ucID = ucID;
+		this.confID = confID;
 	}
 	
-	public void addStreamStats(String ssrc, StreamStats streamStats) {
-		stats.put(ssrc, streamStats);
+	public void addStats(ConferenceStats stats) {
+		conferenceStatsList.add(stats);
 	}
-	
-	public void removeStreamStats(String ssrc) {
-		stats.remove(ssrc);
-	}
+
 }

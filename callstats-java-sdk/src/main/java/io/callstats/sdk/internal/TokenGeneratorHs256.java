@@ -1,9 +1,8 @@
 package io.callstats.sdk.internal;
 
+import io.callstats.sdk.ICallStatsTokenGenerator;
+
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Base64;
@@ -13,8 +12,6 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
-
-import io.callstats.sdk.ICallStatsTokenGenerator;
 
 public class TokenGeneratorHs256 implements ICallStatsTokenGenerator {
 	
