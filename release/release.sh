@@ -27,7 +27,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKERIMGNAME="csio/callstatsjava-release"
 cd ${DIR}/../callstats-java-sdk
-DOCKERCMD="docker run --rm -it -v $(pwd):/usr/src/app -v ${DIR}/../release/.m2:/root/.m2 -v $HOME/.gnupg:/root/.gnupg -w /usr/src/app $DOCKERIMGNAME"
+DOCKERCMD="docker run --rm -it -v $(pwd):/usr/src/app -v ${DIR}/../release/.m2:/root/.m2 -v $HOME/.gnupg:/root/.gnupg2 -w /usr/src/app $DOCKERIMGNAME"
 
 function die_with() {
 	echo "$*" >&2
@@ -40,7 +40,7 @@ function has_command() {
 }
 
 function has_xmllint_with_xpath() {
-	if [ "$(docker run run --rm -it $DOCKERIMGNAME xmllint 2>&1 | grep xpath | wc -l)" = "0" ] ; then
+	if [ "$(docker run --rm -it $DOCKERIMGNAME xmllint 2>&1 | grep xpath | wc -l)" = "0" ] ; then
 		return 1
 	else
 		return 0
@@ -236,7 +236,7 @@ echo ""
 
 
 # build and deploy the release
-$DOCKERCMD $MVN -DperformRelease=true -Dmaven.test.skip=true clean deploy -P release || rollback_and_die_with "Build/Deploy failure. Release failed."
+$DOCKERCMD bash -c "pushd /root && cp -a .gnupg2 .gnupg && popd && $MVN -DperformRelease=true -Dmaven.test.skip=true clean deploy -P release" || rollback_and_die_with "Build/Deploy failure. Release failed."
 
 # tag the release (N.B. should this be before perform the release?)
 git tag "v${RELEASE_VERSION}" || die_with "Failed to create tag ${RELEASE_VERSION}! Release has been deployed, however"

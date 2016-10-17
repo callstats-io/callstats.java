@@ -15,6 +15,9 @@
 
 release/.m2/settings.xml
 release/.m2/repository/
+release/.m2/copy_reference_file.log
+release/.m2/settings-docker.xml
+
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
