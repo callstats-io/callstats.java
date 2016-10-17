@@ -4,7 +4,7 @@
 	<groupId>io.callstats</groupId>
 	<artifactId>callstats-java-sdk</artifactId>
 	<packaging>jar</packaging>
-	<version>3.3.0</version>
+	<version>3.3.1-SNAPSHOT</version>
 	<name>callstats-java-sdk</name>
 	<url>https://github.com/callstats-io/callstats.java</url>
 	<developers>
