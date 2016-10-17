@@ -64,7 +64,7 @@ public class TokenGeneratorHs256 implements ICallStatsTokenGenerator {
 	}
 	/**
 	 * Clear character array
-	 * @param secret
+	 * @param secret secret key
 	 */
 	public static void clearCharArray(char[] secret) {
 		Arrays.fill(secret, '\0');
@@ -72,7 +72,7 @@ public class TokenGeneratorHs256 implements ICallStatsTokenGenerator {
 	
 	/**
 	 * Clear byte array
-	 * @param secret
+	 * @param secret secret key
 	 */
 	public static void clearByteArray(byte[] secret) {
 		Arrays.fill(secret, (byte)0);

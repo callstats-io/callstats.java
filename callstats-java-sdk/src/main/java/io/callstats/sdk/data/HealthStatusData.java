@@ -74,7 +74,7 @@ public class HealthStatusData {
 	/**
 	 * Sets the total memory.
 	 *
-	 * @param cpuUsage the new cpu usage
+	 * @param totalMemory the total memory
 	 */
 	public void setTotalMemory(float totalMemory) {
 		this.totalMemory = totalMemory;
@@ -93,7 +93,7 @@ public class HealthStatusData {
 	/**
 	 * Sets the thread count.
 	 *
-	 * @param cpuUsage the new cpu usage
+	 * @param threadCount the thread count
 	 */
 	public void setThreadCount(int threadCount) {
 		this.threadCount = threadCount;

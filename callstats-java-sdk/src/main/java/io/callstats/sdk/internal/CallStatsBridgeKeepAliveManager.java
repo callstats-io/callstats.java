@@ -67,6 +67,7 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param bridgeId the bridge id            
 	 * @param token the token            
 	 * @param httpClient the http client
+	 * @param keepAliveStatusListener listener
 	 *            
 	 */
 	public CallStatsBridgeKeepAliveManager(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient,
@@ -121,6 +122,7 @@ public class CallStatsBridgeKeepAliveManager {
 
 	/**
 	 * Start keep alive sender.
+	 * @param authToken authentication token 
 	 */
 	public void startKeepAliveSender(String authToken) {
 		this.token = authToken;		

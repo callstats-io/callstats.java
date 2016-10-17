@@ -113,6 +113,7 @@ public class CallStatsHttpClient {
 	
 	/**
 	 * Instantiates a new call stats http client.
+	 *  @param url url
 	 */
 	public CallStatsHttpClient(CallStatsUrls url) {
 		super();
@@ -259,9 +260,9 @@ public class CallStatsHttpClient {
 	 *
 	 * @param url the url
 	 * @param httpMethodType the http method type
-	 * @param body the body
+	 * @param body the message string 
 	 * @return the http response
-	 * @throws IOException 
+	 * @throws IOException throws IO Exception
 	 */
 	public HttpResponse sendHttpRequest(String url, String httpMethodType, String body) throws IOException {
 
@@ -369,7 +370,7 @@ public class CallStatsHttpClient {
 	 *
 	 * @param url the url
 	 * @param httpMethodType the http method type
-	 * @param body the body
+	 * @param paramList the parameter list
 	 * @param listener the listener
 	 */
 	public void sendAsyncHttpRequest(String url, String httpMethodType, List<NameValuePair> paramList , final CallStatsHttpResponseListener listener) {
