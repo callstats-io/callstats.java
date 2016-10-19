@@ -222,6 +222,7 @@ public class CallStatsTest{
 											.statsType(CallStatsStreamType.INBOUND)
 											.jitter(3)
 											.rtt(34)
+											.avsync(3.2)
 											.ucID(ucid)
 											.build();
 				callstatslib.reportConferenceStats(userID, conferenceStats);
@@ -236,6 +237,7 @@ public class CallStatsTest{
 										.statsType(CallStatsStreamType.INBOUND)
 										.jitter(3)
 										.rtt(34)
+										.avsync(3.2)
 										.ucID(ucid)
 										.build();
 				callstatslib.reportConferenceStats(userID, conferenceStats);
