@@ -60,31 +60,7 @@ public class ConferenceStats {
 	public void setFromUserID(String fromUserID) {
 		this.fromUserID = fromUserID;
 	}
-	public int getRtt() {
-		return data.getRtt();
-	}
-	public void setRtt(int rtt) {
-		data.setRtt(rtt);
-	}
-	public long getPacketsSent() {
-		return data.getPacketsSent();
-	}
-	public void setPacketsSent(long packetsSent) {
-		data.setPacketsSent(packetsSent);
-	}
-	public long getBytesSent() {
-		return data.getBytesSent();
-	}
-	public void setBytesSent(long bytesSent) {
-		data.setBytesSent(bytesSent);
-	}
-	public double getJitter() {
-		return data.getJitter();
-	}
-	public void setJitter(double jitter) {
-		data.setJitter(jitter);
-	}	
-	
+		
 	public String getStatsType() {
 		return this.statsType;
 	}
@@ -100,41 +76,96 @@ public class ConferenceStats {
 	}
 	
 	class ConferenceStatsInfo {
-		int rtt;
 		long packetsSent;
+		long packetsReceived;
+		long packetsLost;
+		long packetsDuplicated;
+		long packetsDiscarded;
+		long packetsRepaired;
+		
 		long bytesSent;
+		long bytesReceived;
+		long bytesDuplicated;
+		long bytesDiscarded;
+		long bytesRepaired;
+		
+		long burstPacketsLost;
+		long burstLossIntervalCount;
+		long burstPacketsDiscarded;
+		long burstDiscardIntervalCount;
+		
+		double gapLossRate;
+		double gapDiscardRate;
+		
+		double fractionalPacketLost;
+		double fractionalPacketDiscarded;
+		
+		long framesSent;
+		long framesReceived;
+		long framesLost;
+		long framesDropped;
+		long framesCorrupted;
+		
+		int rtt;
 		double jitter;
 		
-		public int getRtt() {
-			return rtt;
-		}
-		public void setRtt(int rtt) {
-			this.rtt = rtt;
-		}
-		public long getPacketsSent() {
-			return packetsSent;
-		}
-		public void setPacketsSent(long packetsSent) {
-			this.packetsSent = packetsSent;
-		}
-		public long getBytesSent() {
-			return bytesSent;
-		}
-		public void setBytesSent(long bytesSent) {
-			this.bytesSent = bytesSent;
-		}
-		public double getJitter() {
-			return jitter;
-		}
-		public void setJitter(double jitter) {
-			this.jitter = jitter;
-		}	
+		double currentPlayoutDelay;
+		double maxPlayoutDelay;
+		double minPlayoutDelay;
+		
+		double currentJBDelay;
+		double highWatermarkJBDelay;
+		double lowWatermarkJBDelay;
+		double maxJBDelay;
+		double minJBDelay;
+		double avsync;
+		
 		
 		public ConferenceStatsInfo(ConferenceStatsBuilder builder) {
-			this.rtt = builder.getRtt();
+			
 			this.packetsSent = builder.getPacketsSent();
+			this.packetsReceived = builder.getPacketsReceived();
+			this.packetsLost = builder.getPacketsLost();
+			this.packetsDuplicated = builder.getPacketsDuplicated();
+			this.packetsDiscarded = builder.getPacketsDiscarded();
+			this.packetsRepaired = builder.getPacketsRepaired();
+			
 			this.bytesSent = builder.getBytesSent();
+			this.bytesReceived = builder.getBytesReceived();
+			this.bytesDuplicated = builder.getBytesDuplicated();
+			this.bytesDiscarded = builder.getBytesDiscarded();
+			this.bytesRepaired = builder.getBytesRepaired();
+			
+			this.burstPacketsLost = builder.getBurstPacketsLost();
+			this.burstLossIntervalCount = builder.getBurstLossIntervalCount();
+			this.burstPacketsDiscarded = builder.getBurstPacketsDiscarded();
+			this.burstDiscardIntervalCount = builder.getBurstDiscardIntervalCount();
+			
+			this.gapLossRate = builder.getGapLossRate();
+			this.gapDiscardRate = builder.getGapDiscardRate();
+			
+			this.fractionalPacketLost = builder.getFractionalPacketLost();
+			this.fractionalPacketDiscarded = builder.getFractionalPacketDiscarded();
+			
+			this.framesSent = builder.getFramesSent();
+			this.framesReceived = builder.getFramesReceived();
+			this.framesLost = builder.getFramesLost();
+			this.framesDropped = builder.getFramesDropped();
+			this.framesCorrupted = builder.getFramesCorrupted();
+			
+			this.rtt = builder.getRtt();
 			this.jitter = builder.getJitter();
+			
+			this.currentPlayoutDelay = builder.getCurrentPlayoutDelay();
+			this.maxPlayoutDelay = builder.getMaxPlayoutDelay();
+			this.minPlayoutDelay = builder.getMinPlayoutDelay();
+			
+			this.currentJBDelay = builder.getCurrentJBDelay();
+			this.highWatermarkJBDelay = builder.getHighWatermarkJBDelay();
+			this.lowWatermarkJBDelay = builder.getLowWatermarkJBDelay();
+			this.maxJBDelay = builder.getMaxJBDelay();
+			this.minJBDelay = builder.getMinJBDelay();
+			this.avsync = builder.getAvsync();		
 		}
 		
 		public ConferenceStatsInfo() {

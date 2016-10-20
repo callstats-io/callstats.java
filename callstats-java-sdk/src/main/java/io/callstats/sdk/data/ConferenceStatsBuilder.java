@@ -9,8 +9,7 @@ public class ConferenceStatsBuilder {
 	String fromUserID;
 	String ucID;
 	String confID;
-		
-	long packetsSent;
+	
 	long packetsReceived;
 	long packetsLost;
 	long packetsDuplicated;
@@ -53,6 +52,101 @@ public class ConferenceStatsBuilder {
 	double maxJBDelay;
 	double minJBDelay;
 	double avsync;
+		
+	long packetsSent;
+	public long getPacketsReceived() {
+		return packetsReceived;
+	}
+	public long getPacketsLost() {
+		return packetsLost;
+	}
+	public long getPacketsDuplicated() {
+		return packetsDuplicated;
+	}
+	public long getPacketsDiscarded() {
+		return packetsDiscarded;
+	}
+	public long getPacketsRepaired() {
+		return packetsRepaired;
+	}
+	public long getBytesReceived() {
+		return bytesReceived;
+	}
+	public long getBytesDuplicated() {
+		return bytesDuplicated;
+	}
+	public long getBytesDiscarded() {
+		return bytesDiscarded;
+	}
+	public long getBytesRepaired() {
+		return bytesRepaired;
+	}
+	public long getBurstPacketsLost() {
+		return burstPacketsLost;
+	}
+	public long getBurstLossIntervalCount() {
+		return burstLossIntervalCount;
+	}
+	public long getBurstPacketsDiscarded() {
+		return burstPacketsDiscarded;
+	}
+	public long getBurstDiscardIntervalCount() {
+		return burstDiscardIntervalCount;
+	}
+	public double getGapLossRate() {
+		return gapLossRate;
+	}
+	public double getGapDiscardRate() {
+		return gapDiscardRate;
+	}
+	public double getFractionalPacketLost() {
+		return fractionalPacketLost;
+	}
+	public double getFractionalPacketDiscarded() {
+		return fractionalPacketDiscarded;
+	}
+	public long getFramesSent() {
+		return framesSent;
+	}
+	public long getFramesReceived() {
+		return framesReceived;
+	}
+	public long getFramesLost() {
+		return framesLost;
+	}
+	public long getFramesDropped() {
+		return framesDropped;
+	}
+	public long getFramesCorrupted() {
+		return framesCorrupted;
+	}
+	public double getCurrentPlayoutDelay() {
+		return currentPlayoutDelay;
+	}
+	public double getMaxPlayoutDelay() {
+		return maxPlayoutDelay;
+	}
+	public double getMinPlayoutDelay() {
+		return minPlayoutDelay;
+	}
+	public double getCurrentJBDelay() {
+		return currentJBDelay;
+	}
+	public double getHighWatermarkJBDelay() {
+		return highWatermarkJBDelay;
+	}
+	public double getLowWatermarkJBDelay() {
+		return lowWatermarkJBDelay;
+	}
+	public double getMaxJBDelay() {
+		return maxJBDelay;
+	}
+	public double getMinJBDelay() {
+		return minJBDelay;
+	}
+	public double getAvsync() {
+		return avsync;
+	}
 	
 	public String getLocalUserID() {
 		return localUserID;
