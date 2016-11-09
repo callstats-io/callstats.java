@@ -1,5 +1,7 @@
 package io.callstats.sdk.internal;
 
+import java.io.UnsupportedEncodingException;
+
 import io.callstats.sdk.CallStatsErrors;
 
 public interface CallStatsBridgeKeepAliveStatusListener {
@@ -13,6 +15,6 @@ public interface CallStatsBridgeKeepAliveStatusListener {
 	void onKeepAliveError(CallStatsErrors error, String errMsg);
 	
 	
-	void onSuccess();
+	void onSuccess() throws UnsupportedEncodingException;
 
 }

@@ -1,5 +1,8 @@
 package io.callstats.sdk.messages;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class CallStatsEventMessage {
 	private String version;
 	private int appID;
@@ -74,30 +77,30 @@ public class CallStatsEventMessage {
 	}
 
 	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
-			String remoteID, EventInfo event) {
+			String remoteID, EventInfo event) throws UnsupportedEncodingException {
 		super();
 		this.version = version;
 		this.appID = appID;
 		this.endpointType = endpointType;
-		this.conferenceID = conferenceID;
+		this.conferenceID = URLEncoder.encode(conferenceID, "UTF-8");
 		this.apiTS = apiTS;
 		this.token = token;
-		this.localID = localID;
-		this.remoteID = remoteID;
+		this.localID = URLEncoder.encode(localID, "UTF-8");;
+		this.remoteID = URLEncoder.encode(remoteID, "UTF-8");;
 		this.event = event;
 	}
 
 	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
-			String remoteID, String ucID, EventInfo event) {
+			String remoteID, String ucID, EventInfo event) throws UnsupportedEncodingException {
 		super();
 		this.version = version;
 		this.appID = appID;
 		this.endpointType = endpointType;
-		this.conferenceID = conferenceID;
+		this.conferenceID = URLEncoder.encode(conferenceID, "UTF-8");;
 		this.apiTS = apiTS;
 		this.token = token;
-		this.localID = localID;
-		this.remoteID = remoteID;
+		this.localID = URLEncoder.encode(localID, "UTF-8");;
+		this.remoteID = URLEncoder.encode(remoteID, "UTF-8");;
 		this.event = event;
 		this.ucID = ucID;
 	}

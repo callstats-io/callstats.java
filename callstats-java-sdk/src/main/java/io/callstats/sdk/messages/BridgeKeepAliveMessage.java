@@ -1,5 +1,8 @@
 package io.callstats.sdk.messages;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * The Class BridgeKeepAliveMessage.
  */
@@ -28,12 +31,13 @@ public class BridgeKeepAliveMessage {
 	 * @param version the version
 	 * @param apiTS the api ts
 	 * @param token the token
+	 * @throws UnsupportedEncodingException 
 	 */
 	public BridgeKeepAliveMessage(int appID, String bridgeID,
-			String version, long apiTS, String token) {
+			String version, long apiTS, String token) throws UnsupportedEncodingException {
 		super();
 		this.appID = appID;
-		this.bridgeID = bridgeID;
+		this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
 		this.version = version;
 		this.apiTS = apiTS;
 		this.token = token;
@@ -70,9 +74,10 @@ public class BridgeKeepAliveMessage {
 	 * Sets the bridge id.
 	 *
 	 * @param bridgeID the new bridge id
+	 * @throws UnsupportedEncodingException 
 	 */
-	public void setBridgeID(String bridgeID) {
-		this.bridgeID = bridgeID;
+	public void setBridgeID(String bridgeID) throws UnsupportedEncodingException {
+		this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
 	}
 	
 	/**

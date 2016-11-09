@@ -1,5 +1,8 @@
 package io.callstats.sdk.messages;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.HealthStatusData;
 import io.callstats.sdk.data.ServerInfo;
@@ -45,12 +48,13 @@ public class BridgeStatusUpdateMessage {
 	 * @param token the token
 	 * @param bridgeStatusInfo the bridge status info
 	 * @param endpointInfo the endpoint info
+	 * @throws UnsupportedEncodingException 
 	 */
 	public BridgeStatusUpdateMessage(int appID, String bridgeID, String version,
-		String endpointType, long apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
+		String endpointType, long apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) throws UnsupportedEncodingException {
 		super();
 		this.appID = appID;
-		this.bridgeID = bridgeID;
+		this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
 		this.version = version;
 		this.endpointType = endpointType;
 		this.apiTS = apiTS;
@@ -131,9 +135,10 @@ public class BridgeStatusUpdateMessage {
 	 * Sets the bridge id.
 	 *
 	 * @param userID the new bridge id
+	 * @throws UnsupportedEncodingException 
 	 */
-	public void setBridgeID(String userID) {
-		this.bridgeID = userID;
+	public void setBridgeID(String userID) throws UnsupportedEncodingException {
+		this.bridgeID = URLEncoder.encode(userID, "UTF-8");;
 	}
 
 	/**

@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -132,7 +133,12 @@ public class CallStatsBridgeKeepAliveManager {
 		future = scheduler.scheduleAtFixedRate(new Runnable() {			
 
 			public void run() {
-				sendKeepAliveBridgeMessage(appId, bridgeId, token, httpClient);
+				try {
+					sendKeepAliveBridgeMessage(appId, bridgeId, token, httpClient);
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}, 0, keepAliveInterval, TimeUnit.MILLISECONDS);
 	}
@@ -144,9 +150,10 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param bridgeId the bridge id         
 	 * @param token the token           
 	 * @param httpClient the http client
+	 * @throws UnsupportedEncodingException 
 	 *            
 	 */
-	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient) {
+	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient) throws UnsupportedEncodingException {
 		long apiTS = System.currentTimeMillis();
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
 		String requestMessageString = gson.toJson(message);
@@ -176,7 +183,12 @@ public class CallStatsBridgeKeepAliveManager {
 						keepAliveStatusListener.onKeepAliveError(CallStatsErrors.AUTH_ERROR, keepAliveResponse.getReason());
 					}
 					httpClient.setDisrupted(false);
-					keepAliveStatusListener.onSuccess();
+					try {
+						keepAliveStatusListener.onSuccess();
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else {
 					httpClient.setDisrupted(true);
 				}
