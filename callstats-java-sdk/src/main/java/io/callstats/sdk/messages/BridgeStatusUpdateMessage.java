@@ -3,6 +3,9 @@ package io.callstats.sdk.messages;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.HealthStatusData;
 import io.callstats.sdk.data.ServerInfo;
@@ -36,6 +39,9 @@ public class BridgeStatusUpdateMessage {
 	
 	/** The event. */
 	private EventInfo event;
+	
+	/** The logger. */
+	private static final Logger logger = LogManager.getLogger("CallStats");
 		
 	/**
 	 * Instantiates a new bridge event message.
@@ -48,13 +54,19 @@ public class BridgeStatusUpdateMessage {
 	 * @param token the token
 	 * @param bridgeStatusInfo the bridge status info
 	 * @param endpointInfo the endpoint info
-	 * @throws UnsupportedEncodingException 
+	 * 
 	 */
 	public BridgeStatusUpdateMessage(int appID, String bridgeID, String version,
-		String endpointType, long apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) throws UnsupportedEncodingException {
+		String endpointType, long apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
 		super();
 		this.appID = appID;
-		this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
+		try {
+			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 		this.version = version;
 		this.endpointType = endpointType;
 		this.apiTS = apiTS;
@@ -135,10 +147,16 @@ public class BridgeStatusUpdateMessage {
 	 * Sets the bridge id.
 	 *
 	 * @param userID the new bridge id
-	 * @throws UnsupportedEncodingException 
+	 *
 	 */
-	public void setBridgeID(String userID) throws UnsupportedEncodingException {
-		this.bridgeID = URLEncoder.encode(userID, "UTF-8");;
+	public void setBridgeID(String userID) {
+		try {
+			this.bridgeID = URLEncoder.encode(userID, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		};
 	}
 
 	/**

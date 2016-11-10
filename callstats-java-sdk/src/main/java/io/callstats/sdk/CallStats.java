@@ -25,7 +25,6 @@ import io.callstats.sdk.messages.CallStatsEventResponseMessage;
 import io.callstats.sdk.messages.EventInfo;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +52,6 @@ public class CallStats {
 	
 	/** The app id. */
 	private int appId;
-	
-	/** The app secret. */
-	private String appSecret;
 	
 	/** The bridge id. */
 	private String bridgeId;
@@ -174,7 +170,7 @@ public class CallStats {
 		
 		httpClient = new CallStatsHttpClient();
 		authHttpClient = new CallStatsHttpClient(CallStatsUrls.AUTH_BASE);
-		authenticator = new CallStatsAuthenticator(appId, tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
+		authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
 			public void onInitialized(String msg) {
 				setInitialized(true);
 				logger.info("SDK Initialized " + msg);
@@ -200,9 +196,8 @@ public class CallStats {
 	 * Send call stats bridge status update.
 	 *
 	 * @param bridgeStatusInfo the bridge status info
-	 * @throws UnsupportedEncodingException 
 	 */
-	public void sendCallStatsBridgeStatusUpdate(BridgeStatusInfo bridgeStatusInfo) throws UnsupportedEncodingException {
+	public void sendCallStatsBridgeStatusUpdate(BridgeStatusInfo bridgeStatusInfo) {
 		if (isInitialized()) {
 			long epoch = System.currentTimeMillis();
 			String token = getToken();
@@ -240,14 +235,7 @@ public class CallStats {
 							authenticator.doAuthentication();
 						}
 						httpClient.setDisrupted(false);
-						try {
-							sendCallStatsBridgeStatusUpdateFromQueue();
-						} catch (UnsupportedEncodingException e) {
-							// TODO Auto-generated catch block
-							logger.error("UnsupportedEncodingException " + e.getMessage(), e);
-							e.printStackTrace();
-							throw new RuntimeException(e);
-						}
+						sendCallStatsBridgeStatusUpdateFromQueue();
 					} else {
 						httpClient.setDisrupted(true);
 					}
@@ -268,7 +256,7 @@ public class CallStats {
 	}
 	
 	
-	private synchronized void sendCallStatsBridgeStatusUpdateFromQueue() throws UnsupportedEncodingException {
+	private synchronized void sendCallStatsBridgeStatusUpdateFromQueue() {
 		if (bridgeStatusInfoQueue.getLength() < 1)
 			return;
 
@@ -279,7 +267,7 @@ public class CallStats {
 	}
 
 	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, ConferenceInfo conferenceInfo,
-			final CallStatsStartConferenceListener listener) throws UnsupportedEncodingException {
+			final CallStatsStartConferenceListener listener) {
 		if (eventType == null || conferenceInfo == null || listener == null) {
 			logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
@@ -300,7 +288,7 @@ public class CallStats {
 		}
 	}
 
-	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, UserInfo userInfo) throws UnsupportedEncodingException {
+	public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType, UserInfo userInfo) {
 		if (eventType == null || userInfo == null) {
 			logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
@@ -375,7 +363,7 @@ public class CallStats {
 		}
 	}
 
-	public synchronized void stopStatsReportingForUser(String userID, String confID) throws UnsupportedEncodingException {
+	public synchronized void stopStatsReportingForUser(String userID, String confID) {
 		if (userID == null || confID == null) {
 			logger.error("stopStatsReportingForUser: Arguments cannot be null ");
 			throw new IllegalArgumentException("stopStatsReportingForUser: Arguments cannot be null");
@@ -426,7 +414,7 @@ public class CallStats {
 					}
 				}
 
-				public void onSuccess() throws UnsupportedEncodingException {
+				public void onSuccess() {
 					sendCallStatsBridgeStatusUpdateFromQueue();
 				}
 			});
@@ -435,7 +423,7 @@ public class CallStats {
 	}
 	
 	
-	private synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) throws UnsupportedEncodingException {
+	private synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
 		if (stats == null || userInfo == null) {
 			logger.error("sendCallStatsConferenceStats: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendCallStatsConferenceStats: Arguments cannot be null");

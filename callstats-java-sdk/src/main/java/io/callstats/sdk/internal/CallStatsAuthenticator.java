@@ -8,29 +8,18 @@ import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.messages.AuthenticateErrorAction;
 import io.callstats.sdk.messages.AuthenticateErrorActionDeserializer;
 import io.callstats.sdk.messages.AuthenticateErrorActionType;
-import io.callstats.sdk.messages.AuthenticateErrorCode;
-import io.callstats.sdk.messages.AuthenticateRequest;
 import io.callstats.sdk.messages.AuthenticateResponse;
 import io.callstats.sdk.messages.AuthenticateResponseError;
 import io.callstats.sdk.messages.AuthenticateRetryActionParams;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 
 /**
  * The Class CallStatsAuthenticator.
@@ -48,12 +36,6 @@ public class CallStatsAuthenticator {
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsAuthenticator");
 		
-	/** The Constant challengeUrl. */
-	private static final String challengeUrl = "/o/challenge";
-	
-	/** The Constant authorizeUrl. */
-	private static final String authorizeUrl = "/o/authorize";
-	
 	/** The Constant authorizeUrl. */
 	private static final String authenticateUrl = "/authenticate";
 	
@@ -78,9 +60,6 @@ public class CallStatsAuthenticator {
 	
 	/** The app id. */
 	private int appId;
-	
-	/** The app secret. */
-	private String appSecret;
 	
 	/** The bridge id. */
 	private String bridgeId;
@@ -149,7 +128,6 @@ public class CallStatsAuthenticator {
 			CallStatsInitListener listener) {
 		this.listener = listener;
 		this.appId = appId;
-		this.appSecret = appSecret;
 		this.bridgeId = bridgeId;
 		this.httpClient = httpClient;
 		gson = new GsonBuilder()

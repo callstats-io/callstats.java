@@ -11,8 +11,6 @@ import io.callstats.sdk.data.ServerInfo;
 import io.callstats.sdk.data.UserInfo;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
-
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 import org.junit.Before;
@@ -145,7 +143,7 @@ public class CallStatsTest{
 	 * @throws UnsupportedEncodingException 
 	 */
 	@Test
-	public void initializeTestWithSendCallStatsEvent() throws UnsupportedEncodingException {
+	public void initializeTestWithSendCallStatsEvent() {
 		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
 		Random randomGenerator = new Random();
 		try {
@@ -189,7 +187,7 @@ public class CallStatsTest{
 	
 	
 	@Test
-	public void initializeTestWihSendCallStatsConferenceStartEvent() throws UnsupportedEncodingException {
+	public void initializeTestWihSendCallStatsConferenceStartEvent() {
 		callstatslib.initialize(appId, appSecret, "jit.si.346",serverInfo,listener);
 		try {
 			Thread.sleep(2000);
@@ -211,12 +209,9 @@ public class CallStatsTest{
 				System.out.println("UCID is "+ucid);
 				UserInfo userInfo = new UserInfo(confID, userID , ucid);
 				
-				try {
-					callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
+				callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
+				
 							
 				callstatslib.startStatsReportingForUser(userID,confID);
 				ConferenceStats conferenceStats = new ConferenceStatsBuilder()
@@ -264,12 +259,8 @@ public class CallStatsTest{
 										.build();
 				callstatslib.reportConferenceStats(userID, conferenceStats);
 				
-				try {
-					callstatslib.stopStatsReportingForUser(userID,confID);
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				callstatslib.stopStatsReportingForUser(userID,confID);
+				
 				
 			}
 			

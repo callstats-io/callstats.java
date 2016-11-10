@@ -3,6 +3,9 @@ package io.callstats.sdk.messages;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class CallStatsEventMessage {
 	private String version;
 	private int appID;
@@ -14,6 +17,7 @@ public class CallStatsEventMessage {
 	private String remoteID;
 	private String ucID;
 	private EventInfo event;
+	private static final Logger logger = LogManager.getLogger("CallStats");
 
 	public String getUcID() {
 		return ucID;
@@ -77,32 +81,45 @@ public class CallStatsEventMessage {
 	}
 
 	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
-			String remoteID, EventInfo event) throws UnsupportedEncodingException {
+			String remoteID, EventInfo event) {
 		super();
 		this.version = version;
 		this.appID = appID;
-		this.endpointType = endpointType;
-		this.conferenceID = URLEncoder.encode(conferenceID, "UTF-8");
+		this.endpointType = endpointType;	
 		this.apiTS = apiTS;
 		this.token = token;
-		this.localID = URLEncoder.encode(localID, "UTF-8");;
-		this.remoteID = URLEncoder.encode(remoteID, "UTF-8");;
 		this.event = event;
+		try {
+			this.conferenceID = URLEncoder.encode(conferenceID, "UTF-8");
+			this.localID = URLEncoder.encode(localID, "UTF-8");
+			this.remoteID = URLEncoder.encode(remoteID, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 	public CallStatsEventMessage(String version, int appID, String endpointType, String conferenceID, long apiTS, String token, String localID,
-			String remoteID, String ucID, EventInfo event) throws UnsupportedEncodingException {
+			String remoteID, String ucID, EventInfo event) {
 		super();
 		this.version = version;
 		this.appID = appID;
-		this.endpointType = endpointType;
-		this.conferenceID = URLEncoder.encode(conferenceID, "UTF-8");;
+		this.endpointType = endpointType;	
 		this.apiTS = apiTS;
 		this.token = token;
-		this.localID = URLEncoder.encode(localID, "UTF-8");;
-		this.remoteID = URLEncoder.encode(remoteID, "UTF-8");;
 		this.event = event;
 		this.ucID = ucID;
+		
+		try {
+			this.conferenceID = URLEncoder.encode(conferenceID, "UTF-8");
+			this.localID = URLEncoder.encode(localID, "UTF-8");
+			this.remoteID = URLEncoder.encode(remoteID, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 }
