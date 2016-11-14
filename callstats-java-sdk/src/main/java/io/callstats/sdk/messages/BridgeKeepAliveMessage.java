@@ -36,8 +36,7 @@ public class BridgeKeepAliveMessage {
 	 * @param bridgeID the bridge id
 	 * @param version the version
 	 * @param apiTS the api ts
-	 * @param token the token
-	 * @throws UnsupportedEncodingException 
+	 * @param token the token 
 	 */
 	public BridgeKeepAliveMessage(int appID, String bridgeID,
 			String version, long apiTS, String token) {
@@ -86,7 +85,6 @@ public class BridgeKeepAliveMessage {
 	 * Sets the bridge id.
 	 *
 	 * @param bridgeID the new bridge id
-	 * @throws UnsupportedEncodingException 
 	 */
 	public void setBridgeID(String bridgeID) {
 		try {

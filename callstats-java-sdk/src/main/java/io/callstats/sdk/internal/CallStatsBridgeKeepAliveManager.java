@@ -144,7 +144,6 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param bridgeId the bridge id         
 	 * @param token the token           
 	 * @param httpClient the http client
-	 * @throws UnsupportedEncodingException 
 	 *            
 	 */
 	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient) {
