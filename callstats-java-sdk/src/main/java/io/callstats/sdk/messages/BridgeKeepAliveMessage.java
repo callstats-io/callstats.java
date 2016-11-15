@@ -90,7 +90,6 @@ public class BridgeKeepAliveMessage {
 		try {
 			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
 			e.printStackTrace();
 			throw new RuntimeException(e);

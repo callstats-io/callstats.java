@@ -11,14 +11,15 @@ import io.callstats.sdk.data.ServerInfo;
 import io.callstats.sdk.data.UserInfo;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
+
 import java.util.Random;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class CallStatsTest.
  *
@@ -68,79 +69,77 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
 		Mockito.verify(listener).onInitialized(msg);
 	}
 	
-//	/**
-//	 * Initialize with invalid app id test.
-//	 */
-//	@Test
-//	public void initializeWithInvalidAppIdTest() {
-//		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
-//		String errMsg = "SDK Authentication Error";
-//
-//		callstatslib.initialize(appId+1, appSecret, "jit.si.345",serverInfo,listener);
-//
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		Mockito.verify(listener).onError(error, errMsg);
-//	}
-//	
-//	/**
-//	 * Initialize with null args test.
-//	 */
-//	@Test
-//	public void initializeWithNullArgsTest() {
-//		Throwable e = null;
-//
-//		try {
-//
-//		callstatslib.initialize(0, appSecret, "jit.si.345",serverInfo,listener);
-//
-//		} catch (Throwable e1) {
-//			e = e1;
-//		}
-//		assertTrue(e instanceof IllegalArgumentException);
-//		
-//		try {
-//
-//			callstatslib.initialize(appId, appSecret, null,serverInfo,listener);
-//
-//		} catch (Throwable e1) {
-//				e = e1;
-//		}
-//		assertTrue(e instanceof IllegalArgumentException);
-//		
-//		try {
-//
-//			callstatslib.initialize(appId, "", "jit.si.345",serverInfo,listener);
-//
-//		} catch (Throwable e1) {
-//				e = e1;
-//		}
-//		assertTrue(e instanceof IllegalArgumentException);
-//		
-//		try {
-//			callstatslib.initialize(appId, appSecret, "",serverInfo,listener);
-//
-//		} catch (Throwable e1) {
-//				e = e1;
-//		}
-//		assertTrue(e instanceof IllegalArgumentException);
-//	}
+	/**
+	 * Initialize with invalid app id test.
+	 */
+	@Ignore
+	public void initializeWithInvalidAppIdTest() {
+		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
+		String errMsg = "SDK Authentication Error";
+
+		callstatslib.initialize(appId+1, appSecret, "jit.si.345",serverInfo,listener);
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		Mockito.verify(listener).onError(error, errMsg);
+	}
+	
+	/**
+	 * Initialize with null args test.
+	 */
+	@Ignore
+	public void initializeWithNullArgsTest() {
+		Throwable e = null;
+
+		try {
+
+		callstatslib.initialize(0, appSecret, "jit.si.345",serverInfo,listener);
+
+		} catch (Throwable e1) {
+			e = e1;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+		
+		try {
+
+			callstatslib.initialize(appId, appSecret, null,serverInfo,listener);
+
+		} catch (Throwable e1) {
+				e = e1;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+		
+		try {
+
+			callstatslib.initialize(appId, "", "jit.si.345",serverInfo,listener);
+
+		} catch (Throwable e1) {
+				e = e1;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+		
+		try {
+			callstatslib.initialize(appId, appSecret, "",serverInfo,listener);
+
+		} catch (Throwable e1) {
+				e = e1;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+	}
 		
 	
 	/**
 	 * Initialize test with send call stats event.
-	 * @throws UnsupportedEncodingException 
+	 *
 	 */
 	@Test
 	public void initializeTestWithSendCallStatsEvent() {
@@ -149,7 +148,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
@@ -179,7 +177,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(15000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -192,7 +189,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
@@ -203,7 +199,6 @@ public class CallStatsTest{
 		callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_SETUP, conferenceInfo, new CallStatsStartConferenceListener() {
 			
 			public void onResponse(String  ucid) {
-				// TODO Auto-generated method stub
 				String userID = "2345";
 				String confID = "callstats.io/room1";
 				System.out.println("UCID is "+ucid);
@@ -265,7 +260,6 @@ public class CallStatsTest{
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -274,7 +268,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

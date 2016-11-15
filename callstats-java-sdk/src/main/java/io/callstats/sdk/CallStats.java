@@ -248,9 +248,6 @@ public class CallStats {
 
 			});
 		} else {
-			// TODO retransmission queue
-			// throw new
-			// UnsupportedOperationException("queueing not implemented yet");
 			bridgeStatusInfoQueue.push(bridgeStatusInfo);
 		}
 	}
