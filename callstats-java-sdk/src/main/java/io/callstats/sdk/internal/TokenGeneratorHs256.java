@@ -98,7 +98,6 @@ public class TokenGeneratorHs256 implements ICallStatsTokenGenerator {
 			String jwt = jws.getCompactSerialization();
 			return jwt;
 		} catch (JoseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

@@ -1,7 +1,6 @@
 package io.callstats.sdk.data;
 
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TrafficStatusData.
  */

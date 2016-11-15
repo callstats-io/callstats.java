@@ -15,11 +15,11 @@ import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
 import java.util.Random;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class CallStatsTest.
  *
@@ -69,7 +69,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
@@ -79,7 +78,7 @@ public class CallStatsTest{
 	/**
 	 * Initialize with invalid app id test.
 	 */
-	@Test
+	@Ignore
 	public void initializeWithInvalidAppIdTest() {
 		CallStatsErrors error = CallStatsErrors.HTTP_ERROR;
 		String errMsg = "SDK Authentication Error";
@@ -89,7 +88,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Mockito.verify(listener).onError(error, errMsg);
@@ -98,7 +96,7 @@ public class CallStatsTest{
 	/**
 	 * Initialize with null args test.
 	 */
-	@Test
+	@Ignore
 	public void initializeWithNullArgsTest() {
 		Throwable e = null;
 
@@ -141,6 +139,7 @@ public class CallStatsTest{
 	
 	/**
 	 * Initialize test with send call stats event.
+	 *
 	 */
 	@Test
 	public void initializeTestWithSendCallStatsEvent() {
@@ -149,7 +148,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
@@ -179,7 +177,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(15000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -192,24 +189,24 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String msg = "SDK authentication successful";
 		Mockito.verify(listener).onInitialized(msg);
 		
-		ConferenceInfo conferenceInfo = new ConferenceInfo("jackk", "2345");
+		ConferenceInfo conferenceInfo = new ConferenceInfo("callstats.io/room1", "2345");
 		
 		callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_SETUP, conferenceInfo, new CallStatsStartConferenceListener() {
 			
 			public void onResponse(String  ucid) {
-				// TODO Auto-generated method stub
 				String userID = "2345";
-				String confID = "jackk";
+				String confID = "callstats.io/room1";
 				System.out.println("UCID is "+ucid);
 				UserInfo userInfo = new UserInfo(confID, userID , ucid);
 				
+
 				callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED, userInfo);
+				
 							
 				callstatslib.startStatsReportingForUser(userID,confID);
 				ConferenceStats conferenceStats = new ConferenceStatsBuilder()
@@ -259,10 +256,10 @@ public class CallStatsTest{
 				
 				callstatslib.stopStatsReportingForUser(userID,confID);
 				
+				
 			}
 			
 			public void onError(CallStatsErrors error, String errMsg) {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -271,7 +268,6 @@ public class CallStatsTest{
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

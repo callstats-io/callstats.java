@@ -1,5 +1,11 @@
 package io.callstats.sdk.messages;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * The Class BridgeKeepAliveMessage.
  */
@@ -19,6 +25,9 @@ public class BridgeKeepAliveMessage {
 	
 	/** The token. */
 	private String token;
+	
+	/** The logger. */
+	private static final Logger logger = LogManager.getLogger("CallStats");
 		
 	/**
 	 * Instantiates a new bridge keep alive message.
@@ -27,16 +36,22 @@ public class BridgeKeepAliveMessage {
 	 * @param bridgeID the bridge id
 	 * @param version the version
 	 * @param apiTS the api ts
-	 * @param token the token
+	 * @param token the token 
 	 */
 	public BridgeKeepAliveMessage(int appID, String bridgeID,
 			String version, long apiTS, String token) {
 		super();
 		this.appID = appID;
-		this.bridgeID = bridgeID;
 		this.version = version;
 		this.apiTS = apiTS;
 		this.token = token;
+		try {
+			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 		
 	/**
@@ -72,7 +87,13 @@ public class BridgeKeepAliveMessage {
 	 * @param bridgeID the new bridge id
 	 */
 	public void setBridgeID(String bridgeID) {
-		this.bridgeID = bridgeID;
+		try {
+			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**

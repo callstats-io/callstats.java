@@ -23,17 +23,20 @@ import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
 import io.callstats.sdk.messages.CallStatsEventMessage;
 import io.callstats.sdk.messages.CallStatsEventResponseMessage;
 import io.callstats.sdk.messages.EventInfo;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -49,9 +52,6 @@ public class CallStats {
 	
 	/** The app id. */
 	private int appId;
-	
-	/** The app secret. */
-	private String appSecret;
 	
 	/** The bridge id. */
 	private String bridgeId;
@@ -170,7 +170,7 @@ public class CallStats {
 		
 		httpClient = new CallStatsHttpClient();
 		authHttpClient = new CallStatsHttpClient(CallStatsUrls.AUTH_BASE);
-		authenticator = new CallStatsAuthenticator(appId, tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
+		authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
 			public void onInitialized(String msg) {
 				setInitialized(true);
 				logger.info("SDK Initialized " + msg);
@@ -248,9 +248,6 @@ public class CallStats {
 
 			});
 		} else {
-			// TODO retransmission queue
-			// throw new
-			// UnsupportedOperationException("queueing not implemented yet");
 			bridgeStatusInfoQueue.push(bridgeStatusInfo);
 		}
 	}

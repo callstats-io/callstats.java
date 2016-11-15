@@ -177,6 +177,7 @@ public class CallStatsBridgeKeepAliveManager {
 					}
 					httpClient.setDisrupted(false);
 					keepAliveStatusListener.onSuccess();
+					
 				} else {
 					httpClient.setDisrupted(true);
 				}

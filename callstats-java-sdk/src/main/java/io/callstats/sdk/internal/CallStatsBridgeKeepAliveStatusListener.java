@@ -1,5 +1,6 @@
 package io.callstats.sdk.internal;
 
+
 import io.callstats.sdk.CallStatsErrors;
 
 public interface CallStatsBridgeKeepAliveStatusListener {
@@ -11,7 +12,6 @@ public interface CallStatsBridgeKeepAliveStatusListener {
 	 * @param errMsg the err msg
 	 */
 	void onKeepAliveError(CallStatsErrors error, String errMsg);
-	
 	
 	void onSuccess();
 

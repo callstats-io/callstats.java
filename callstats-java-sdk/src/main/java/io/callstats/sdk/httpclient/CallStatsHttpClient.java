@@ -156,7 +156,6 @@ public class CallStatsHttpClient {
 		try {
 			ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
 		} catch (IOReactorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
@@ -229,7 +228,6 @@ public class CallStatsHttpClient {
 		try {
 			uri = new URI(url);
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new IllegalStateException("Invalid URL:" + url, e);
 		}
@@ -247,7 +245,6 @@ public class CallStatsHttpClient {
 		try {
 			entity = new StringEntity(body);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
