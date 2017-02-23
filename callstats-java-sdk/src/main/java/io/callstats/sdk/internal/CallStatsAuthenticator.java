@@ -56,7 +56,7 @@ public class CallStatsAuthenticator {
 	private String token;
 	
 	/** The expires. */
-	private String expires;
+	private int expires;
 	
 	/** The app id. */
 	private int appId;
@@ -101,7 +101,7 @@ public class CallStatsAuthenticator {
 	 *
 	 * @return the expires
 	 */
-	public String getExpires() {
+	public long getExpires() {
 		return expires;
 	}
 	
@@ -110,7 +110,7 @@ public class CallStatsAuthenticator {
 	 *
 	 * @param expires the new expires
 	 */
-	public void setExpires(String expires) {
+	public void setExpires(int expires) {
 		this.expires = expires;
 	}	
 
@@ -167,6 +167,14 @@ public class CallStatsAuthenticator {
 		}
 	}
 	
+	public void doAuthenticationAfterExpire(long timeout) {
+		scheduler.schedule(new Runnable() {
+			public void run() {
+				doAuthentication();
+			}
+		}, timeout, TimeUnit.SECONDS);
+	}
+	
 	/**
 	 * Schedule authentication.
 	 *
@@ -221,13 +229,17 @@ public class CallStatsAuthenticator {
 						listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());
 						scheduleAuthentication(appId, bridgeId, httpClient);
 						return;
-					}
-					logger.info("Authentication response "
-								+ responseStatus + " "
-								+ authResponseMessage.getToken());
-					//expires = authResponseMessage.getAuthenticateBody().getExpires();
+					}					
+					
+					expires = authResponseMessage.getExpires();
 					token = authResponseMessage.getToken();
+							
+					int timeout = (int) (expires*0.9);
+					if (timeout > 0 ) {
+						doAuthenticationAfterExpire(timeout);
+					}		
 					listener.onInitialized(authSuccessString);
+					
 				} else if (responseStatus == CallStatsResponseStatus.INVALID_PROTO_FORMAT_ERROR) {
 					AuthenticateResponseError authResponseMessageError;
 					String responseString;
