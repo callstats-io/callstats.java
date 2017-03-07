@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
@@ -70,7 +71,7 @@ public class CallStatsAuthenticator {
 	private String authErrString = "SDK Authentication Error";
 	private String authSuccessString = "SDK authentication successful";
 	
-	
+	private ScheduledFuture<?> scheduledFuture;
 	
 	private Boolean isAuthenticationInProgress = false;
 
@@ -157,6 +158,12 @@ public class CallStatsAuthenticator {
 				.create();
 	}
 	
+	private void cancelScheduledAuthentication() {
+		if (scheduledFuture != null) {
+			scheduledFuture.cancel(false);
+		}
+	}
+	
 	/**
 	 * Do authentication.
 	 */
@@ -167,8 +174,9 @@ public class CallStatsAuthenticator {
 		}
 	}
 	
-	public void doAuthenticationAfterExpire(long timeout) {
-		scheduler.schedule(new Runnable() {
+	public void doAuthenticationAfterExpire(long timeout) {	
+		cancelScheduledAuthentication();
+		scheduledFuture = scheduler.schedule(new Runnable() {
 			public void run() {
 				doAuthentication();
 			}
@@ -184,7 +192,8 @@ public class CallStatsAuthenticator {
 	 * @param httpClient the http client
 	 */
 	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
-		scheduler.schedule(new Runnable() {
+		cancelScheduledAuthentication();
+		scheduledFuture = scheduler.schedule(new Runnable() {
 			public void run() {
 				sendAsyncAuthenticationRequest(appId, bridgeId, httpClient);
 			}
