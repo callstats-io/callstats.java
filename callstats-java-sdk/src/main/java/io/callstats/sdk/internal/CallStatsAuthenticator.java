@@ -158,7 +158,7 @@ public class CallStatsAuthenticator {
 				.create();
 	}
 	
-	private void cancelScheduledAuthentication() {
+	private synchronized void cancelScheduledAuthentication() {
 		if (scheduledFuture != null) {
 			scheduledFuture.cancel(false);
 		}
@@ -167,14 +167,14 @@ public class CallStatsAuthenticator {
 	/**
 	 * Do authentication.
 	 */
-	public void doAuthentication() {
+	public synchronized void doAuthentication() {
 		if (!isAuthenticationInProgress) {
 			sendAsyncAuthenticationRequest(appId, bridgeId,
 					httpClient);
 		}
 	}
 	
-	public void doAuthenticationAfterExpire(long timeout) {	
+	private synchronized void doAuthenticationAfterExpire(long timeout) {	
 		cancelScheduledAuthentication();
 		scheduledFuture = scheduler.schedule(new Runnable() {
 			public void run() {
