@@ -191,7 +191,7 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
+	private synchronized void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
 		cancelScheduledAuthentication();
 		scheduledFuture = scheduler.schedule(new Runnable() {
 			public void run() {
