@@ -1,5 +1,6 @@
 package io.callstats.sdk;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.BridgeStatusInfoBuilder;
@@ -19,6 +20,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+
+import com.google.gson.Gson;
 
 /**
  * The Class CallStatsTest.
@@ -181,6 +184,30 @@ public class CallStatsTest{
 		}
 	}
 	
+	/**
+	 * Starts stats build test.
+	 */
+	@Test
+	public void statsBuildTest() {
+		String res = "{\"streamType\":\"inbound\",\"ssrc\":\"34567898\",\"data\":{\"packetsSent\":34556,\"bytesSent\":23456,\"rtt\":34,\"jitter\":3.0,\"avsync\":3.2}}";
+		ConferenceStats conferenceStats = new ConferenceStatsBuilder()
+		.bytesSent(23456)
+		.packetsSent(34556)
+		.ssrc("34567898")
+		.confID("confID")
+		.localUserID("2345")
+		.remoteUserID("1234")
+		.statsType(CallStatsStreamType.INBOUND)
+		.jitter(3)
+		.rtt(34)
+		.avsync(3.2)
+		.ucID("ucid")
+		.build();
+		Gson gson = new Gson();
+		String statsString = gson.toJson(conferenceStats);
+		System.out.println("Stats string is " + statsString);
+		assertEquals(res, statsString);
+	}
 	
 	
 	@Test

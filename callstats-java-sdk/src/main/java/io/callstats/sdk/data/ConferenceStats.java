@@ -76,49 +76,49 @@ public class ConferenceStats {
 	}
 	
 	class ConferenceStatsInfo {
-		long packetsSent;
-		long packetsReceived;
-		long packetsLost;
-		long packetsDuplicated;
-		long packetsDiscarded;
-		long packetsRepaired;
+		Long packetsSent;
+		Long packetsReceived;
+		Long packetsLost;
+		Long packetsDuplicated;
+		Long packetsDiscarded;
+		Long packetsRepaired;
 		
-		long bytesSent;
-		long bytesReceived;
-		long bytesDuplicated;
-		long bytesDiscarded;
-		long bytesRepaired;
+		Long bytesSent;
+		Long bytesReceived;
+		Long bytesDuplicated;
+		Long bytesDiscarded;
+		Long bytesRepaired;
 		
-		long burstPacketsLost;
-		long burstLossIntervalCount;
-		long burstPacketsDiscarded;
-		long burstDiscardIntervalCount;
+		Long burstPacketsLost;
+		Long burstLossIntervalCount;
+		Long burstPacketsDiscarded;
+		Long burstDiscardIntervalCount;
 		
-		double gapLossRate;
-		double gapDiscardRate;
+		Double gapLossRate;
+		Double gapDiscardRate;
 		
-		double fractionalPacketLost;
-		double fractionalPacketDiscarded;
+		Double fractionalPacketLost;
+		Double fractionalPacketDiscarded;
 		
-		long framesSent;
-		long framesReceived;
-		long framesLost;
-		long framesDropped;
-		long framesCorrupted;
+		Long framesSent;
+		Long framesReceived;
+		Long framesLost;
+		Long framesDropped;
+		Long framesCorrupted;
 		
-		int rtt;
-		double jitter;
+		Integer rtt;
+		Double jitter;
 		
-		double currentPlayoutDelay;
-		double maxPlayoutDelay;
-		double minPlayoutDelay;
+		Double currentPlayoutDelay;
+		Double maxPlayoutDelay;
+		Double minPlayoutDelay;
 		
-		double currentJBDelay;
-		double highWatermarkJBDelay;
-		double lowWatermarkJBDelay;
-		double maxJBDelay;
-		double minJBDelay;
-		double avsync;
+		Double currentJBDelay;
+		Double highWatermarkJBDelay;
+		Double lowWatermarkJBDelay;
+		Double maxJBDelay;
+		Double minJBDelay;
+		Double avsync;
 		
 		
 		public ConferenceStatsInfo(ConferenceStatsBuilder builder) {
