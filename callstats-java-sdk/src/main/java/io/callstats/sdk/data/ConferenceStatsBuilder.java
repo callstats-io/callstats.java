@@ -10,141 +10,141 @@ public class ConferenceStatsBuilder {
 	String ucID;
 	String confID;
 	
-	long packetsReceived;
-	long packetsLost;
-	long packetsDuplicated;
-	long packetsDiscarded;
-	long packetsRepaired;
+	Long packetsReceived;
+	Long packetsLost;
+	Long packetsDuplicated;
+	Long packetsDiscarded;
+	Long packetsRepaired;
 	
-	long bytesSent;
-	long bytesReceived;
-	long bytesDuplicated;
-	long bytesDiscarded;
-	long bytesRepaired;
+	Long bytesSent;
+	Long bytesReceived;
+	Long bytesDuplicated;
+	Long bytesDiscarded;
+	Long bytesRepaired;
 	
-	long burstPacketsLost;
-	long burstLossIntervalCount;
-	long burstPacketsDiscarded;
-	long burstDiscardIntervalCount;
+	Long burstPacketsLost;
+	Long burstLossIntervalCount;
+	Long burstPacketsDiscarded;
+	Long burstDiscardIntervalCount;
 	
-	double gapLossRate;
-	double gapDiscardRate;
+	Double gapLossRate;
+	Double gapDiscardRate;
 	
-	double fractionalPacketLost;
-	double fractionalPacketDiscarded;
+	Double fractionalPacketLost;
+	Double fractionalPacketDiscarded;
 	
-	long framesSent;
-	long framesReceived;
-	long framesLost;
-	long framesDropped;
-	long framesCorrupted;
+	Long framesSent;
+	Long framesReceived;
+	Long framesLost;
+	Long framesDropped;
+	Long framesCorrupted;
 	
-	int rtt;
-	double jitter;
+	Integer rtt;
+	Double jitter;
 	
-	double currentPlayoutDelay;
-	double maxPlayoutDelay;
-	double minPlayoutDelay;
+	Double currentPlayoutDelay;
+	Double maxPlayoutDelay;
+	Double minPlayoutDelay;
 	
-	double currentJBDelay;
-	double highWatermarkJBDelay;
-	double lowWatermarkJBDelay;
-	double maxJBDelay;
-	double minJBDelay;
-	double avsync;
+	Double currentJBDelay;
+	Double highWatermarkJBDelay;
+	Double lowWatermarkJBDelay;
+	Double maxJBDelay;
+	Double minJBDelay;
+	Double avsync;
 		
-	long packetsSent;
-	public long getPacketsReceived() {
+	Long packetsSent;
+	public Long getPacketsReceived() {
 		return packetsReceived;
 	}
-	public long getPacketsLost() {
+	public Long getPacketsLost() {
 		return packetsLost;
 	}
-	public long getPacketsDuplicated() {
+	public Long getPacketsDuplicated() {
 		return packetsDuplicated;
 	}
-	public long getPacketsDiscarded() {
+	public Long getPacketsDiscarded() {
 		return packetsDiscarded;
 	}
-	public long getPacketsRepaired() {
+	public Long getPacketsRepaired() {
 		return packetsRepaired;
 	}
-	public long getBytesReceived() {
+	public Long getBytesReceived() {
 		return bytesReceived;
 	}
-	public long getBytesDuplicated() {
+	public Long getBytesDuplicated() {
 		return bytesDuplicated;
 	}
-	public long getBytesDiscarded() {
+	public Long getBytesDiscarded() {
 		return bytesDiscarded;
 	}
-	public long getBytesRepaired() {
+	public Long getBytesRepaired() {
 		return bytesRepaired;
 	}
-	public long getBurstPacketsLost() {
+	public Long getBurstPacketsLost() {
 		return burstPacketsLost;
 	}
-	public long getBurstLossIntervalCount() {
+	public Long getBurstLossIntervalCount() {
 		return burstLossIntervalCount;
 	}
-	public long getBurstPacketsDiscarded() {
+	public Long getBurstPacketsDiscarded() {
 		return burstPacketsDiscarded;
 	}
-	public long getBurstDiscardIntervalCount() {
+	public Long getBurstDiscardIntervalCount() {
 		return burstDiscardIntervalCount;
 	}
-	public double getGapLossRate() {
+	public Double getGapLossRate() {
 		return gapLossRate;
 	}
-	public double getGapDiscardRate() {
+	public Double getGapDiscardRate() {
 		return gapDiscardRate;
 	}
-	public double getFractionalPacketLost() {
+	public Double getFractionalPacketLost() {
 		return fractionalPacketLost;
 	}
-	public double getFractionalPacketDiscarded() {
+	public Double getFractionalPacketDiscarded() {
 		return fractionalPacketDiscarded;
 	}
-	public long getFramesSent() {
+	public Long getFramesSent() {
 		return framesSent;
 	}
-	public long getFramesReceived() {
+	public Long getFramesReceived() {
 		return framesReceived;
 	}
-	public long getFramesLost() {
+	public Long getFramesLost() {
 		return framesLost;
 	}
-	public long getFramesDropped() {
+	public Long getFramesDropped() {
 		return framesDropped;
 	}
-	public long getFramesCorrupted() {
+	public Long getFramesCorrupted() {
 		return framesCorrupted;
 	}
-	public double getCurrentPlayoutDelay() {
+	public Double getCurrentPlayoutDelay() {
 		return currentPlayoutDelay;
 	}
-	public double getMaxPlayoutDelay() {
+	public Double getMaxPlayoutDelay() {
 		return maxPlayoutDelay;
 	}
-	public double getMinPlayoutDelay() {
+	public Double getMinPlayoutDelay() {
 		return minPlayoutDelay;
 	}
-	public double getCurrentJBDelay() {
+	public Double getCurrentJBDelay() {
 		return currentJBDelay;
 	}
-	public double getHighWatermarkJBDelay() {
+	public Double getHighWatermarkJBDelay() {
 		return highWatermarkJBDelay;
 	}
-	public double getLowWatermarkJBDelay() {
+	public Double getLowWatermarkJBDelay() {
 		return lowWatermarkJBDelay;
 	}
-	public double getMaxJBDelay() {
+	public Double getMaxJBDelay() {
 		return maxJBDelay;
 	}
-	public double getMinJBDelay() {
+	public Double getMinJBDelay() {
 		return minJBDelay;
 	}
-	public double getAvsync() {
+	public Double getAvsync() {
 		return avsync;
 	}
 	
@@ -160,13 +160,13 @@ public class ConferenceStatsBuilder {
 	public String getFromUserID() {
 		return fromUserID;
 	}
-	public int getRtt() {
+	public Integer getRtt() {
 		return rtt;
 	}
-	public long getPacketsSent() {
+	public Long getPacketsSent() {
 		return packetsSent;
 	}
-	public long getBytesSent() {
+	public Long getBytesSent() {
 		return bytesSent;
 	}
 	public double getJitter() {
