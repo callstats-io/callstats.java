@@ -189,7 +189,7 @@ public class CallStatsTest{
 	 */
 	@Test
 	public void statsBuildTest() {
-		String res = "{\"streamType\":\"inbound\",\"ssrc\":\"34567898\",\"data\":{\"packetsSent\":34556,\"bytesSent\":23456,\"rtt\":34,\"jitter\":3.0,\"avsync\":3.2}}";
+		String res = "{\"streamType\":\"inbound\",\"ssrc\":\"34567898\",\"data\":{\"packetsSent\":34556,\"bytesSent\":23456,\"rtt\":34,\"avsync\":3.2}}";
 		ConferenceStats conferenceStats = new ConferenceStatsBuilder()
 		.bytesSent(23456)
 		.packetsSent(34556)
@@ -198,7 +198,6 @@ public class CallStatsTest{
 		.localUserID("2345")
 		.remoteUserID("1234")
 		.statsType(CallStatsStreamType.INBOUND)
-		.jitter(3)
 		.rtt(34)
 		.avsync(3.2)
 		.ucID("ucid")
