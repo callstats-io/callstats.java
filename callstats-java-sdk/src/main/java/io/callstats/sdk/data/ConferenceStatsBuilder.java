@@ -169,7 +169,7 @@ public class ConferenceStatsBuilder {
 	public Long getBytesSent() {
 		return bytesSent;
 	}
-	public double getJitter() {
+	public Double getJitter() {
 		return jitter;
 	}
 	public String getUcID() {
