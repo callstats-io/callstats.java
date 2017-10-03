@@ -372,7 +372,7 @@ public class CallStats {
 			ConferenceStats conferenceStats = tempStats.get(0);
 			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID(),conferenceStats.getRemoteUserID(),
 					conferenceStats.getUcID(), conferenceStats.getConfID());
-			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getLocalUserID(), conferenceStats.getUcID());
+			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getRemoteUserID(), conferenceStats.getUcID());
 			for (ConferenceStats stats : tempStats) {
 				conferenceStatsData.addStats(stats);
 			}
