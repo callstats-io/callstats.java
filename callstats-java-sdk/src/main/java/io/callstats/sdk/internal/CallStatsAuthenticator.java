@@ -201,7 +201,7 @@ public class CallStatsAuthenticator {
 		params.add(new NameValuePair("code", tokenGenerator.generateToken(forcenewtoken)));
 		params.add(new NameValuePair("grant_type", "authorization_code"));
 		
-		httpClient.sendHttp2Request(authenticateUrl, params, new CallStatsHttp2ResponseListener() {
+		httpClient.sendAuthRequest(authenticateUrl, params, new CallStatsHttp2ResponseListener() {
 			public void onResponse(Response response) {
 				isAuthenticationInProgress = false;
 				int responseStatus = response.code();

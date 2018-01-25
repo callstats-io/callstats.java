@@ -204,7 +204,7 @@ public class CallStats {
 					CallStatsConst.END_POINT_TYPE, epoch, token,
 					bridgeStatusInfo, serverInfo);
 			String requestMessageString = gson.toJson(eventMessage);
-			httpClient.sendHttp2Request(CallStatsConst.bridgeEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+			httpClient.sendBridgeEvents(CallStatsConst.bridgeEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
 				public void onResponse(Response response) {
 					int responseStatus = response.code();
 					if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
@@ -299,7 +299,7 @@ public class CallStats {
 	private synchronized void sendCallStatsConferenceEventMessage(CallStatsEventMessage eventMessage,final CallStatsStartConferenceListener listener ) {
 		String requestMessageString = gson.toJson(eventMessage);
 		logger.info("message sending is "+requestMessageString);
-		httpClient.sendHttp2Request(CallStatsConst.conferenceEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+		httpClient.sendBridgeEvents(CallStatsConst.conferenceEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
@@ -423,7 +423,7 @@ public class CallStats {
 		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
 				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
 		String requestMessageString = gson.toJson(eventMessage);
-		httpClient.sendHttp2Request(CallStatsConst.conferenceEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+		httpClient.sendBridgeEvents(CallStatsConst.conferenceEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {

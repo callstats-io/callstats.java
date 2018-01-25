@@ -149,7 +149,7 @@ public class CallStatsBridgeKeepAliveManager {
 		long apiTS = System.currentTimeMillis();
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
 		String requestMessageString = gson.toJson(message);
-		httpClient.sendHttp2Request(keepAliveEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+		httpClient.sendBridgeEvents(keepAliveEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {

@@ -89,7 +89,7 @@ public class CallStatsHttp2Client {
 		}
 	}
 	
-	public void sendHttp2Request(String url, String body, final CallStatsHttp2ResponseListener listener) {
+	public void sendBridgeEvents(String url, String body, final CallStatsHttp2ResponseListener listener) {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 	    RequestBody msg = RequestBody.create(JSON, body);
 	    Request request = new Request.Builder()
@@ -98,11 +98,22 @@ public class CallStatsHttp2Client {
 	    .addHeader("Accept-Charset", "utf-8")
         .post(msg)
         .build();
-	    logger.debug("sending request "+body);
 	    send(request, listener);
 	}
 	
-	public void sendHttp2Request(String url, List<NameValuePair> paramList, final CallStatsHttp2ResponseListener listener) {
+	public void sendBridgeStats(String url, String body, final CallStatsHttp2ResponseListener listener) {
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+	    RequestBody msg = RequestBody.create(JSON, body);
+	    Request request = new Request.Builder()
+        .url(STATS_BASE_URL+url)
+        .addHeader("Accept", "application/json")
+	    .addHeader("Accept-Charset", "utf-8")
+        .post(msg)
+        .build();
+	    send(request, listener);
+	}
+	
+	public void sendAuthRequest(String url, List<NameValuePair> paramList, final CallStatsHttp2ResponseListener listener) {
 	    Builder builder = new FormBody.Builder();
 	    for (int i=0; i<paramList.size(); i++) {
 	    	NameValuePair nameValuePair = paramList.get(i);
