@@ -1,143 +1,96 @@
 package io.callstats.sdk.data;
 
+import io.callstats.sdk.internal.CallStatsConst;
+
 /**
  * The Class ServerInfo.
  */
 public class ServerInfo {
-	
-	/** The endpoint data. */
-	EndPointData endpointData;
-	
+
+	/** The name. */
+	String buildName;
+
+	String buildVersion;
+	/** The os. */
+	String os;
+
+	/** The ver. */
+	String osVersion;
+
+	String appVersion;
+
+	String type = CallStatsConst.END_POINT_TYPE;
+
 	/**
-	 * Instantiates a new endpoint info.
+	 * Instantiates a new ServerInfo info.
 	 */
 	public ServerInfo() {
 		super();
-		endpointData = new EndPointData();
 	}
-	
+
 	/**
 	 * Gets the name.
 	 *
 	 * @return the name
 	 */
 	public String getName() {
-		return endpointData.getName();
+		return buildName;
 	}
-	
+
 	/**
 	 * Sets the name.
 	 *
-	 * @param name the new name
+	 * @param name
+	 *            the new name
 	 */
 	public void setName(String name) {
-		endpointData.setName(name);
+		this.buildName = name;
 	}
-	
+
 	/**
 	 * Gets the os.
 	 *
 	 * @return the os
 	 */
 	public String getOs() {
-		return endpointData.getOs();
+		return os;
 	}
-	
+
 	/**
 	 * Sets the os.
 	 *
-	 * @param os the new os
+	 * @param os
+	 *            the new os
 	 */
 	public void setOs(String os) {
-		endpointData.setOs(os);
+		this.os = os;
 	}
-	
+
 	/**
 	 * Gets the ver.
 	 *
 	 * @return the ver
 	 */
 	public String getVer() {
-		return endpointData.getVer();
+		return osVersion;
 	}
-	
+
 	/**
 	 * Sets the ver.
 	 *
-	 * @param ver the new ver
+	 * @param ver
+	 *            the new ver
 	 */
 	public void setVer(String ver) {
-		endpointData.setVer(ver);
+		this.osVersion = ver;
 	}
-	
-	/**
-	 * The Class EndPointData.
-	 */
-	private class EndPointData {
-		
-		/** The name. */
-		String name;
-		
-		/** The os. */
-		String  os;		
-		
-		/** The ver. */
-		String ver;
-		
-		
-		/**
-		 * Gets the name.
-		 *
-		 * @return the name
-		 */
-		public String getName() {
-			return name;
-		}
-		
-		/**
-		 * Sets the name.
-		 *
-		 * @param name the new name
-		 */
-		public void setName(String name) {
-			this.name = name;
-		}
-		
-		/**
-		 * Gets the os.
-		 *
-		 * @return the os
-		 */
-		public String getOs() {
-			return os;
-		}
-		
-		/**
-		 * Sets the os.
-		 *
-		 * @param os the new os
-		 */
-		public void setOs(String os) {
-			this.os = os;
-		}
-		
-		/**
-		 * Gets the version.
-		 *
-		 * @return the version
-		 */
-		public String getVer() {
-			return ver;
-		}
-		
-		/**
-		 * Sets the ver.
-		 *
-		 * @param ver the new ver
-		 */
-		public void setVer(String ver) {
-			this.ver = ver;
-		}
+
+	public String getEndpointType() {
+		return type;
 	}
-			
+
+	public void setEndpointType(String endpointType) {
+		this.type = endpointType;
+	}
+
 }

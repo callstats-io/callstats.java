@@ -1,105 +1,102 @@
 package io.callstats.sdk;
 
-import io.callstats.sdk.data.BridgeStatusInfo;
-import io.callstats.sdk.data.ConferenceInfo;
-import io.callstats.sdk.data.ConferenceStats;
-import io.callstats.sdk.data.ConferenceStatsData;
-import io.callstats.sdk.data.ServerInfo;
-import io.callstats.sdk.data.UserInfo;
-import io.callstats.sdk.httpclient.CallStatsHttpClient;
-import io.callstats.sdk.internal.BridgeStatusInfoQueue;
-import io.callstats.sdk.internal.CallStatsAuthenticator;
-import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
-import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
-import io.callstats.sdk.internal.CallStatsConst;
-import io.callstats.sdk.internal.CallStatsResponseStatus;
-import io.callstats.sdk.internal.CallStatsUrls;
-import io.callstats.sdk.internal.TokenGeneratorHs256;
-import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
-import io.callstats.sdk.listeners.CallStatsInitListener;
-import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
-import io.callstats.sdk.messages.BridgeStatusUpdateMessage;
-import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
-import io.callstats.sdk.messages.CallStatsEventMessage;
-import io.callstats.sdk.messages.CallStatsEventResponseMessage;
-import io.callstats.sdk.messages.EventInfo;
-
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import io.callstats.sdk.data.BridgeStatusInfo;
+import io.callstats.sdk.data.ConferenceInfo;
+import io.callstats.sdk.data.ConferenceStats;
+import io.callstats.sdk.data.ServerInfo;
+import io.callstats.sdk.data.UserInfo;
+import io.callstats.sdk.httpclient.CallStatsHttp2Client;
+import io.callstats.sdk.internal.BridgeStatusInfoQueue;
+import io.callstats.sdk.internal.CallStatsAuthenticator;
+import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
+import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
+import io.callstats.sdk.internal.CallStatsConst;
+import io.callstats.sdk.internal.CallStatsResponseStatus;
+import io.callstats.sdk.internal.TokenGeneratorHs256;
+import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
+import io.callstats.sdk.listeners.CallStatsInitListener;
+import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
+import io.callstats.sdk.messages.BridgeStatusUpdateMessage;
+import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
+import io.callstats.sdk.messages.CallStatsEventResponse;
+import io.callstats.sdk.messages.ConferenceSetupEvent;
+import io.callstats.sdk.messages.ConferenceStatsEvent;
+import okhttp3.Response;
+
 /**
  * The Class CallStats.
  *
  * @author Karthik Budigere
  */
-public class CallStats {	
-	
+public class CallStats {
+
 	/** The http client. */
-	private CallStatsHttpClient httpClient;
-	
+	private CallStatsHttp2Client httpClient;
+
 	/** The app id. */
 	private int appId;
-	
+
 	/** The bridge id. */
 	private String bridgeId;
-	
+
 	/** The listener. */
 	private CallStatsInitListener listener;
-	
+
 	/** The authenticator. */
 	private CallStatsAuthenticator authenticator;
-	
+
 	/** The logger. */
 	private static final Logger logger = LogManager.getLogger("CallStats");
-	
+
 	/** The gson. */
 	private Gson gson;
-	
+
 	/** The server info. */
 	private ServerInfo serverInfo;
-	
+
 	/** The is initialized. */
 	private boolean isInitialized;
-	
+
 	private BridgeStatusInfoQueue bridgeStatusInfoQueue;
-	
-	
-	private Map<String, List<ConferenceStats>> conferenceStatsMap = new HashMap<String,List<ConferenceStats>>();
-			
-	
+
+	private Map<String, List<ConferenceStats>> conferenceStatsMap = new HashMap<String, List<ConferenceStats>>();
+
 	/** The bridge keep alive manager. */
 	private CallStatsBridgeKeepAliveManager bridgeKeepAliveManager;
 
 	private ICallStatsTokenGenerator tokenGenerator;
 
-	private CallStatsHttpClient authHttpClient;
-	
+	private CallStatsHttp2Client authHttpClient;
+
 	/**
 	 * Checks if is initialized.
 	 *
 	 * @return true, if is initialized
 	 */
 	public boolean isInitialized() {
-	    return isInitialized;
+		return isInitialized;
 	}
 
 	/**
 	 * Sets the initialized.
 	 *
-	 * @param isInitialized the new initialized
+	 * @param isInitialized
+	 *            the new initialized
 	 */
 	private void setInitialized(boolean isInitialized) {
 		this.isInitialized = isInitialized;
@@ -114,27 +111,31 @@ public class CallStats {
 		if (System.getProperty("callstats.configurationFile") != null) {
 			CallStatsConst.CallStatsJavaSDKPropertyFileName = System.getProperty("callstats.configurationFile");
 		}
-		
-		logger.info("config file path is "+System.getProperty("callstats.configurationFile"));
+
+		logger.info("config file path is " + System.getProperty("callstats.configurationFile"));
 		CallStatsConst.CS_VERSION = getClass().getPackage().getImplementationVersion();
 	}
-	
+
 	private String getToken() {
 		return authenticator.getToken();
 	}
-	
+
 	/**
 	 * Initialize callstats.
 	 *
-	 * @param appId the app id
-	 * @param appSecret the app secret
-	 * @param bridgeId the bridge id
-	 * @param serverInfo the server info
-	 * @param callStatsInitListener the call stats init listener
+	 * @param appId
+	 *            the app id
+	 * @param appSecret
+	 *            the app secret
+	 * @param bridgeId
+	 *            the bridge id
+	 * @param serverInfo
+	 *            the server info
+	 * @param callStatsInitListener
+	 *            the call stats init listener
 	 */
 
-	public void initialize(final int appId, final String appSecret,
-			final String bridgeId, final ServerInfo serverInfo,
+	public void initialize(final int appId, final String appSecret, final String bridgeId, final ServerInfo serverInfo,
 			final CallStatsInitListener callStatsInitListener) {
 		if (StringUtils.isBlank(appSecret)) {
 			logger.error("intialize: Arguments cannot be null ");
@@ -142,22 +143,25 @@ public class CallStats {
 		}
 		initialize(appId, new TokenGeneratorHs256(appSecret.toCharArray(), appId, bridgeId), bridgeId, serverInfo, callStatsInitListener);
 	}
-	
+
 	/**
 	 * Initialize callstats.
 	 *
-	 * @param appId the app id
-	 * @param tokenGenerator token generator
-	 * @param bridgeId the bridge id
-	 * @param serverInfo the server info
-	 * @param callStatsInitListener the call stats init listener
+	 * @param appId
+	 *            the app id
+	 * @param tokenGenerator
+	 *            token generator
+	 * @param bridgeId
+	 *            the bridge id
+	 * @param serverInfo
+	 *            the server info
+	 * @param callStatsInitListener
+	 *            the call stats init listener
 	 */
 
-	public void initialize(final int appId, ICallStatsTokenGenerator tokenGenerator,
-			final String bridgeId, final ServerInfo serverInfo,
+	public void initialize(final int appId, ICallStatsTokenGenerator tokenGenerator, final String bridgeId, final ServerInfo serverInfo,
 			final CallStatsInitListener callStatsInitListener) {
-		if (appId <= 0 || StringUtils.isBlank(bridgeId) || serverInfo == null
-				|| callStatsInitListener == null) {
+		if (appId <= 0 || StringUtils.isBlank(bridgeId) || serverInfo == null || callStatsInitListener == null) {
 			logger.error("intialize: Arguments cannot be null ");
 			throw new IllegalArgumentException("intialize: Arguments cannot be null");
 		}
@@ -167,10 +171,11 @@ public class CallStats {
 		this.bridgeId = bridgeId;
 		this.listener = callStatsInitListener;
 		this.serverInfo = serverInfo;
-		
-		httpClient = new CallStatsHttpClient();
-		authHttpClient = new CallStatsHttpClient(CallStatsUrls.AUTH_BASE);
+
+		httpClient = new CallStatsHttp2Client();
+		authHttpClient = new CallStatsHttp2Client();
 		authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
+			@Override
 			public void onInitialized(String msg) {
 				setInitialized(true);
 				logger.info("SDK Initialized " + msg);
@@ -178,69 +183,57 @@ public class CallStats {
 				listener.onInitialized(msg);
 			}
 
+			@Override
 			public void onError(CallStatsErrors error, String errMsg) {
 				logger.info("SDK Initialization Failed " + errMsg);
 				listener.onError(error, errMsg);;
 			}
 		});
 		authenticator.doAuthentication();
-		
-//		CallStatsAsyncHttpClient httpClient1;
-//		httpClient1 = new CallStatsAsyncHttpClient();	
-//		authenticator.doAuthentication1(appId, appSecret, bridgeId,httpClient1);
 	}
-	
-	
 
 	/**
 	 * Send call stats bridge status update.
 	 *
-	 * @param bridgeStatusInfo the bridge status info
+	 * @param bridgeStatusInfo
+	 *            the bridge status info
 	 */
 	public void sendCallStatsBridgeStatusUpdate(BridgeStatusInfo bridgeStatusInfo) {
 		if (isInitialized()) {
 			long epoch = System.currentTimeMillis();
 			String token = getToken();
-			BridgeStatusUpdateMessage eventMessage = new BridgeStatusUpdateMessage(
-					appId, bridgeId, CallStatsConst.CS_VERSION,
-					CallStatsConst.END_POINT_TYPE, epoch, token,
-					bridgeStatusInfo, serverInfo);
+			BridgeStatusUpdateMessage eventMessage = new BridgeStatusUpdateMessage(bridgeId, epoch, bridgeStatusInfo);
 			String requestMessageString = gson.toJson(eventMessage);
-			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-				public void onResponse(HttpResponse response) {
-					int responseStatus = response.getStatusLine().getStatusCode();
-					logger.debug("Response " + response.toString() + ":" + responseStatus);
+			String url = "/" + appId + "/stats/bridge/status";
+			httpClient.sendBridgeStatistics(url, token, requestMessageString, new CallStatsHttp2ResponseListener() {
+				@Override
+				public void onResponse(Response response) {
+					int responseStatus = response.code();
+					BridgeStatusUpdateResponse eventResponseMessage;
+					try {
+						String responseString = response.body().string();
+						eventResponseMessage = gson.fromJson(responseString, BridgeStatusUpdateResponse.class);
+					} catch (IOException e) {
+						logger.error("IO Exception " + e.getMessage(), e);
+						throw new RuntimeException(e);
+					} catch (JsonSyntaxException e) {
+						logger.error("Json Syntax Exception " + e.getMessage(), e);
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
+					logger.debug("BridgeStatusUpdate Response " + eventResponseMessage.getStatus() + ":" + eventResponseMessage.getMsg());
+					httpClient.setDisrupted(false);
 					if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-						BridgeStatusUpdateResponse eventResponseMessage;
-						try {
-							String responseString = EntityUtils.toString(response.getEntity());
-							eventResponseMessage = gson.fromJson(responseString, BridgeStatusUpdateResponse.class);
-						} catch (ParseException e) {
-							logger.error("ParseException " + e.getMessage(), e);
-							throw new RuntimeException(e);
-						} catch (IOException e) {
-							logger.error("IO Exception " + e.getMessage(), e);
-							throw new RuntimeException(e);
-						} catch (JsonSyntaxException e) {
-							logger.error("Json Syntax Exception " + e.getMessage(), e);
-							e.printStackTrace();
-							throw new RuntimeException(e);
-						}
-						logger.debug("Response status is " + eventResponseMessage.getStatus()
-								+ ":" + eventResponseMessage.getReason());
-						if (eventResponseMessage.getStatus().equals(CallStatsConst.ERROR)
-								&& eventResponseMessage.getReason().contains(CallStatsErrors.INVALID_TOKEN_ERROR.getReason())) {
-							// logger.debug("Response status is "+eventResponseMessage.getStatus()+":"+eventResponseMessage.getReason());
-							bridgeKeepAliveManager.stopKeepAliveSender();
-							authenticator.doAuthentication();
-						}
-						httpClient.setDisrupted(false);
 						sendCallStatsBridgeStatusUpdateFromQueue();
+					} else if (responseStatus == CallStatsResponseStatus.INVALID_AUTHENTICATION_TOKEN) {
+						bridgeKeepAliveManager.stopKeepAliveSender();
+						authenticator.doAuthentication();
 					} else {
 						httpClient.setDisrupted(true);
 					}
 				}
 
+				@Override
 				public void onFailure(Exception e) {
 					logger.error("Response exception" + e.getMessage(), e);
 					httpClient.setDisrupted(true);
@@ -251,8 +244,7 @@ public class CallStats {
 			bridgeStatusInfoQueue.push(bridgeStatusInfo);
 		}
 	}
-	
-	
+
 	private synchronized void sendCallStatsBridgeStatusUpdateFromQueue() {
 		if (bridgeStatusInfoQueue.getLength() < 1)
 			return;
@@ -271,15 +263,17 @@ public class CallStats {
 		}
 
 		long apiTS = System.currentTimeMillis();
-		String token = getToken();
-		String eventData = "{\"fromUserID\":\""+conferenceInfo.getInitiatorID()+"\"}";
-		logger.debug("eventa data is "+eventData);
-		EventInfo event = new EventInfo(eventType.getMessageType(), eventData);
 		if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP) {
-
-			CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
-					conferenceInfo.getConfID(), apiTS, token, bridgeId, conferenceInfo.getInitiatorID(), event);
-			sendCallStatsConferenceEventMessage(eventMessage, listener);
+			ConferenceSetupEvent eventMessage = new ConferenceSetupEvent(bridgeId, conferenceInfo.getInitiatorID(), apiTS, serverInfo);
+			String requestMessageString = gson.toJson(eventMessage);
+			String url = "";
+			try {
+				url = "/" + appId + "/conferences/" + URLEncoder.encode(conferenceInfo.getConfID(), "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sendCallStatsConferenceEventMessage(url, requestMessageString, listener);
 		} else {
 			listener.onError(CallStatsErrors.CS_PROTO_ERROR, "Invaid Message type");
 		}
@@ -289,53 +283,58 @@ public class CallStats {
 		if (eventType == null || userInfo == null) {
 			logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
-		}		
-		
-		long apiTS = System.currentTimeMillis();
-		String token = getToken();
-		String eventData = "{ \"fromUserID\":\""+userInfo.getUserID()+"\"}";
-		EventInfo event = new EventInfo(eventType.getMessageType(), eventData);
+		}
 
-		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
-				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
-
-		sendCallStatsConferenceEventMessage(eventMessage, null);
+		// long apiTS = System.currentTimeMillis();
+		// String token = getToken();
+		if (eventType == CallStatsConferenceEvents.AUDIO_MUTE || eventType == CallStatsConferenceEvents.AUDIO_UNMUTE
+				|| eventType == CallStatsConferenceEvents.VIDEO_PAUSE || eventType == CallStatsConferenceEvents.VIDEO_RESUME) {
+			// TODO send media action event
+		} else if (eventType == CallStatsConferenceEvents.USER_JOINED || eventType == CallStatsConferenceEvents.USER_LEFT) {
+			// TODO send user action event
+		} else if (eventType == CallStatsConferenceEvents.FABRIC_HOLD || eventType == CallStatsConferenceEvents.FABRIC_RESUME) {
+			// TODO send fabric action event
+		} else if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP_FAILED || eventType == CallStatsConferenceEvents.CONFERENCE_TERMINATED) {
+			// TODO send conference action event
+		}
+		// sendCallStatsConferenceEventMessage(userInfo.getConfID(), requestMessageString, null);
 	}
 
-	private synchronized void sendCallStatsConferenceEventMessage(CallStatsEventMessage eventMessage,final CallStatsStartConferenceListener listener ) {
-		String requestMessageString = gson.toJson(eventMessage);
-		logger.info("message sending is "+requestMessageString);
-		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
-				int responseStatus = response.getStatusLine().getStatusCode();
+	private synchronized void sendCallStatsConferenceEventMessage(String url, String reqMsg, final CallStatsStartConferenceListener listener) {
+		String token = getToken();
+		httpClient.sendBridgeEvents(url, token, reqMsg, new CallStatsHttp2ResponseListener() {
+			@Override
+			public void onResponse(Response response) {
+				int responseStatus = response.code();
+				String responseString = "";
+				try {
+					responseString = response.body().string();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				logger.debug("received response " + responseString);
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-					CallStatsEventResponseMessage eventResponseMessage;
+					CallStatsEventResponse eventResponseMessage;
 					try {
-						String responseString = EntityUtils.toString(response.getEntity());
-						logger.debug("received response "+responseString);
-						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
-					} catch (ParseException e) {
-						logger.error("ParseException " + e.getMessage(), e);
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						logger.error("IO Exception " + e.getMessage(), e);
-						throw new RuntimeException(e);
+						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponse.class);
 					} catch (JsonSyntaxException e) {
 						logger.error("Json Syntax Exception " + e.getMessage(), e);
 						e.printStackTrace();
 						throw new RuntimeException(e);
 					}
-					logger.debug("conference event Response status is " + eventResponseMessage.getStatus() + ":"
-							+ eventResponseMessage.getConferenceID() + ":" + eventResponseMessage.getUcID());
-					if(listener != null) {
+					logger.debug("conference event Response status is " + eventResponseMessage.getStatus() + ":" + eventResponseMessage.getUcID());
+					if (listener != null) {
 						listener.onResponse(eventResponseMessage.getUcID());
-					}					
+					}
 					httpClient.setDisrupted(false);
 				} else {
+
 					httpClient.setDisrupted(true);
 				}
 			}
 
+			@Override
 			public void onFailure(Exception e) {
 				logger.error("Response exception" + e.getMessage(), e);
 				httpClient.setDisrupted(true);
@@ -343,16 +342,15 @@ public class CallStats {
 
 		});
 	}
-	
-	
+
 	public synchronized void startStatsReportingForUser(String userID, String confID) {
 		if (userID == null || confID == null) {
 			logger.error("startStatsReportingForUser: Arguments cannot be null ");
 			throw new IllegalArgumentException("startStatsReportingForUser: Arguments cannot be null");
 		}
-		
-		String key = userID+":"+confID;
-		
+
+		String key = userID + ":" + confID;
+
 		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
 		if (tempStats == null) {
 			tempStats = new ArrayList<ConferenceStats>();
@@ -365,23 +363,23 @@ public class CallStats {
 			logger.error("stopStatsReportingForUser: Arguments cannot be null ");
 			throw new IllegalArgumentException("stopStatsReportingForUser: Arguments cannot be null");
 		}
-		String key = userID+":"+confID;
+		String key = userID + ":" + confID;
 		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
-		
+		long apiTS = System.currentTimeMillis();
 		if (tempStats != null && tempStats.size() > 0) {
 			ConferenceStats conferenceStats = tempStats.get(0);
-			ConferenceStatsData conferenceStatsData = new ConferenceStatsData(conferenceStats.getLocalUserID(),conferenceStats.getRemoteUserID(),
-					conferenceStats.getUcID(), conferenceStats.getConfID());
+			ConferenceStatsEvent conferenceStatsEvent = new ConferenceStatsEvent(bridgeId, conferenceStats.getRemoteUserID(),
+					conferenceStats.getLocalUserID(), conferenceStats.getConfID(), apiTS);
 			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getRemoteUserID(), conferenceStats.getUcID());
 			for (ConferenceStats stats : tempStats) {
-				conferenceStatsData.addStats(stats);
+				conferenceStatsEvent.addStats(stats);
 			}
 
-			String statsString = gson.toJson(conferenceStatsData);
+			String statsString = gson.toJson(conferenceStatsEvent);
 			logger.debug("Stats string is " + statsString);
 			sendCallStatsConferenceStats(statsString, info);
 			conferenceStatsMap.remove(key);
-		}		
+		}
 	}
 
 	public synchronized void reportConferenceStats(String userID, ConferenceStats stats) {
@@ -389,83 +387,83 @@ public class CallStats {
 			logger.error("sendConferenceStats: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendConferenceStats: Arguments cannot be null");
 		}
-		String key = userID+":"+stats.getConfID();
+		String key = userID + ":" + stats.getConfID();
 		List<ConferenceStats> tempStats = conferenceStatsMap.get(key);
 		if (tempStats == null) {
-			//tempStats = new ArrayList<ConferenceStats>();
+			// tempStats = new ArrayList<ConferenceStats>();
 			throw new IllegalStateException("reportConferenceStats called without calling startStatsReportingForUser");
 		} else {
 			tempStats.add(stats);
 			conferenceStatsMap.put(key, tempStats);
-		}	
+		}
 	}
-	
+
 	private synchronized void startKeepAliveThread() {
 		if (bridgeKeepAliveManager == null) {
-			bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient, new CallStatsBridgeKeepAliveStatusListener() {
-				public void onKeepAliveError(
-						CallStatsErrors error,
-						String errMsg) {
-					if (error == CallStatsErrors.AUTH_ERROR) {
-						authenticator.doAuthentication();
-					}
-				}
+			bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient,
+					new CallStatsBridgeKeepAliveStatusListener() {
+						@Override
+						public void onKeepAliveError(CallStatsErrors error, String errMsg) {
+							if (error == CallStatsErrors.AUTH_ERROR) {
+								authenticator.doAuthentication();
+							}
+						}
 
-				public void onSuccess() {
-					sendCallStatsBridgeStatusUpdateFromQueue();
-				}
-			});
+						@Override
+						public void onSuccess() {
+							sendCallStatsBridgeStatusUpdateFromQueue();
+						}
+					});
 		}
 		bridgeKeepAliveManager.startKeepAliveSender(authenticator.getToken());
 	}
-	
-	
+
 	private synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
 		if (stats == null || userInfo == null) {
 			logger.error("sendCallStatsConferenceStats: Arguments cannot be null ");
 			throw new IllegalArgumentException("sendCallStatsConferenceStats: Arguments cannot be null");
 		}
-		
-		long apiTS = System.currentTimeMillis();
+
+		if (userInfo.getUcID() == null) {
+			logger.error("sendCallStatsConferenceStats: UCID is null ");
+			throw new IllegalArgumentException("sendCallStatsConferenceStats: UCID is null");
+		}
+
 		String token = getToken();
-		EventInfo event = new EventInfo(CallStatsConferenceEvents.CONFERENCE_STATS.getMessageType(), stats);
-		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
-				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
-		String requestMessageString = gson.toJson(eventMessage);
-		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
-				int responseStatus = response.getStatusLine().getStatusCode();
+		String url = "";
+		try {
+			url = "/" + appId + "/conferences/" + URLEncoder.encode(userInfo.getConfID(), "utf-8") + "/" + userInfo.getUcID() + "/stats";
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		httpClient.sendBridgeStats(url, token, stats, new CallStatsHttp2ResponseListener() {
+			@Override
+			public void onResponse(Response response) {
+				int responseStatus = response.code();
+				String responseString = "";
+				try {
+					responseString = response.body().string();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				logger.debug("sendBridgeStats : received response " + responseString);
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-					CallStatsEventResponseMessage eventResponseMessage;
-					try {
-						String responseString = EntityUtils.toString(response.getEntity());
-						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
-					} catch (ParseException e) {
-						logger.error("ParseException " + e.getMessage(), e);
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						logger.error("IO Execption " + e.getMessage(), e);
-						throw new RuntimeException(e);
-					} catch (JsonSyntaxException e) {
-						logger.error("Json Syntax Exception " + e.getMessage(), e);
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-					logger.debug("conference event Response status is " + eventResponseMessage.getStatus() + ":"
-							+ eventResponseMessage.getConferenceID() + ":" + eventResponseMessage.getUcID());
 					httpClient.setDisrupted(false);
 				} else {
+
 					httpClient.setDisrupted(true);
 				}
 			}
-	
+
+			@Override
 			public void onFailure(Exception e) {
 				logger.error("Response exception" + e.getMessage(), e);
 				httpClient.setDisrupted(true);
 			}
-	
+
 		});
 
 	}
-	
+
 }

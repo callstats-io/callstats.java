@@ -1,14 +1,9 @@
 package io.callstats.sdk.internal.listeners;
 
+import okhttp3.Response;
 
-import com.ning.http.client.Response;
 
-/**
- * The listener interface for receiving callStatsAsyncHttpResponse events.
- *
- * @author Karthik Budigere
- */
-public interface CallStatsAsyncHttpResponseListener {
+public interface CallStatsHttp2ResponseListener {
 	
 	/**
 	 * On response.
@@ -23,4 +18,5 @@ public interface CallStatsAsyncHttpResponseListener {
 	 * @param e the e
 	 */
 	void onFailure (Exception e);
+
 }
