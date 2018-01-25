@@ -2,8 +2,8 @@ package io.callstats.sdk.internal;
 
 import io.callstats.sdk.CallStatsErrors;
 import io.callstats.sdk.ICallStatsTokenGenerator;
-import io.callstats.sdk.httpclient.CallStatsHttpClient;
-import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
+import io.callstats.sdk.httpclient.CallStatsHttp2Client;
+import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.messages.AuthenticateErrorAction;
 import io.callstats.sdk.messages.AuthenticateErrorActionDeserializer;
@@ -18,10 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import okhttp3.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -65,7 +62,7 @@ public class CallStatsAuthenticator {
 	private String bridgeId;
 	
 	/** The http client. */
-	private CallStatsHttpClient httpClient;
+	private CallStatsHttp2Client httpClient;
 	
 	private String authErrString = "SDK Authentication Error";
 	private String authSuccessString = "SDK authentication successful";
@@ -124,7 +121,7 @@ public class CallStatsAuthenticator {
 	 * @param listener the listener
 	 */
 	public CallStatsAuthenticator(final int appId, final String appSecret,
-			final String bridgeId, final CallStatsHttpClient httpClient,
+			final String bridgeId, final CallStatsHttp2Client httpClient,
 			CallStatsInitListener listener) {
 		this.listener = listener;
 		this.appId = appId;
@@ -145,7 +142,7 @@ public class CallStatsAuthenticator {
 	 * @param listener the listener
 	 */
 	public CallStatsAuthenticator(final int appId, ICallStatsTokenGenerator tokenGenerator,
-			final String bridgeId, final CallStatsHttpClient httpClient,
+			final String bridgeId, final CallStatsHttp2Client httpClient,
 			CallStatsInitListener listener) {
 		this.tokenGenerator = tokenGenerator;
 		this.listener = listener;
@@ -175,7 +172,7 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
+	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttp2Client httpClient) {
 		scheduler.schedule(new Runnable() {
 			public void run() {
 				sendAsyncAuthenticationRequest(appId, bridgeId, httpClient);
@@ -192,7 +189,7 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void sendAsyncAuthenticationRequest(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
+	private void sendAsyncAuthenticationRequest(final int appId, final String bridgeId, final CallStatsHttp2Client httpClient) {
 		synchronized (isAuthenticationInProgress) {
 			if (isAuthenticationInProgress)
 				return;
@@ -200,21 +197,19 @@ public class CallStatsAuthenticator {
 			
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("client_id", bridgeId+"@"+appId));
-		params.add(new BasicNameValuePair("code", tokenGenerator.generateToken(forcenewtoken)));
-		params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+		params.add(new NameValuePair("client_id", bridgeId+"@"+appId));
+		params.add(new NameValuePair("code", tokenGenerator.generateToken(forcenewtoken)));
+		params.add(new NameValuePair("grant_type", "authorization_code"));
 		
-		httpClient.sendAsyncHttpRequest(authenticateUrl, CallStatsConst.httpPostMethod, params, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
+		httpClient.sendHttp2Request(authenticateUrl, params, new CallStatsHttp2ResponseListener() {
+			public void onResponse(Response response) {
 				isAuthenticationInProgress = false;
-				int responseStatus = response.getStatusLine()
-						.getStatusCode();
-				logger.info("Response status " + responseStatus);
+				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
 					AuthenticateResponse authResponseMessage;
 					String responseString;
 					try {
-						responseString = EntityUtils.toString(response.getEntity());
+						responseString = response.body().string();
 						authResponseMessage = gson.fromJson(responseString, AuthenticateResponse.class);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -232,7 +227,7 @@ public class CallStatsAuthenticator {
 					AuthenticateResponseError authResponseMessageError;
 					String responseString;
 					try {
-						responseString = EntityUtils.toString(response.getEntity());
+						responseString = response.body().string();
 						authResponseMessageError = gson.fromJson(responseString, AuthenticateResponseError.class);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -257,7 +252,6 @@ public class CallStatsAuthenticator {
 					scheduleAuthentication(appId, bridgeId, httpClient);
 					listener.onError(CallStatsErrors.HTTP_ERROR, authErrString);
 				}
-			
 				
 			}
 

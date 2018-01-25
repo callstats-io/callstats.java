@@ -1,6 +1,6 @@
 package io.callstats.sdk;
 
-import io.callstats.sdk.httpclient.CallStatsHttpClient;
+import io.callstats.sdk.httpclient.CallStatsHttp2Client;
 import io.callstats.sdk.internal.CallStatsAuthenticator;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 
@@ -12,7 +12,7 @@ public class CallStatsAuthenticatorTest {
 	
 	/** The listener. */
 	CallStatsInitListener listener;
-	CallStatsHttpClient httpClient;
+	CallStatsHttp2Client httpClient;
 	CallStatsAuthenticator authenticator;
 	
 	/** The app id. */
@@ -26,7 +26,7 @@ public class CallStatsAuthenticatorTest {
 	@Before
 	public void setUp() {	
 		listener = Mockito.mock(CallStatsInitListener.class);
-		httpClient = new CallStatsHttpClient();
+		httpClient = new CallStatsHttp2Client();
 		authenticator = new CallStatsAuthenticator(appId, appSecret, bridgeId, httpClient, listener);
 	}
 	
