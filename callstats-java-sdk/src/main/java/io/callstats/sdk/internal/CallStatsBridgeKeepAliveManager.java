@@ -1,11 +1,5 @@
 package io.callstats.sdk.internal;
 
-import io.callstats.sdk.CallStatsErrors;
-import io.callstats.sdk.httpclient.CallStatsHttp2Client;
-import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
-import io.callstats.sdk.messages.BridgeKeepAliveMessage;
-import io.callstats.sdk.messages.BridgeKeepAliveResponse;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,13 +10,18 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+import io.callstats.sdk.CallStatsErrors;
+import io.callstats.sdk.httpclient.CallStatsHttp2Client;
+import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
+import io.callstats.sdk.messages.BridgeKeepAliveMessage;
+import io.callstats.sdk.messages.BridgeKeepAliveResponse;
+import okhttp3.Response;
 
 /**
  * The Class CallStatsBridgeKeepAliveManager.
@@ -30,7 +29,7 @@ import com.google.gson.JsonSyntaxException;
 public class CallStatsBridgeKeepAliveManager {
 
 	/** The Constant keepAliveEventUrl. */
-	private static final String keepAliveEventUrl = "/callStatsBridgeKeepAliveEvent";
+	private String keepAliveEventUrl = "/callStatsBridgeKeepAliveEvent";
 
 	/** The app id. */
 	private int appId;
@@ -62,36 +61,42 @@ public class CallStatsBridgeKeepAliveManager {
 	/**
 	 * Instantiates a new call stats bridge keep alive manager.
 	 *
-	 * @param appId the app id          
-	 * @param bridgeId the bridge id            
-	 * @param token the token            
-	 * @param httpClient the http client
-	 * @param keepAliveStatusListener listener
-	 *            
+	 * @param appId
+	 *            the app id
+	 * @param bridgeId
+	 *            the bridge id
+	 * @param token
+	 *            the token
+	 * @param httpClient
+	 *            the http client
+	 * @param keepAliveStatusListener
+	 *            listener
+	 * 
 	 */
 	public CallStatsBridgeKeepAliveManager(int appId, String bridgeId, String token, final CallStatsHttp2Client httpClient,
 			CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener) {
 		super();
+		keepAliveEventUrl = "/" + appId + "/stats/bridge/alive";
 		Properties prop = new Properties();
 		InputStream input = null;
 
-		//input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
+		// input = getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 		try {
 			input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
 			if (input != null) {
 				prop.load(input);
-				if(prop.getProperty("CallStats.keepAliveInterval") != null) {
+				if (prop.getProperty("CallStats.keepAliveInterval") != null) {
 					keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
 				}
-			}	
-		} catch (FileNotFoundException e ) {
+			}
+		} catch (FileNotFoundException e) {
 			logger.error("Configuration file not found", e);
 			throw new RuntimeException("Configuration file not found");
-		} catch (IOException e ) {
+		} catch (IOException e) {
 			logger.error("Configuration file read IO exception", e);
 			throw new RuntimeException("Configuration file read IO exception");
 		}
-	
+
 		this.appId = appId;
 		this.bridgeId = bridgeId;
 		this.token = token;
@@ -121,15 +126,18 @@ public class CallStatsBridgeKeepAliveManager {
 
 	/**
 	 * Start keep alive sender.
-	 * @param authToken authentication token 
+	 * 
+	 * @param authToken
+	 *            authentication token
 	 */
 	public void startKeepAliveSender(String authToken) {
-		this.token = authToken;		
+		this.token = authToken;
 		stopKeepAliveSender();
-		
-		logger.info("Starting keepAlive Sender");
-		future = scheduler.scheduleAtFixedRate(new Runnable() {			
 
+		logger.info("Starting keepAlive Sender");
+		future = scheduler.scheduleAtFixedRate(new Runnable() {
+
+			@Override
 			public void run() {
 				sendKeepAliveBridgeMessage(appId, bridgeId, token, httpClient);
 			}
@@ -139,45 +147,49 @@ public class CallStatsBridgeKeepAliveManager {
 	/**
 	 * Send keep alive bridge message.
 	 *
-	 * @param appId the app id            
-	 * @param bridgeId the bridge id         
-	 * @param token the token           
-	 * @param httpClient the http client
-	 *            
+	 * @param appId
+	 *            the app id
+	 * @param bridgeId
+	 *            the bridge id
+	 * @param token
+	 *            the token
+	 * @param httpClient
+	 *            the http client
+	 * 
 	 */
 	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttp2Client httpClient) {
 		long apiTS = System.currentTimeMillis();
-		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
+		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(bridgeId, apiTS);
 		String requestMessageString = gson.toJson(message);
-		httpClient.sendBridgeEvents(keepAliveEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+		httpClient.sendBridgeAlive(keepAliveEventUrl, token, requestMessageString, new CallStatsHttp2ResponseListener() {
+			@Override
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
+				BridgeKeepAliveResponse keepAliveResponse;
+				try {
+					String responseString = response.body().string();
+					keepAliveResponse = gson.fromJson(responseString, BridgeKeepAliveResponse.class);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				} catch (JsonSyntaxException e) {
+					logger.error("Json Syntax Exception " + e.getMessage(), e);
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+				httpClient.setDisrupted(false);
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-					BridgeKeepAliveResponse keepAliveResponse;
-					try {
-						String responseString = response.body().string();
-						keepAliveResponse = gson.fromJson(responseString, BridgeKeepAliveResponse.class);
-					} catch (IOException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					} catch (JsonSyntaxException e) {
-						logger.error("Json Syntax Exception " + e.getMessage(), e);
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-					//logger.info("Response status is " + keepAliveResponse.getStatus() + ":" + keepAliveResponse.getReason());
-					if (keepAliveResponse.getStatus().equals(CallStatsConst.ERROR) && keepAliveResponse.getReason().contains(CallStatsConst.INVALID_TOKEN)) {
-						stopKeepAliveSender();
-						keepAliveStatusListener.onKeepAliveError(CallStatsErrors.AUTH_ERROR, keepAliveResponse.getReason());
-					}
-					httpClient.setDisrupted(false);
 					keepAliveStatusListener.onSuccess();
-					
+
+				} else if (responseStatus == CallStatsResponseStatus.INVALID_AUTHENTICATION_TOKEN) {
+					stopKeepAliveSender();
+					keepAliveStatusListener.onKeepAliveError(CallStatsErrors.AUTH_ERROR, keepAliveResponse.getMsg());
 				} else {
 					httpClient.setDisrupted(true);
 				}
 			}
 
+			@Override
 			public void onFailure(Exception e) {
 				logger.info("Response exception" + e.toString());
 				httpClient.setDisrupted(true);

@@ -40,10 +40,10 @@ public class CallStatsTest{
 	ServerInfo serverInfo;
 	
 	/** The app id. */
-	public static int appId = 1234567;
+	public static int appId = 175240362;
 	
 	/** The app secret. */
-	public static String appSecret = "app_secret";
+	public static String appSecret = "Nl60t+h2b+BI:Gvd126EUWQheaWQX9mwmeWIbzvs=";
 	
 	public static String bridgeId = "winteriscoming";
 	
