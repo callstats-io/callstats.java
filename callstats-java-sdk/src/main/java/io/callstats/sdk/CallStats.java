@@ -6,16 +6,15 @@ import io.callstats.sdk.data.ConferenceStats;
 import io.callstats.sdk.data.ConferenceStatsData;
 import io.callstats.sdk.data.ServerInfo;
 import io.callstats.sdk.data.UserInfo;
-import io.callstats.sdk.httpclient.CallStatsHttpClient;
+import io.callstats.sdk.httpclient.CallStatsHttp2Client;
 import io.callstats.sdk.internal.BridgeStatusInfoQueue;
 import io.callstats.sdk.internal.CallStatsAuthenticator;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.CallStatsResponseStatus;
-import io.callstats.sdk.internal.CallStatsUrls;
 import io.callstats.sdk.internal.TokenGeneratorHs256;
-import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
+import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 import io.callstats.sdk.listeners.CallStatsStartConferenceListener;
 import io.callstats.sdk.messages.BridgeStatusUpdateMessage;
@@ -30,10 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Response;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,7 +46,7 @@ import com.google.gson.JsonSyntaxException;
 public class CallStats {	
 	
 	/** The http client. */
-	private CallStatsHttpClient httpClient;
+	private CallStatsHttp2Client httpClient;
 	
 	/** The app id. */
 	private int appId;
@@ -85,7 +83,7 @@ public class CallStats {
 
 	private ICallStatsTokenGenerator tokenGenerator;
 
-	private CallStatsHttpClient authHttpClient;
+	private CallStatsHttp2Client authHttpClient;
 	
 	/**
 	 * Checks if is initialized.
@@ -168,8 +166,8 @@ public class CallStats {
 		this.listener = callStatsInitListener;
 		this.serverInfo = serverInfo;
 		
-		httpClient = new CallStatsHttpClient();
-		authHttpClient = new CallStatsHttpClient(CallStatsUrls.AUTH_BASE);
+		httpClient = new CallStatsHttp2Client();
+		authHttpClient = new CallStatsHttp2Client();
 		authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
 			public void onInitialized(String msg) {
 				setInitialized(true);
@@ -206,18 +204,14 @@ public class CallStats {
 					CallStatsConst.END_POINT_TYPE, epoch, token,
 					bridgeStatusInfo, serverInfo);
 			String requestMessageString = gson.toJson(eventMessage);
-			httpClient.sendAsyncHttpRequest(CallStatsConst.bridgeEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-				public void onResponse(HttpResponse response) {
-					int responseStatus = response.getStatusLine().getStatusCode();
-					logger.debug("Response " + response.toString() + ":" + responseStatus);
+			httpClient.sendBridgeEvents(CallStatsConst.bridgeEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+				public void onResponse(Response response) {
+					int responseStatus = response.code();
 					if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
 						BridgeStatusUpdateResponse eventResponseMessage;
 						try {
-							String responseString = EntityUtils.toString(response.getEntity());
+							String responseString = response.body().string();
 							eventResponseMessage = gson.fromJson(responseString, BridgeStatusUpdateResponse.class);
-						} catch (ParseException e) {
-							logger.error("ParseException " + e.getMessage(), e);
-							throw new RuntimeException(e);
 						} catch (IOException e) {
 							logger.error("IO Exception " + e.getMessage(), e);
 							throw new RuntimeException(e);
@@ -305,18 +299,15 @@ public class CallStats {
 	private synchronized void sendCallStatsConferenceEventMessage(CallStatsEventMessage eventMessage,final CallStatsStartConferenceListener listener ) {
 		String requestMessageString = gson.toJson(eventMessage);
 		logger.info("message sending is "+requestMessageString);
-		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
-				int responseStatus = response.getStatusLine().getStatusCode();
+		httpClient.sendBridgeEvents(CallStatsConst.conferenceEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+			public void onResponse(Response response) {
+				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
 					CallStatsEventResponseMessage eventResponseMessage;
 					try {
-						String responseString = EntityUtils.toString(response.getEntity());
+						String responseString = response.body().string();
 						logger.debug("received response "+responseString);
 						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
-					} catch (ParseException e) {
-						logger.error("ParseException " + e.getMessage(), e);
-						throw new RuntimeException(e);
 					} catch (IOException e) {
 						logger.error("IO Exception " + e.getMessage(), e);
 						throw new RuntimeException(e);
@@ -432,17 +423,14 @@ public class CallStats {
 		CallStatsEventMessage eventMessage = new CallStatsEventMessage(CallStatsConst.CS_VERSION, appId, CallStatsConst.END_POINT_TYPE,
 				userInfo.getConfID(), apiTS, token, bridgeId, userInfo.getUserID(), userInfo.getUcID(), event);
 		String requestMessageString = gson.toJson(eventMessage);
-		httpClient.sendAsyncHttpRequest(CallStatsConst.conferenceEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
-				int responseStatus = response.getStatusLine().getStatusCode();
+		httpClient.sendBridgeEvents(CallStatsConst.conferenceEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+			public void onResponse(Response response) {
+				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
 					CallStatsEventResponseMessage eventResponseMessage;
 					try {
-						String responseString = EntityUtils.toString(response.getEntity());
+						String responseString = response.body().string();
 						eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponseMessage.class);
-					} catch (ParseException e) {
-						logger.error("ParseException " + e.getMessage(), e);
-						throw new RuntimeException(e);
 					} catch (IOException e) {
 						logger.error("IO Execption " + e.getMessage(), e);
 						throw new RuntimeException(e);

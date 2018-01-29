@@ -1,8 +1,8 @@
 package io.callstats.sdk.internal;
 
 import io.callstats.sdk.CallStatsErrors;
-import io.callstats.sdk.httpclient.CallStatsHttpClient;
-import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
+import io.callstats.sdk.httpclient.CallStatsHttp2Client;
+import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
 import io.callstats.sdk.messages.BridgeKeepAliveMessage;
 import io.callstats.sdk.messages.BridgeKeepAliveResponse;
 
@@ -16,9 +16,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
+import okhttp3.Response;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,7 +48,7 @@ public class CallStatsBridgeKeepAliveManager {
 	private Gson gson;
 
 	/** The http client. */
-	private CallStatsHttpClient httpClient;
+	private CallStatsHttp2Client httpClient;
 
 	private CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener;
 
@@ -70,7 +69,7 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param keepAliveStatusListener listener
 	 *            
 	 */
-	public CallStatsBridgeKeepAliveManager(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient,
+	public CallStatsBridgeKeepAliveManager(int appId, String bridgeId, String token, final CallStatsHttp2Client httpClient,
 			CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener) {
 		super();
 		Properties prop = new Properties();
@@ -146,22 +145,18 @@ public class CallStatsBridgeKeepAliveManager {
 	 * @param httpClient the http client
 	 *            
 	 */
-	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttpClient httpClient) {
+	private void sendKeepAliveBridgeMessage(int appId, String bridgeId, String token, final CallStatsHttp2Client httpClient) {
 		long apiTS = System.currentTimeMillis();
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(appId, bridgeId, CallStatsConst.CS_VERSION, apiTS, token);
 		String requestMessageString = gson.toJson(message);
-		httpClient.sendAsyncHttpRequest(keepAliveEventUrl, CallStatsConst.httpPostMethod, requestMessageString, new CallStatsHttpResponseListener() {
-			public void onResponse(HttpResponse response) {
-				int responseStatus = response.getStatusLine().getStatusCode();
-				logger.debug("Response " + response.toString() + ":" + responseStatus);
+		httpClient.sendBridgeEvents(keepAliveEventUrl, requestMessageString, new CallStatsHttp2ResponseListener() {
+			public void onResponse(Response response) {
+				int responseStatus = response.code();
 				if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
 					BridgeKeepAliveResponse keepAliveResponse;
 					try {
-						String responseString = EntityUtils.toString(response.getEntity());
+						String responseString = response.body().string();
 						keepAliveResponse = gson.fromJson(responseString, BridgeKeepAliveResponse.class);
-					} catch (ParseException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
 					} catch (IOException e) {
 						e.printStackTrace();
 						throw new RuntimeException(e);
