@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,9 @@ import io.callstats.sdk.internal.NameValuePair;
 import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.CipherSuite;
 import okhttp3.ConnectionPool;
+import okhttp3.ConnectionSpec;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -21,6 +24,7 @@ import okhttp3.FormBody.Builder;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.TlsVersion;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,10 +54,17 @@ public class CallStatsHttp2Client {
 	}
 	
 	public CallStatsHttp2Client() {
+		ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)  
+	        .tlsVersions(TlsVersion.TLS_1_2)
+	        .allEnabledCipherSuites()
+	        .supportsTlsExtensions(true)
+	        .build();
+
 		okHttpClientclient = new OkHttpClient.Builder()
 			.readTimeout(connectionTimeOut, TimeUnit.MILLISECONDS)
 			.writeTimeout(connectionTimeOut, TimeUnit.MILLISECONDS)
 			.connectionPool(new ConnectionPool())
+			.connectionSpecs(Collections.singletonList(spec))
 			.build();
 		loadConfigurations();
 	}
@@ -89,27 +100,37 @@ public class CallStatsHttp2Client {
 		}
 	}
 	
-	public void sendBridgeEvents(String url, String body, final CallStatsHttp2ResponseListener listener) {
+	private Request buildRequest(String url, String token, String body) {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 	    RequestBody msg = RequestBody.create(JSON, body);
 	    Request request = new Request.Builder()
-        .url(EVENTS_BASE_URL+url)
+        .url(url)
         .addHeader("Accept", "application/json")
 	    .addHeader("Accept-Charset", "utf-8")
+	    .addHeader("Authorization", "Bearer "+token)
         .post(msg)
         .build();
+	    return request;
+	}
+	
+	public void sendBridgeEvents(String url, String token, String body, final CallStatsHttp2ResponseListener listener) {
+		Request request = buildRequest(EVENTS_BASE_URL+url, token, body);
 	    send(request, listener);
 	}
 	
-	public void sendBridgeStats(String url, String body, final CallStatsHttp2ResponseListener listener) {
-		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-	    RequestBody msg = RequestBody.create(JSON, body);
-	    Request request = new Request.Builder()
-        .url(STATS_BASE_URL+url)
-        .addHeader("Accept", "application/json")
-	    .addHeader("Accept-Charset", "utf-8")
-        .post(msg)
-        .build();
+	public void sendBridgeStats(String url, String token, String body, final CallStatsHttp2ResponseListener listener) {
+		Request request = buildRequest(STATS_BASE_URL+url, token, body);
+	    send(request, listener);
+	}
+	
+	public void sendBridgeAlive(String url, String token, String body, final CallStatsHttp2ResponseListener listener) {
+		Request request = buildRequest(STATS_BASE_URL+url, token, body);
+		logger.info("sending to "+STATS_BASE_URL+url);
+	    send(request, listener);
+	}
+	
+	public void sendBridgeStatistics(String url, String token, String body, final CallStatsHttp2ResponseListener listener) {
+		Request request = buildRequest(STATS_BASE_URL+url, token, body);
 	    send(request, listener);
 	}
 	
