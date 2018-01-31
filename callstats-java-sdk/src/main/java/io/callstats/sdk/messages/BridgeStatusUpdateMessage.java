@@ -7,131 +7,128 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import io.callstats.sdk.data.BridgeStatusInfo;
-import io.callstats.sdk.data.HealthStatusData;
-import io.callstats.sdk.data.ServerInfo;
-import io.callstats.sdk.data.TrafficStatusData;
 
 /**
  * The Class BridgeEventMessage.
  */
 public class BridgeStatusUpdateMessage {
-	
-	/** The Constant MSG_TYPE. */
-	private static final String MSG_TYPE = "CallStatsBridgeEvent";
-	
-	/** The app id. */
-	private int appID;
-	
+
 	/** The bridge id. */
-	private String bridgeID;
-	
-	/** The version. */
-	private String version;
-	
-	/** The endpoint type. */
-	private String endpointType;
-	
-	/** The api ts. */
-	private long apiTS;
-	
-	/** The token. */
-	private String token;
-	
-	/** The event. */
-	private EventInfo event;
-	
+	private String localID;
+
+	/** The origin id. */
+	private String originID;
+
+	/** The device id. */
+	private String deviceID;
+
+	/** The timestamp. */
+	private long timestamp;
+
+	/** The cpu usage. */
+	private float cpuUsage;
+
+	/** Total used memory on the machine. */
+	private float memoryUsage;
+
+	/** The total memory of the machine. */
+	private float totalMemory;
+
+	/** The number of Java threads that the video bridge is using. */
+	private int threadCount;
+
+	/** intervalSentBytes: The sent bytes in the last measurement interval. */
+	private long intervalSentBytes;
+
+	/** intervalReceivedBytes: The received bytes in the last measurement interval. */
+	private long intervalReceivedBytes;
+
+	/**
+	 * intervalRtpFractionLoss: The packet loss observed in the last measurement interval. It is the fraction of the RTP packets lost, and the RTP
+	 * packets lost and received in the last measurement interval. The value is between 0.0 and 1.0.
+	 */
+	private float intervalRtpFractionLoss;
+
+	/** totalLoss: The total cumulative packets lost. */
+	private long totalRtpLostPackets;
+
+	/** avgIntervalRtt: The avg RTT observed in the last measurement interval. */
+	private float intervalAverageRtt;
+
+	/** avgIntervalJitter: The avg interval jitter in the last measurement interval. */
+	private float intervalAverageJitter;
+
+	/** intervalDownloadBitRate: Download bit rate for the endpoints in kilobits per second measured over the last measurement interval. */
+	private int intervalDownloadBitrate;
+
+	/** intervalUploadBitRate: Upload bit rate for the video bridge in kilobits per second measured over the last measurement interval. */
+	private int intervalUploadBitrate;
+
+	/** audioFabricCount: Current number of open/active 5 tuples that use audio. */
+	private int audioFabricCount;
+
+	/** videoFabricCount: Current number of open/active 5-tuples that use video. */
+	private int videoFabricCount;
+
+	/** conferenceCount: Current number of multimedia conferences. */
+	private int conferenceCount;
+
+	/** participantsCount: Current number of multimedia participants cumulative over all ongoing conferences. */
+	private int participantsCount;
+
 	/** The logger. */
 	private static final Logger logger = LogManager.getLogger("CallStats");
-		
+
 	/**
 	 * Instantiates a new bridge event message.
 	 *
-	 * @param appID the app id
-	 * @param bridgeID the bridge id
-	 * @param version the version
-	 * @param endpointType the endpoint type
-	 * @param apiTS the api ts
-	 * @param token the token
-	 * @param bridgeStatusInfo the bridge status info
-	 * @param endpointInfo the endpoint info
+	 * @param bridgeID
+	 *            the bridge id
+	 * @param timestamp
+	 *            the timestamp
+	 * @param bridgeStatusInfo
+	 *            the bridge status info
 	 * 
 	 */
-	public BridgeStatusUpdateMessage(int appID, String bridgeID, String version,
-		String endpointType, long apiTS, String token,BridgeStatusInfo bridgeStatusInfo,ServerInfo endpointInfo) {
+	public BridgeStatusUpdateMessage(String bridgeID, long timestamp, BridgeStatusInfo bridgeStatusInfo) {
 		super();
-		this.appID = appID;
 		try {
-			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
+			this.localID = URLEncoder.encode(bridgeID, "UTF-8");
+			this.setOriginID(this.localID);
+			this.setDeviceID(this.localID);
 		} catch (UnsupportedEncodingException e) {
 			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		this.version = version;
-		this.endpointType = endpointType;
-		this.apiTS = apiTS;
-		this.token = token;
-		this.event = new EventInfo();
-		
-		setData(bridgeStatusInfo);		
-		
-		event.setEventType(MSG_TYPE);
-		event.setEndpointInfo(endpointInfo);		
+		this.timestamp = timestamp;
+		setData(bridgeStatusInfo);
 	}
 
 	/**
 	 * Sets the data.
 	 *
-	 * @param bridgeStatusInfo the new data
+	 * @param bridgeStatusInfo
+	 *            the new data
 	 */
 	private void setData(BridgeStatusInfo bridgeStatusInfo) {
-		EventData data = new EventData();
-		HealthStatusData healthStatusData = new HealthStatusData();
-		TrafficStatusData trafficStatusData = new TrafficStatusData();
-		
-		healthStatusData.setCpuUsage(bridgeStatusInfo.getCpuUsage());
-		healthStatusData.setMemoryUsage(bridgeStatusInfo.getMemoryUsage());
-		healthStatusData.setThreadCount(bridgeStatusInfo.getThreadCount());
-		healthStatusData.setTotalMemory(bridgeStatusInfo.getTotalMemory());
-		
-		trafficStatusData.setAvgIntervalJitter(bridgeStatusInfo.getAvgIntervalJitter());
-		trafficStatusData.setAvgIntervalRtt(bridgeStatusInfo.getAvgIntervalRtt());
-		trafficStatusData.setTotalLoss(bridgeStatusInfo.getTotalLoss());
-		trafficStatusData.setAudioFabricCount(bridgeStatusInfo.getAudioFabricCount());
-		trafficStatusData.setVideoFabricCount(bridgeStatusInfo.getVideoFabricCount());
-		trafficStatusData.setConferenceCount(bridgeStatusInfo.getConferenceCount());
-		trafficStatusData.setIntervalDownloadBitRate(bridgeStatusInfo.getIntervalDownloadBitRate());
-		trafficStatusData.setIntervalUploadBitRate(bridgeStatusInfo.getIntervalUploadBitRate());
-		trafficStatusData.setParticipantsCount(bridgeStatusInfo.getParticipantsCount());
-		trafficStatusData.setIntervalReceivedBytes(bridgeStatusInfo.getIntervalReceivedBytes());
-		trafficStatusData.setIntervalSentBytes(bridgeStatusInfo.getIntervalSentBytes());
-		trafficStatusData.setIntervalRtpFractionLoss(bridgeStatusInfo.getIntervalRtpFractionLoss());
-		
-		
-		
-		
-		data.setMeasurementInterval(bridgeStatusInfo.getMeasurementInterval());
-		data.setHealthStatusData(healthStatusData);
-		data.setTrafficStatusData(trafficStatusData);
-		event.setEventData(data);
-	}
-	
-	/**
-	 * Gets the app id.
-	 *
-	 * @return the app id
-	 */
-	public int getAppID() {
-		return appID;
-	}
+		setCpuUsage(bridgeStatusInfo.getCpuUsage());
+		setMemoryUsage(bridgeStatusInfo.getMemoryUsage());
+		threadCount = bridgeStatusInfo.getThreadCount();
+		totalMemory = bridgeStatusInfo.getTotalMemory();
 
-	/**
-	 * Sets the app id.
-	 *
-	 * @param appID the new app id
-	 */
-	public void setAppID(int appID) {
-		this.appID = appID;
+		intervalAverageJitter = bridgeStatusInfo.getAvgIntervalJitter();
+		intervalAverageRtt = bridgeStatusInfo.getAvgIntervalRtt();
+		totalRtpLostPackets = (long) bridgeStatusInfo.getTotalLoss();
+		audioFabricCount = bridgeStatusInfo.getAudioFabricCount();
+		videoFabricCount = bridgeStatusInfo.getVideoFabricCount();
+		conferenceCount = bridgeStatusInfo.getConferenceCount();
+		intervalDownloadBitrate = bridgeStatusInfo.getIntervalDownloadBitRate();
+		intervalUploadBitrate = bridgeStatusInfo.getIntervalUploadBitRate();
+		participantsCount = bridgeStatusInfo.getParticipantsCount();
+		intervalReceivedBytes = bridgeStatusInfo.getIntervalReceivedBytes();
+		intervalSentBytes = bridgeStatusInfo.getIntervalSentBytes();
+		intervalRtpFractionLoss = bridgeStatusInfo.getIntervalRtpFractionLoss();
 	}
 
 	/**
@@ -139,259 +136,187 @@ public class BridgeStatusUpdateMessage {
 	 *
 	 * @return the bridge id
 	 */
-	public String getBridgeID() {
-		return bridgeID;
+	public String getLocalID() {
+		return localID;
 	}
 
 	/**
 	 * Sets the bridge id.
 	 *
-	 * @param userID the new bridge id
+	 * @param userID
+	 *            the new bridge id
 	 *
 	 */
-	public void setBridgeID(String userID) {
+	public void setLocalID(String userID) {
 		try {
-			this.bridgeID = URLEncoder.encode(userID, "UTF-8");
+			this.localID = URLEncoder.encode(userID, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
 			e.printStackTrace();
 			throw new RuntimeException(e);
-		};
+		} ;
 	}
 
 	/**
-	 * Gets the version.
+	 * Gets the timestamp.
 	 *
-	 * @return the version
+	 * @return the timestamp
 	 */
-	public String getVersion() {
-		return version;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
 	/**
-	 * Sets the version.
+	 * Sets the timestamp.
 	 *
-	 * @param version the new version
+	 * @param timestamp
+	 *            the new timestamp
 	 */
-	public void setVersion(String version) {
-		this.version = version;
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
-	/**
-	 * Gets the endpoint type.
-	 *
-	 * @return the endpoint type
-	 */
-	public String getEndpointType() {
-		return endpointType;
+	public String getOriginID() {
+		return originID;
 	}
 
-	/**
-	 * Sets the endpoint type.
-	 *
-	 * @param endpointType the new endpoint type
-	 */
-	public void setEndpointType(String endpointType) {
-		this.endpointType = endpointType;
+	public void setOriginID(String originID) {
+		this.originID = originID;
 	}
 
-	/**
-	 * Gets the api ts.
-	 *
-	 * @return the api ts
-	 */
-	public long getApiTS() {
-		return apiTS;
+	public String getDeviceID() {
+		return deviceID;
 	}
 
-	/**
-	 * Sets the api ts.
-	 *
-	 * @param apiTS the new api ts
-	 */
-	public void setApiTS(long apiTS) {
-		this.apiTS = apiTS;
+	public void setDeviceID(String deviceID) {
+		this.deviceID = deviceID;
 	}
 
-	/**
-	 * Gets the token.
-	 *
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
+	public float getCpuUsage() {
+		return cpuUsage;
 	}
 
-	/**
-	 * Sets the token.
-	 *
-	 * @param token the new token
-	 */
-	public void setToken(String token) {
-		this.token = token;
+	public void setCpuUsage(float cpuUsage) {
+		this.cpuUsage = cpuUsage;
 	}
 
-	/**
-	 * Gets the event.
-	 *
-	 * @return the event
-	 */
-	public EventInfo getEvent() {
-		return event;
+	public float getMemoryUsage() {
+		return memoryUsage;
 	}
 
-	/**
-	 * Sets the event.
-	 *
-	 * @param event the new event
-	 */
-	public void setEvent(EventInfo event) {
-		this.event = event;
+	public void setMemoryUsage(float memoryUsage) {
+		this.memoryUsage = memoryUsage;
 	}
-		
-	/**
-	 * The Class EventData.
-	 */
-	private class EventData {
-		
-		/** The health status data. */
-		HealthStatusData healthStatusData;
-		
-		/** The traffic status data. */
-		TrafficStatusData trafficStatusData;
-		
-		int measurementInterval;
-		
-		public int getMeasurementInterval() {
-			return measurementInterval;
-		}
 
-		public void setMeasurementInterval(int submissionInterval) {
-			this.measurementInterval = submissionInterval;
-		}
-
-		/**
-		 * Instantiates a new event data.
-		 */
-		public EventData() {
-			healthStatusData = new HealthStatusData();
-			trafficStatusData = new TrafficStatusData();
-		}
-		
-		/**
-		 * Gets the health status data.
-		 *
-		 * @return the health status data
-		 */
-		public HealthStatusData getHealthStatusData() {
-			return healthStatusData;
-		}
-		
-		/**
-		 * Sets the health status data.
-		 *
-		 * @param healthStatusData the new health status data
-		 */
-		public void setHealthStatusData(HealthStatusData healthStatusData) {
-			this.healthStatusData = healthStatusData;
-		}
-		
-		/**
-		 * Gets the traffic status data.
-		 *
-		 * @return the traffic status data
-		 */
-		public TrafficStatusData getTrafficStatusData() {
-			return trafficStatusData;
-		}
-		
-		/**
-		 * Sets the traffic status data.
-		 *
-		 * @param trafficStatusData the new traffic status data
-		 */
-		public void setTrafficStatusData(TrafficStatusData trafficStatusData) {
-			this.trafficStatusData = trafficStatusData;
-		}
-		
+	public float getTotalMemory() {
+		return totalMemory;
 	}
-	
-	/**
-	 * The Class EventInfo.
-	 */
-	private class EventInfo {
-		
-		/** The event type. */
-		String eventType;
-		
-		/** The event data. */
-		EventData eventData;
-		
-		/** The endpoint info. */
-		ServerInfo endpointInfo;
-		
-		/**
-		 * Instantiates a new event info.
-		 */
-		public EventInfo() {
-			super();
-			eventData = new EventData();
-			endpointInfo = new ServerInfo();
-		}
-		
-		/**
-		 * Gets the event type.
-		 *
-		 * @return the event type
-		 */
-		public String getEventType() {
-			return eventType;
-		}
-		
-		/**
-		 * Sets the event type.
-		 *
-		 * @param eventType the new event type
-		 */
-		public void setEventType(String eventType) {
-			this.eventType = eventType;
-		}
-		
-		/**
-		 * Gets the event data.
-		 *
-		 * @return the event data
-		 */
-		public EventData getEventData() {
-			return eventData;
-		}
-		
-		/**
-		 * Sets the event data.
-		 *
-		 * @param eventData the new event data
-		 */
-		public void setEventData(EventData eventData) {
-			this.eventData = eventData;
-		}
-		
-		/**
-		 * Gets the endpoint info.
-		 *
-		 * @return the endpoint info
-		 */
-		public ServerInfo getEndpointInfo() {
-			return endpointInfo;
-		}
-		
-		/**
-		 * Sets the endpoint info.
-		 *
-		 * @param endpointInfo the new endpoint info
-		 */
-		public void setEndpointInfo(ServerInfo endpointInfo) {
-			this.endpointInfo = endpointInfo;
-		}
+
+	public void setTotalMemory(float totalMemory) {
+		this.totalMemory = totalMemory;
+	}
+
+	public int getThreadCount() {
+		return threadCount;
+	}
+
+	public void setThreadCount(int threadCount) {
+		this.threadCount = threadCount;
+	}
+
+	public long getIntervalSentBytes() {
+		return intervalSentBytes;
+	}
+
+	public void setIntervalSentBytes(long intervalSentBytes) {
+		this.intervalSentBytes = intervalSentBytes;
+	}
+
+	public long getIntervalReceivedBytes() {
+		return intervalReceivedBytes;
+	}
+
+	public void setIntervalReceivedBytes(long intervalReceivedBytes) {
+		this.intervalReceivedBytes = intervalReceivedBytes;
+	}
+
+	public float getIntervalRtpFractionLoss() {
+		return intervalRtpFractionLoss;
+	}
+
+	public void setIntervalRtpFractionLoss(float intervalRtpFractionLoss) {
+		this.intervalRtpFractionLoss = intervalRtpFractionLoss;
+	}
+
+	public float getTotalRtpLostPackets() {
+		return totalRtpLostPackets;
+	}
+
+	public void setTotalRtpLostPackets(long totalRtpLostPackets) {
+		this.totalRtpLostPackets = totalRtpLostPackets;
+	}
+
+	public float getIntervalAverageRtt() {
+		return intervalAverageRtt;
+	}
+
+	public void setIntervalAverageRtt(float intervalAverageRtt) {
+		this.intervalAverageRtt = intervalAverageRtt;
+	}
+
+	public float getIntervalAverageJitter() {
+		return intervalAverageJitter;
+	}
+
+	public void setIntervalAverageJitter(float intervalAverageJitter) {
+		this.intervalAverageJitter = intervalAverageJitter;
+	}
+
+	public int getIntervalDownloadBitrate() {
+		return intervalDownloadBitrate;
+	}
+
+	public void setIntervalDownloadBitrate(int intervalDownloadBitrate) {
+		this.intervalDownloadBitrate = intervalDownloadBitrate;
+	}
+
+	public int getIntervalUploadBitrate() {
+		return intervalUploadBitrate;
+	}
+
+	public void setIntervalUploadBitrate(int intervalUploadBitrate) {
+		this.intervalUploadBitrate = intervalUploadBitrate;
+	}
+
+	public int getAudioFabricCount() {
+		return audioFabricCount;
+	}
+
+	public void setAudioFabricCount(int audioFabricCount) {
+		this.audioFabricCount = audioFabricCount;
+	}
+
+	public int getVideoFabricCount() {
+		return videoFabricCount;
+	}
+
+	public void setVideoFabricCount(int videoFabricCount) {
+		this.videoFabricCount = videoFabricCount;
+	}
+
+	public int getConferenceCount() {
+		return conferenceCount;
+	}
+
+	public void setConferenceCount(int conferenceCount) {
+		this.conferenceCount = conferenceCount;
+	}
+
+	public int getParticipantsCount() {
+		return participantsCount;
+	}
+
+	public void setParticipantsCount(int participantsCount) {
+		this.participantsCount = participantsCount;
 	}
 }
- 
