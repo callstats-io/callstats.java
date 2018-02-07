@@ -175,7 +175,6 @@ public class CallStats {
 		httpClient = new CallStatsHttp2Client();
 		authHttpClient = new CallStatsHttp2Client();
 		authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient, new CallStatsInitListener() {
-			@Override
 			public void onInitialized(String msg) {
 				setInitialized(true);
 				logger.info("SDK Initialized " + msg);
@@ -183,7 +182,6 @@ public class CallStats {
 				listener.onInitialized(msg);
 			}
 
-			@Override
 			public void onError(CallStatsErrors error, String errMsg) {
 				logger.info("SDK Initialization Failed " + errMsg);
 				listener.onError(error, errMsg);;
@@ -206,7 +204,6 @@ public class CallStats {
 			String requestMessageString = gson.toJson(eventMessage);
 			String url = "/" + appId + "/stats/bridge/status";
 			httpClient.sendBridgeStatistics(url, token, requestMessageString, new CallStatsHttp2ResponseListener() {
-				@Override
 				public void onResponse(Response response) {
 					int responseStatus = response.code();
 					BridgeStatusUpdateResponse eventResponseMessage;
@@ -233,7 +230,6 @@ public class CallStats {
 					}
 				}
 
-				@Override
 				public void onFailure(Exception e) {
 					logger.error("Response exception" + e.getMessage(), e);
 					httpClient.setDisrupted(true);
@@ -303,7 +299,6 @@ public class CallStats {
 	private synchronized void sendCallStatsConferenceEventMessage(String url, String reqMsg, final CallStatsStartConferenceListener listener) {
 		String token = getToken();
 		httpClient.sendBridgeEvents(url, token, reqMsg, new CallStatsHttp2ResponseListener() {
-			@Override
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
 				String responseString = "";
@@ -334,7 +329,6 @@ public class CallStats {
 				}
 			}
 
-			@Override
 			public void onFailure(Exception e) {
 				logger.error("Response exception" + e.getMessage(), e);
 				httpClient.setDisrupted(true);
@@ -402,14 +396,12 @@ public class CallStats {
 		if (bridgeKeepAliveManager == null) {
 			bridgeKeepAliveManager = new CallStatsBridgeKeepAliveManager(appId, bridgeId, authenticator.getToken(), httpClient,
 					new CallStatsBridgeKeepAliveStatusListener() {
-						@Override
 						public void onKeepAliveError(CallStatsErrors error, String errMsg) {
 							if (error == CallStatsErrors.AUTH_ERROR) {
 								authenticator.doAuthentication();
 							}
 						}
 
-						@Override
 						public void onSuccess() {
 							sendCallStatsBridgeStatusUpdateFromQueue();
 						}
@@ -438,7 +430,6 @@ public class CallStats {
 			e.printStackTrace();
 		}
 		httpClient.sendBridgeStats(url, token, stats, new CallStatsHttp2ResponseListener() {
-			@Override
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
 				String responseString = "";
@@ -456,7 +447,6 @@ public class CallStats {
 				}
 			}
 
-			@Override
 			public void onFailure(Exception e) {
 				logger.error("Response exception" + e.getMessage(), e);
 				httpClient.setDisrupted(true);

@@ -180,7 +180,6 @@ public class CallStatsAuthenticator {
 	 */
 	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttp2Client httpClient) {
 		scheduler.schedule(new Runnable() {
-			@Override
 			public void run() {
 				sendAsyncAuthenticationRequest(appId, bridgeId, httpClient);
 			}
@@ -212,7 +211,6 @@ public class CallStatsAuthenticator {
 		params.add(new NameValuePair("grant_type", "authorization_code"));
 
 		httpClient.sendAuthRequest(authenticateUrl, params, new CallStatsHttp2ResponseListener() {
-			@Override
 			public void onResponse(Response response) {
 				isAuthenticationInProgress = false;
 				int responseStatus = response.code();
@@ -263,7 +261,7 @@ public class CallStatsAuthenticator {
 
 			}
 
-			@Override
+
 			public void onFailure(Exception e) {
 				isAuthenticationInProgress = false;
 				listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());

@@ -2,7 +2,9 @@ package io.callstats.sdk.internal;
 
 public enum CallStatsUrls {
 	STATS_SUBMIT_BASE("CallStats.BaseURL", "https://collector.callstats.io"),
-	AUTH_BASE("CallStats.AuthBaseURL", "https://auth.callstats.io");
+	AUTH_BASE("CallStats.AuthBaseURL", "https://auth.callstats.io"),
+	EVENTS_BASE("CallStats.EventsBaseURL", "https://test-events.callstats.io/v1/apps"),
+	STATS_BASE("CallStats.StatsBaseURL", "https://test-stats.callstats.io/v1/apps");
 	
 	private final String propertyName;
 	private String propertyDefaultUrl;       

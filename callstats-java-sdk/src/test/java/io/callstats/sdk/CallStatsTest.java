@@ -40,7 +40,7 @@ public class CallStatsTest {
 	ServerInfo serverInfo;
 
 	/** The app id. */
-	public static int appId = 123456;
+	public static int appId = 1234567;
 
 	/** The app secret. */
 	public static String appSecret = "app_secret";
@@ -200,8 +200,6 @@ public class CallStatsTest {
 		ConferenceInfo conferenceInfo = new ConferenceInfo("callstats.io/room1", "2345");
 		System.out.println("sending conference start ");
 		callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_SETUP, conferenceInfo, new CallStatsStartConferenceListener() {
-
-			@Override
 			public void onResponse(String ucid) {
 				String userID = "2345";
 				String confID = "callstats.io/room1";
@@ -228,7 +226,6 @@ public class CallStatsTest {
 
 			}
 
-			@Override
 			public void onError(CallStatsErrors error, String errMsg) {
 
 			}

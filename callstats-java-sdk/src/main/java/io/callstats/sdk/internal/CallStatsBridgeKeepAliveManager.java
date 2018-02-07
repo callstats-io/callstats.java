@@ -136,8 +136,6 @@ public class CallStatsBridgeKeepAliveManager {
 
 		logger.info("Starting keepAlive Sender");
 		future = scheduler.scheduleAtFixedRate(new Runnable() {
-
-			@Override
 			public void run() {
 				sendKeepAliveBridgeMessage(appId, bridgeId, token, httpClient);
 			}
@@ -162,7 +160,6 @@ public class CallStatsBridgeKeepAliveManager {
 		BridgeKeepAliveMessage message = new BridgeKeepAliveMessage(bridgeId, apiTS);
 		String requestMessageString = gson.toJson(message);
 		httpClient.sendBridgeAlive(keepAliveEventUrl, token, requestMessageString, new CallStatsHttp2ResponseListener() {
-			@Override
 			public void onResponse(Response response) {
 				int responseStatus = response.code();
 				BridgeKeepAliveResponse keepAliveResponse;
@@ -189,7 +186,6 @@ public class CallStatsBridgeKeepAliveManager {
 				}
 			}
 
-			@Override
 			public void onFailure(Exception e) {
 				logger.info("Response exception" + e.toString());
 				httpClient.setDisrupted(true);

@@ -140,13 +140,11 @@ public class CallStatsHttp2Client {
 	private void send(Request request, final CallStatsHttp2ResponseListener listener) {
 		Call call = okHttpClientclient.newCall(request);
 		call.enqueue(new Callback() {
-			@Override
 			public void onFailure(Call arg0, IOException e) {
 				isDisrupted = true;
 				listener.onFailure(e);
 			}
 
-			@Override
 			public void onResponse(Call arg0, Response response) throws IOException {
 				listener.onResponse(response);
 			}
