@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import io.callstats.sdk.internal.CallStatsConst;
+import io.callstats.sdk.internal.CallStatsUrls;
 import io.callstats.sdk.internal.NameValuePair;
 import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
 import okhttp3.Call;
@@ -78,9 +79,14 @@ public class CallStatsHttp2Client {
 					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
 				}
 
-				if (EVENTS_BASE_URL == null || STATS_BASE_URL == null) {
-					logger.error("Callstats BASE URL can not be null");
-					throw new RuntimeException("Callstats Events and Stats BASE URL can not be null");
+				if (EVENTS_BASE_URL == null) {
+					EVENTS_BASE_URL = CallStatsUrls.EVENTS_BASE.getDefaultUrl();
+				}
+				if (STATS_BASE_URL == null) {
+					STATS_BASE_URL = CallStatsUrls.STATS_BASE.getDefaultUrl();
+				}
+				if (AUTH_BASE_URL == null) {
+					AUTH_BASE_URL = CallStatsUrls.AUTH_BASE.getDefaultUrl();
 				}
 			}
 			logger.info("Base URL is " + EVENTS_BASE_URL);

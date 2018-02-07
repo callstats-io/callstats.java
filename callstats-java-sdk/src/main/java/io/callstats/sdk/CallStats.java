@@ -112,7 +112,7 @@ public class CallStats {
 			CallStatsConst.CallStatsJavaSDKPropertyFileName = System.getProperty("callstats.configurationFile");
 		}
 
-		logger.info("config file path is " + System.getProperty("callstats.configurationFile"));
+		logger.info("config file path is " + System.getProperty("callstats.configurationFile")+":"+CallStatsConst.CallStatsJavaSDKPropertyFileName);
 		CallStatsConst.CS_VERSION = getClass().getPackage().getImplementationVersion();
 	}
 
