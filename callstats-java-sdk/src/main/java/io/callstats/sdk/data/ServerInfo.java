@@ -18,6 +18,8 @@ public class ServerInfo {
 	String osVersion;
 
 	String appVersion;
+	
+	String callstatsVersion;
 
 	String type = CallStatsConst.END_POINT_TYPE;
 
@@ -25,7 +27,7 @@ public class ServerInfo {
 	 * Instantiates a new ServerInfo info.
 	 */
 	public ServerInfo() {
-		super();
+		callstatsVersion = CallStatsConst.CS_VERSION;
 	}
 
 	/**

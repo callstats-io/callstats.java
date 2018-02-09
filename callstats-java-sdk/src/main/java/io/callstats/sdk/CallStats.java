@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -365,12 +366,16 @@ public class CallStats {
 			ConferenceStatsEvent conferenceStatsEvent = new ConferenceStatsEvent(bridgeId, conferenceStats.getRemoteUserID(),
 					conferenceStats.getLocalUserID(), conferenceStats.getConfID(), apiTS);
 			UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getRemoteUserID(), conferenceStats.getUcID());
-			for (ConferenceStats stats : tempStats) {
-				conferenceStatsEvent.addStats(stats);
-			}
 
+			tempStats.forEach(new Consumer<ConferenceStats>() {
+				public void accept(ConferenceStats stats) {
+					conferenceStatsEvent.addStats(stats);
+				}
+			
+			});
+				
 			String statsString = gson.toJson(conferenceStatsEvent);
-			logger.debug("Stats string is " + statsString);
+			logger.debug("Stats string -" + statsString);
 			sendCallStatsConferenceStats(statsString, info);
 			conferenceStatsMap.remove(key);
 		}
