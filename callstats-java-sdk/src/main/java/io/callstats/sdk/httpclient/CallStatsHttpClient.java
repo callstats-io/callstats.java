@@ -45,50 +45,49 @@ import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
  *
  * @author Karthik Budigere
  */
-public class CallStatsHttpClient {	
-	
+public class CallStatsHttpClient {
+
 	/** The base url. */
-	//private static String BASE_URL = "https://c1-as-jc.callstats.io";
+	// private static String BASE_URL = "https://c1-as-jc.callstats.io";
 	private String BASE_URL;
-	
+
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");
 
-	
 	/** The http async client. */
 	private HttpAsyncClient httpAsyncClient;
-	
+
 	/** The connection time out. */
 	private int connectionTimeOut = CallStatsConst.CONNECTION_TIMEOUT;
-	
+
 	/** The so time out. */
 	private int soTimeOut = CallStatsConst.SO_TIMEOUT;
-	
+
 	private boolean isDisrupted;
-	
-	private  RequestConfig config;
-	private  CredentialsProvider credentialsProvider;
-	
+
+	private RequestConfig config;
+	private CredentialsProvider credentialsProvider;
+
 	private boolean isProxyEnabled = false;
-	
+
 	private String proxyHost;
-	
+
 	private int proxyPort;
-	
+
 	private boolean isProxyAuthEnabled = false;
-	
+
 	private String proxyUserName;
-	
-	private String proxyPassword; 
-	
+
+	private String proxyPassword;
+
 	public boolean isDisrupted() {
 		return isDisrupted;
 	}
 
 	public void setDisrupted(boolean isDisrupted) {
 		this.isDisrupted = isDisrupted;
-	}	
-	
+	}
+
 	/**
 	 * Gets the base url.
 	 *
@@ -97,19 +96,20 @@ public class CallStatsHttpClient {
 	public String getBaseUrl() {
 		return BASE_URL;
 	}
-	
+
 	/**
 	 * Backwards compatibility
 	 */
-	
+
 	public CallStatsHttpClient() {
 		this(CallStatsUrls.STATS_SUBMIT_BASE);
 	}
-	
-	
+
 	/**
 	 * Instantiates a new call stats http client.
-	 *  @param url url
+	 * 
+	 * @param url
+	 *            url
 	 */
 	public CallStatsHttpClient(CallStatsUrls url) {
 		super();
@@ -121,55 +121,56 @@ public class CallStatsHttpClient {
 			if (input != null) {
 				prop.load(input);
 				BASE_URL = prop.getProperty(url.toString());
-				
+
 				if (prop.getProperty("CallStats.ConnectionTimeOut") != null) {
 					connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
 				}
-				
-				if (prop.getProperty("CallStats.SOTimeOut") != null) { 
-					soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));	
+
+				if (prop.getProperty("CallStats.SOTimeOut") != null) {
+					soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));
 				}
-				
-				if (prop.getProperty("CallStats.HttpProxyUsed") != null) { 
-					isProxyEnabled = Boolean.parseBoolean(prop.getProperty("CallStats.HttpProxyUsed"));	
+
+				if (prop.getProperty("CallStats.HttpProxyUsed") != null) {
+					isProxyEnabled = Boolean.parseBoolean(prop.getProperty("CallStats.HttpProxyUsed"));
 				}
-				
-				if (prop.getProperty("CallStats.ProxyHost") != null) { 
-					proxyHost = prop.getProperty("CallStats.ProxyHost");	
+
+				if (prop.getProperty("CallStats.ProxyHost") != null) {
+					proxyHost = prop.getProperty("CallStats.ProxyHost");
 				}
-				
-				if (prop.getProperty("CallStats.ProxyPort") != null) { 
-					proxyPort = Integer.parseInt(prop.getProperty("CallStats.ProxyPort"));	
+
+				if (prop.getProperty("CallStats.ProxyPort") != null) {
+					proxyPort = Integer.parseInt(prop.getProperty("CallStats.ProxyPort"));
 				}
-				
-				if (prop.getProperty("CallStats.EnableProxyAuthentication") != null) { 
-					isProxyAuthEnabled = Boolean.parseBoolean(prop.getProperty("CallStats.EnableProxyAuthentication"));	
+
+				if (prop.getProperty("CallStats.EnableProxyAuthentication") != null) {
+					isProxyAuthEnabled = Boolean.parseBoolean(prop.getProperty("CallStats.EnableProxyAuthentication"));
 				}
-				
-				if (prop.getProperty("CallStats.ProxyUserName") != null) { 
-					proxyUserName = prop.getProperty("CallStats.ProxyUserName");	
+
+				if (prop.getProperty("CallStats.ProxyUserName") != null) {
+					proxyUserName = prop.getProperty("CallStats.ProxyUserName");
 				}
-				
-				if (prop.getProperty("CallStats.ProxyPassword") != null) { 
-					proxyPassword = prop.getProperty("CallStats.ProxyPassword");	
+
+				if (prop.getProperty("CallStats.ProxyPassword") != null) {
+					proxyPassword = prop.getProperty("CallStats.ProxyPassword");
 				}
-				
+
 				if (BASE_URL == null) {
 					BASE_URL = url.getDefaultUrl();
 				}
-			}									
-		}  catch (FileNotFoundException e ) {
+			}
+		} catch (FileNotFoundException e) {
 			logger.error("Configuration file not found", e);
 			throw new RuntimeException("Configuration file not found");
-		} catch (IOException e ) {
+		} catch (IOException e) {
 			logger.error("Configuration file read IO exception", e);
 			throw new RuntimeException("Configuration file read IO exception");
 		}
-		
+
 		logger.info("Base URL is " + BASE_URL);
 		// Create I/O reactor configuration
-		IOReactorConfig ioReactorConfig = IOReactorConfig.custom().setIoThreadCount(Runtime.getRuntime().availableProcessors())
-				.setConnectTimeout(connectionTimeOut).setSoTimeout(soTimeOut).build();
+		IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
+				.setIoThreadCount(Runtime.getRuntime().availableProcessors()).setConnectTimeout(connectionTimeOut)
+				.setSoTimeout(soTimeOut).build();
 
 		// Create a custom I/O reactort
 		ConnectingIOReactor ioReactor;
@@ -183,27 +184,26 @@ public class CallStatsHttpClient {
 		PoolingNHttpClientConnectionManager asyncMgr = new PoolingNHttpClientConnectionManager(ioReactor);
 		httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(asyncMgr).build();
 		if (isProxyEnabled) {
-			logger.info("Proxy Enabled " + proxyHost +":"+ proxyPort);
+			logger.info("Proxy Enabled " + proxyHost + ":" + proxyPort);
 			HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-	        config = RequestConfig.custom()
-	                .setProxy(proxy)
-	                .build();
-	        if (isProxyAuthEnabled) {
-	        		credentialsProvider = new BasicCredentialsProvider();
-	        		credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
-	                new UsernamePasswordCredentials(proxyUserName, proxyPassword));
-	        		httpAsyncClient = HttpAsyncClients.custom()
-	        				.setDefaultCredentialsProvider(credentialsProvider)
-	        				.setConnectionManager(asyncMgr).build();
-	        }
+			config = RequestConfig.custom().setProxy(proxy).build();
+			if (isProxyAuthEnabled) {
+				credentialsProvider = new BasicCredentialsProvider();
+				credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
+						new UsernamePasswordCredentials(proxyUserName, proxyPassword));
+				httpAsyncClient = HttpAsyncClients.custom().setDefaultCredentialsProvider(credentialsProvider)
+						.setConnectionManager(asyncMgr).build();
+			}
 		}
 	}
-	
+
 	/**
 	 * Generate http post request.
 	 *
-	 * @param url the url
-	 * @param body the body
+	 * @param url
+	 *            the url
+	 * @param body
+	 *            the body
 	 * @return the http post
 	 */
 	private HttpPost generateHttpPostRequest(String url, String body) {
@@ -219,12 +219,14 @@ public class CallStatsHttpClient {
 		}
 		return post;
 	}
-	
+
 	/**
 	 * Generate http post request from form
 	 *
-	 * @param url the url
-	 * @param body the body
+	 * @param url
+	 *            the url
+	 * @param body
+	 *            the body
 	 * @return the http post
 	 */
 	private HttpPost generateHttpPostRequest(String url, UrlEncodedFormEntity form) {
@@ -232,35 +234,36 @@ public class CallStatsHttpClient {
 
 		HttpPost post = new HttpPost(uri);
 		post.setHeader("Content-type", "application/x-www-form-urlencoded");
-	    post.setHeader("Accept", "application/json");
+		post.setHeader("Accept", "application/json");
 		post.setEntity(form);
 		if (isProxyEnabled) {
 			post.setConfig(config);
 		}
 		return post;
 	}
-	
+
 	/**
 	 * Generate uri.
 	 *
-	 * @param url the url
+	 * @param url
+	 *            the url
 	 * @return the uri
 	 */
 	private URI generateURI(String url) {
 		if (!url.startsWith("http")) {
 			String apiUrl = url.toLowerCase();
 			StringBuilder sb = new StringBuilder();
-	
+
 			sb.append(getBaseUrl());
-	
+
 			if (!apiUrl.startsWith("/")) {
 				sb.append("/");
 			}
 			sb.append(url);
-	
+
 			url = sb.toString();
 		}
-		
+
 		URI uri;
 		try {
 			uri = new URI(url);
@@ -270,11 +273,12 @@ public class CallStatsHttpClient {
 		}
 		return uri;
 	}
-	
+
 	/**
 	 * Generate entity.
 	 *
-	 * @param body the body
+	 * @param body
+	 *            the body
 	 * @return the string entity
 	 */
 	private StringEntity generateEntity(String body) {
@@ -288,28 +292,35 @@ public class CallStatsHttpClient {
 		entity.setContentType("application/json");
 		return entity;
 	}
-		
+
 	/**
 	 * Send async http request.
 	 *
-	 * @param url the url
-	 * @param httpMethodType the http method type
-	 * @param body the body
-	 * @param listener the listener
+	 * @param url
+	 *            the url
+	 * @param httpMethodType
+	 *            the http method type
+	 * @param body
+	 *            the body
+	 * @param listener
+	 *            the listener
 	 */
-	public void sendAsyncHttpRequest(String url, String httpMethodType, String body, final CallStatsHttpResponseListener listener) {
-		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body) || listener == null) {
+	public void sendAsyncHttpRequest(String url, String httpMethodType, String body,
+			final CallStatsHttpResponseListener listener) {
+		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body)
+				|| listener == null) {
 			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
-		
+
 		HttpPost request = null;
 		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
 			request = generateHttpPostRequest(url, body);
 		}
 		sendAsyncHttpRequest(url, httpMethodType, request, listener);
 	}
-	
-	protected void sendAsyncHttpRequest(String url, String httpMethodType, HttpUriRequest request, final CallStatsHttpResponseListener listener) {
+
+	protected void sendAsyncHttpRequest(String url, String httpMethodType, HttpUriRequest request,
+			final CallStatsHttpResponseListener listener) {
 		String apiUrl = url.toLowerCase();
 		StringBuilder sb = new StringBuilder();
 
@@ -348,17 +359,23 @@ public class CallStatsHttpClient {
 			});
 		}
 	}
-	
+
 	/**
 	 * Send async http request.
 	 *
-	 * @param url the url
-	 * @param httpMethodType the http method type
-	 * @param paramList the parameter list
-	 * @param listener the listener
+	 * @param url
+	 *            the url
+	 * @param httpMethodType
+	 *            the http method type
+	 * @param paramList
+	 *            the parameter list
+	 * @param listener
+	 *            the listener
 	 */
-	public void sendAsyncHttpRequest(String url, String httpMethodType, List<NameValuePair> paramList , final CallStatsHttpResponseListener listener) {
-		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || paramList == null || paramList.size() == 0 || listener == null) {
+	public void sendAsyncHttpRequest(String url, String httpMethodType, List<NameValuePair> paramList,
+			final CallStatsHttpResponseListener listener) {
+		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || paramList == null
+				|| paramList.size() == 0 || listener == null) {
 			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
 		}
 
@@ -373,5 +390,5 @@ public class CallStatsHttpClient {
 		}
 		sendAsyncHttpRequest(url, httpMethodType, request, listener);
 	}
-	
+
 }
