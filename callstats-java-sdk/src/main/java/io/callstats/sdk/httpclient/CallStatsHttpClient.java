@@ -75,7 +75,7 @@ public class CallStatsHttpClient {
 	
 	private int proxyPort;
 	
-	private boolean isProxySecure;
+	private boolean isProxyAuthEnabled = false;
 	
 	private String proxyUserName;
 	
@@ -142,8 +142,8 @@ public class CallStatsHttpClient {
 					proxyPort = Integer.parseInt(prop.getProperty("CallStats.ProxyPort"));	
 				}
 				
-				if (prop.getProperty("CallStats.IsProxySecure") != null) { 
-					isProxySecure = Boolean.parseBoolean(prop.getProperty("CallStats.IsProxySecure"));	
+				if (prop.getProperty("CallStats.EnableProxyAuthentication") != null) { 
+					isProxyAuthEnabled = Boolean.parseBoolean(prop.getProperty("CallStats.EnableProxyAuthentication"));	
 				}
 				
 				if (prop.getProperty("CallStats.ProxyUserName") != null) { 
@@ -181,26 +181,21 @@ public class CallStatsHttpClient {
 		}
 
 		PoolingNHttpClientConnectionManager asyncMgr = new PoolingNHttpClientConnectionManager(ioReactor);
-		
+		httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(asyncMgr).build();
 		if (isProxyEnabled) {
 			logger.info("Proxy Enabled " + proxyHost +":"+ proxyPort);
 			HttpHost proxy = new HttpHost(proxyHost, proxyPort);
 	        config = RequestConfig.custom()
 	                .setProxy(proxy)
 	                .build();
-	        if (isProxySecure) {
+	        if (isProxyAuthEnabled) {
 	        		credentialsProvider = new BasicCredentialsProvider();
 	        		credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
-		                new UsernamePasswordCredentials(proxyUserName, proxyPassword));
+	                new UsernamePasswordCredentials(proxyUserName, proxyPassword));
+	        		httpAsyncClient = HttpAsyncClients.custom()
+	        				.setDefaultCredentialsProvider(credentialsProvider)
+	        				.setConnectionManager(asyncMgr).build();
 	        }
-		}
-		if (isProxySecure) {
-			logger.info("Proxy is secure "+proxyUserName+":"+proxyPassword);
-			httpAsyncClient = HttpAsyncClients.custom()
-					.setDefaultCredentialsProvider(credentialsProvider)
-					.setConnectionManager(asyncMgr).build();
-		} else {
-			httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(asyncMgr).build();
 		}
 	}
 	
