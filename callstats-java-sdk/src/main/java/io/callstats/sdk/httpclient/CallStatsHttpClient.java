@@ -1,9 +1,5 @@
 package io.callstats.sdk.httpclient;
 
-import io.callstats.sdk.internal.CallStatsConst;
-import io.callstats.sdk.internal.CallStatsUrls;
-import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,17 +11,19 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
@@ -37,6 +35,10 @@ import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import io.callstats.sdk.internal.CallStatsConst;
+import io.callstats.sdk.internal.CallStatsUrls;
+import io.callstats.sdk.internal.listeners.CallStatsHttpResponseListener;
 
 /**
  * The Class CallStatsHttpClient.
@@ -52,8 +54,6 @@ public class CallStatsHttpClient {
 	/** The Constant logger. */
 	private static final Logger logger = LogManager.getLogger("CallStatsHttpClient");
 
-	/** The httpclient. */
-	private HttpClient httpclient;
 	
 	/** The http async client. */
 	private HttpAsyncClient httpAsyncClient;
@@ -66,32 +66,28 @@ public class CallStatsHttpClient {
 	
 	private boolean isDisrupted;
 	
+	private  RequestConfig config;
+	private  CredentialsProvider credentialsProvider;
+	
+	private boolean isProxyEnabled = false;
+	
+	private String proxyHost;
+	
+	private int proxyPort;
+	
+	private boolean isProxySecure;
+	
+	private String proxyUserName;
+	
+	private String proxyPassword; 
+	
 	public boolean isDisrupted() {
 		return isDisrupted;
 	}
 
 	public void setDisrupted(boolean isDisrupted) {
 		this.isDisrupted = isDisrupted;
-	}
-
-	/**
-	 * Gets the httpclient.
-	 *
-	 * @return the httpclient
-	 */
-	public HttpClient getHttpclient() {
-		return httpclient;
-	}
-	
-	/**
-	 * Sets the httpclient.
-	 *
-	 * @param httpclient the new httpclient
-	 */
-	public void setHttpclient(final HttpClient httpclient) {
-		this.httpclient = httpclient;
-	}
-	
+	}	
 	
 	/**
 	 * Gets the base url.
@@ -134,6 +130,30 @@ public class CallStatsHttpClient {
 					soTimeOut = Integer.parseInt(prop.getProperty("CallStats.SOTimeOut"));	
 				}
 				
+				if (prop.getProperty("CallStats.HttpProxyUsed") != null) { 
+					isProxyEnabled = Boolean.parseBoolean(prop.getProperty("CallStats.HttpProxyUsed"));	
+				}
+				
+				if (prop.getProperty("CallStats.ProxyHost") != null) { 
+					proxyHost = prop.getProperty("CallStats.ProxyHost");	
+				}
+				
+				if (prop.getProperty("CallStats.ProxyPort") != null) { 
+					proxyPort = Integer.parseInt(prop.getProperty("CallStats.ProxyPort"));	
+				}
+				
+				if (prop.getProperty("CallStats.IsProxySecure") != null) { 
+					isProxySecure = Boolean.parseBoolean(prop.getProperty("CallStats.IsProxySecure"));	
+				}
+				
+				if (prop.getProperty("CallStats.ProxyUserName") != null) { 
+					proxyUserName = prop.getProperty("CallStats.ProxyUserName");	
+				}
+				
+				if (prop.getProperty("CallStats.ProxyPassword") != null) { 
+					proxyPassword = prop.getProperty("CallStats.ProxyPassword");	
+				}
+				
 				if (BASE_URL == null) {
 					BASE_URL = url.getDefaultUrl();
 				}
@@ -160,12 +180,28 @@ public class CallStatsHttpClient {
 			throw new RuntimeException(e);
 		}
 
-		PoolingHttpClientConnectionManager mgr = new PoolingHttpClientConnectionManager();
-		mgr.setDefaultMaxPerRoute(10);
-		httpclient = HttpClients.custom().setConnectionManager(mgr).build();
-
 		PoolingNHttpClientConnectionManager asyncMgr = new PoolingNHttpClientConnectionManager(ioReactor);
-		httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(asyncMgr).build();
+		
+		if (isProxyEnabled) {
+			logger.info("Proxy Enabled " + proxyHost +":"+ proxyPort);
+			HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+	        config = RequestConfig.custom()
+	                .setProxy(proxy)
+	                .build();
+	        if (isProxySecure) {
+	        		credentialsProvider = new BasicCredentialsProvider();
+	        		credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
+		                new UsernamePasswordCredentials(proxyUserName, proxyPassword));
+	        }
+		}
+		if (isProxySecure) {
+			logger.info("Proxy is secure "+proxyUserName+":"+proxyPassword);
+			httpAsyncClient = HttpAsyncClients.custom()
+					.setDefaultCredentialsProvider(credentialsProvider)
+					.setConnectionManager(asyncMgr).build();
+		} else {
+			httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(asyncMgr).build();
+		}
 	}
 	
 	/**
@@ -183,6 +219,9 @@ public class CallStatsHttpClient {
 		post.setHeader("Content-type", "application/json");
 		post.setHeader("Accept", "application/json");
 		post.setEntity(entity);
+		if (isProxyEnabled) {
+			post.setConfig(config);
+		}
 		return post;
 	}
 	
@@ -200,6 +239,9 @@ public class CallStatsHttpClient {
 		post.setHeader("Content-type", "application/x-www-form-urlencoded");
 	    post.setHeader("Accept", "application/json");
 		post.setEntity(form);
+		if (isProxyEnabled) {
+			post.setConfig(config);
+		}
 		return post;
 	}
 	
@@ -252,56 +294,6 @@ public class CallStatsHttpClient {
 		return entity;
 	}
 		
-	/**
-	 * Send http request.
-	 *
-	 * @param url the url
-	 * @param httpMethodType the http method type
-	 * @param body the message string 
-	 * @return the http response
-	 * @throws IOException throws IO Exception
-	 */
-	public HttpResponse sendHttpRequest(String url, String httpMethodType, String body) throws IOException {
-
-		if (StringUtils.isBlank(url) || StringUtils.isBlank(httpMethodType) || StringUtils.isBlank(body)) {
-			throw new IllegalArgumentException("sendHttpRequest: Arguments cannot be null");
-		}
-
-		HttpUriRequest request = null;
-		String apiUrl = url.toLowerCase();
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(getBaseUrl());
-
-		if (!apiUrl.startsWith("/")) {
-			sb.append("/");
-		}
-		sb.append(url);
-
-		url = sb.toString();
-		if (httpMethodType.equalsIgnoreCase(CallStatsConst.httpPostMethod)) {
-			request = generateHttpPostRequest(url, body);
-		}
-
-		if (request != null) {
-			request.addHeader(new BasicHeader("Accept", "application/json"));
-			request.addHeader(new BasicHeader("Accept-Charset", "utf-8"));
-			HttpResponse response;
-			try {
-				response = httpclient.execute(request);
-				logger.info("Response is " + response);
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-				throw new ClientProtocolException(e);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new IOException(e);
-			}
-		}
-		return null;
-	}
-	
-	
 	/**
 	 * Send async http request.
 	 *
