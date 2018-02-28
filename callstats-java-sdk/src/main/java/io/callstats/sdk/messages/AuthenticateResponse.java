@@ -13,7 +13,7 @@ public class AuthenticateResponse {
 	
 	/** When token expires */
 	@SerializedName("expires_in")
-	private long expires;
+	private int expires;
 	
 	public String getToken() {
 		return token;
@@ -31,11 +31,11 @@ public class AuthenticateResponse {
 		this.tokenType = tokenType;
 	}
 
-	public long getExpires() {
+	public int getExpires() {
 		return expires;
 	}
 
-	public void setExpires(long expires) {
+	public void setExpires(int expires) {
 		this.expires = expires;
 	}
 }

@@ -40,6 +40,10 @@ public class CallStatsEventResponseMessage {
 		this.conferenceDuration = conferenceDuration;
 	}
 	
+	public String getReason() {
+		return this.eventData.getReason();
+	}
+	
 	public CallStatsEventResponseMessage(String status, String conferenceID, String ucID, int conferenceDuration) {
 		super();
 		this.status = status;

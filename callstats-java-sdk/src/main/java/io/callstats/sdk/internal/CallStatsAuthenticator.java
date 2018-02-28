@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
@@ -56,7 +57,7 @@ public class CallStatsAuthenticator {
 	private String token;
 	
 	/** The expires. */
-	private String expires;
+	private int expires;
 	
 	/** The app id. */
 	private int appId;
@@ -70,7 +71,7 @@ public class CallStatsAuthenticator {
 	private String authErrString = "SDK Authentication Error";
 	private String authSuccessString = "SDK authentication successful";
 	
-	
+	private ScheduledFuture<?> scheduledFuture;
 	
 	private Boolean isAuthenticationInProgress = false;
 
@@ -101,7 +102,7 @@ public class CallStatsAuthenticator {
 	 *
 	 * @return the expires
 	 */
-	public String getExpires() {
+	public long getExpires() {
 		return expires;
 	}
 	
@@ -110,7 +111,7 @@ public class CallStatsAuthenticator {
 	 *
 	 * @param expires the new expires
 	 */
-	public void setExpires(String expires) {
+	public void setExpires(int expires) {
 		this.expires = expires;
 	}	
 
@@ -157,14 +158,29 @@ public class CallStatsAuthenticator {
 				.create();
 	}
 	
+	private synchronized void cancelScheduledAuthentication() {
+		if (scheduledFuture != null) {
+			scheduledFuture.cancel(false);
+		}
+	}
+	
 	/**
 	 * Do authentication.
 	 */
-	public void doAuthentication() {
+	public synchronized void doAuthentication() {
 		if (!isAuthenticationInProgress) {
 			sendAsyncAuthenticationRequest(appId, bridgeId,
 					httpClient);
 		}
+	}
+	
+	private synchronized void doAuthenticationAfterExpire(long timeout) {	
+		cancelScheduledAuthentication();
+		scheduledFuture = scheduler.schedule(new Runnable() {
+			public void run() {
+				doAuthentication();
+			}
+		}, timeout, TimeUnit.SECONDS);
 	}
 	
 	/**
@@ -175,8 +191,9 @@ public class CallStatsAuthenticator {
 	 * @param bridgeId the bridge id
 	 * @param httpClient the http client
 	 */
-	private void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
-		scheduler.schedule(new Runnable() {
+	private synchronized void scheduleAuthentication(final int appId, final String bridgeId, final CallStatsHttpClient httpClient) {
+		cancelScheduledAuthentication();
+		scheduledFuture = scheduler.schedule(new Runnable() {
 			public void run() {
 				sendAsyncAuthenticationRequest(appId, bridgeId, httpClient);
 			}
@@ -221,13 +238,17 @@ public class CallStatsAuthenticator {
 						listener.onError(CallStatsErrors.HTTP_ERROR, e.getMessage());
 						scheduleAuthentication(appId, bridgeId, httpClient);
 						return;
-					}
-					logger.info("Authentication response "
-								+ responseStatus + " "
-								+ authResponseMessage.getToken());
-					//expires = authResponseMessage.getAuthenticateBody().getExpires();
+					}					
+					
+					expires = authResponseMessage.getExpires();
 					token = authResponseMessage.getToken();
+							
+					int timeout = (int) (expires*0.9);
+					if (timeout > 0 ) {
+						doAuthenticationAfterExpire(timeout);
+					}		
 					listener.onInitialized(authSuccessString);
+					
 				} else if (responseStatus == CallStatsResponseStatus.INVALID_PROTO_FORMAT_ERROR) {
 					AuthenticateResponseError authResponseMessageError;
 					String responseString;
