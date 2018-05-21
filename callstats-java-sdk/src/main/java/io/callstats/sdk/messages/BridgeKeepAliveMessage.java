@@ -10,21 +10,17 @@ import org.apache.logging.log4j.Logger;
  * The Class BridgeKeepAliveMessage.
  */
 public class BridgeKeepAliveMessage {
-	
-	/** The app id. */
-	private int appID;
-	
 	/** The bridge id. */
-	private String bridgeID;
+	private String localID;
 	
-	/** The version. */
-	private String version;
+	/** The timestamp. */
+	private long timestamp;
 	
-	/** The api ts. */
-	private long apiTS;
+	/** The origin id. */
+	private String originID;
 	
-	/** The token. */
-	private String token;
+	/** The device id. */
+	private String deviceID;
 	
 	/** The logger. */
 	private static final Logger logger = LogManager.getLogger("CallStats");
@@ -32,63 +28,16 @@ public class BridgeKeepAliveMessage {
 	/**
 	 * Instantiates a new bridge keep alive message.
 	 *
-	 * @param appID the app id
 	 * @param bridgeID the bridge id
-	 * @param version the version
-	 * @param apiTS the api ts
-	 * @param token the token 
+	 * @param timestamp the api ts
+	 * 
 	 */
-	public BridgeKeepAliveMessage(int appID, String bridgeID,
-			String version, long apiTS, String token) {
-		super();
-		this.appID = appID;
-		this.version = version;
-		this.apiTS = apiTS;
-		this.token = token;
+	public BridgeKeepAliveMessage(String bridgeID, long timestamp) {
+		this.timestamp = timestamp;
 		try {
-			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
-		
-	/**
-	 * Gets the app id.
-	 *
-	 * @return the app id
-	 */
-	public int getAppID() {
-		return appID;
-	}
-	
-	/**
-	 * Sets the app id.
-	 *
-	 * @param appID the new app id
-	 */
-	public void setAppID(int appID) {
-		this.appID = appID;
-	}
-	
-	/**
-	 * Gets the bridge id.
-	 *
-	 * @return the bridge id
-	 */
-	public String getBridgeID() {
-		return bridgeID;
-	}
-	
-	/**
-	 * Sets the bridge id.
-	 *
-	 * @param bridgeID the new bridge id
-	 */
-	public void setBridgeID(String bridgeID) {
-		try {
-			this.bridgeID = URLEncoder.encode(bridgeID, "UTF-8");
+			this.localID = URLEncoder.encode(bridgeID, "UTF-8");
+			this.deviceID = this.localID;
+			this.originID = this.localID;
 		} catch (UnsupportedEncodingException e) {
 			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
 			e.printStackTrace();
@@ -96,58 +45,43 @@ public class BridgeKeepAliveMessage {
 		}
 	}
 	
-	/**
-	 * Gets the version.
-	 *
-	 * @return the version
-	 */
-	public String getVersion() {
-		return version;
-	}
-	
-	/**
-	 * Sets the version.
-	 *
-	 * @param version the new version
-	 */
-	public void setVersion(String version) {
-		this.version = version;
-	}
-	
-	/**
-	 * Gets the api ts.
-	 *
-	 * @return the api ts
-	 */
-	public long getApiTS() {
-		return apiTS;
-	}
-	
-	/**
-	 * Sets the api ts.
-	 *
-	 * @param apiTS the new api ts
-	 */
-	public void setApiTS(long apiTS) {
-		this.apiTS = apiTS;
-	}
-	
-	/**
-	 * Gets the token.
-	 *
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
-	}
-	
-	/**
-	 * Sets the token.
-	 *
-	 * @param token the new token
-	 */
-	public void setToken(String token) {
-		this.token = token;
+	public String getLocalID() {
+		return localID;
 	}
 
+	public void setLocalID(String localID) {
+		try {
+			this.localID = URLEncoder.encode(localID, "UTF-8");
+			this.deviceID = this.localID;
+			this.originID = this.localID;
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public String getOriginID() {
+		return originID;
+	}
+
+	public void setOriginID(String originID) {
+		this.originID = originID;
+	}
+
+	public String getDeviceID() {
+		return deviceID;
+	}
+
+	public void setDeviceID(String deviceID) {
+		this.deviceID = deviceID;
+	}
 }

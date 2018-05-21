@@ -1,20 +1,12 @@
 package io.callstats.sdk.messages;
 
-/**
- * The Class BridgeEventResponse.
- */
-public class BridgeStatusUpdateResponse {
+public class CallStatsEventResponse {
 
-	/** The user id. */
 	private String status;
-
-	/** The version. */
 	private String msg;
+	private String ucID;
 
-	/**
-	 * Instantiates a new bridge keep alive response.
-	 */
-	public BridgeStatusUpdateResponse() {
+	public CallStatsEventResponse() {
 
 	}
 
@@ -24,6 +16,12 @@ public class BridgeStatusUpdateResponse {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getUcID() {
+		return ucID;
+	}
+	public void setUcID(String ucID) {
+		this.ucID = ucID;
 	}
 
 	public String getMsg() {
