@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import io.callstats.sdk.httpclient.CallStatsHttp2Client;
 import io.callstats.sdk.internal.CallStatsAuthenticator;
+import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.listeners.CallStatsInitListener;
 
 public class CallStatsAuthenticatorTest {
@@ -25,7 +26,7 @@ public class CallStatsAuthenticatorTest {
   @Before
   public void setUp() {
     listener = Mockito.mock(CallStatsInitListener.class);
-    httpClient = new CallStatsHttp2Client();
+    httpClient = new CallStatsHttp2Client(CallStatsConst.CONNECTION_TIMEOUT);
     authenticator = new CallStatsAuthenticator(appId, appSecret, bridgeId, httpClient, listener);
   }
 

@@ -213,6 +213,8 @@ public class CallStatsAuthenticator {
               "Authentication response " + responseStatus + " " + authResponseMessage.getToken());
           // expires = authResponseMessage.getAuthenticateBody().getExpires();
           token = authResponseMessage.getToken();
+          CallStatsConfigProvider.setURLs(authResponseMessage.getMetadata().getEventsUrl(),
+              authResponseMessage.getMetadata().getStatsUrl());
           listener.onInitialized(authSuccessString);
         } else if (responseStatus == CallStatsResponseStatus.INVALID_REQUEST) {
           AuthenticateResponseError authResponseMessageError;

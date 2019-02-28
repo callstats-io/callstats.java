@@ -180,7 +180,7 @@ public class CallStatsBridgeKeepAliveManager {
           }
 
           public void onFailure(Exception e) {
-            logger.info("Response exception" + e.toString());
+            logger.info("Response exception " + e.toString());
             httpClient.setDisrupted(true);
           }
 
