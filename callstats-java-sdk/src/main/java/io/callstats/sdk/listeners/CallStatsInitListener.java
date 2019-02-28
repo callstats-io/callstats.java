@@ -8,19 +8,19 @@ import io.callstats.sdk.CallStatsErrors;
  * @author Karthik Budigere
  */
 public interface CallStatsInitListener {
-	
-	/**
-	 * On intilization error.
-	 *
-	 * @param error the error
-	 * @param errMsg the err msg
-	 */
-	void onError(CallStatsErrors error, String errMsg);
-	
-	/**
-	 * On initialized.
-	 *
-	 * @param msg the msg
-	 */
-	void onInitialized(String msg);
+
+  /**
+   * On intilization error.
+   *
+   * @param error the error
+   * @param errMsg the err msg
+   */
+  void onError(CallStatsErrors error, String errMsg);
+
+  /**
+   * On initialized.
+   *
+   * @param msg the msg
+   */
+  void onInitialized(String msg);
 }
