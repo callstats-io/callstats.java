@@ -115,7 +115,6 @@ public class CallStats {
     logger.info("config file path is " + System.getProperty("callstats.configurationFile") + ":"
         + CallStatsConst.CallStatsJavaSDKPropertyFileName);
     CallStatsConst.CS_VERSION = getClass().getPackage().getImplementationVersion();
-    logger.info("version is " + CallStatsConst.CS_VERSION);
   }
 
   private String getToken() {
