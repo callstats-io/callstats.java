@@ -15,9 +15,10 @@ public class CallStatsConfigProvider {
 
 
   /** The base url. */
-  public static String EVENTS_BASE_URL;
-  public static String STATS_BASE_URL;
-  public static String AUTH_BASE_URL;
+  public static String eventsBaseUrl;
+  public static String statsBaseUrl;
+  public static String authBaseUrl;
+  public static int keepAliveInterval = CallStatsConst.KEEPALIVE_INTERVAL;
 
 
   /** The connection time out. */
@@ -31,19 +32,19 @@ public class CallStatsConfigProvider {
       input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
       if (input != null) {
         prop.load(input);
-        EVENTS_BASE_URL = prop.getProperty("CallStats.EventsBaseURL");
-        STATS_BASE_URL = prop.getProperty("CallStats.StatsBaseURL");
-        AUTH_BASE_URL = prop.getProperty("CallStats.AuthBaseURL");
+        eventsBaseUrl = prop.getProperty("CallStats.EventsBaseURL");
+        statsBaseUrl = prop.getProperty("CallStats.StatsBaseURL");
+        authBaseUrl = prop.getProperty("CallStats.AuthBaseURL");
+        keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
 
         if (prop.getProperty("CallStats.ConnectionTimeOut") != null) {
           connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
         }
 
-        if (AUTH_BASE_URL == null) {
-          AUTH_BASE_URL = CallStatsUrls.AUTH_BASE.getDefaultUrl();
+        if (authBaseUrl == null) {
+          authBaseUrl = CallStatsUrls.AUTH_BASE.getDefaultUrl();
         }
       }
-      logger.info("URLs " + AUTH_BASE_URL + " " + EVENTS_BASE_URL + " " + STATS_BASE_URL);
     } catch (FileNotFoundException e) {
       logger.error("Configuration file not found", e);
       throw new RuntimeException("Configuration file not found");
@@ -55,16 +56,16 @@ public class CallStatsConfigProvider {
 
   public static void setURLs(String eventsUrl, String statsUrl) {
     if (eventsUrl == null) {
-      EVENTS_BASE_URL = CallStatsUrls.EVENTS_BASE.getDefaultUrl();
+      eventsBaseUrl = CallStatsUrls.EVENTS_BASE.getDefaultUrl();
     } else {
-      EVENTS_BASE_URL = eventsUrl;
+      eventsBaseUrl = eventsUrl;
     }
 
     if (statsUrl == null) {
-      STATS_BASE_URL = CallStatsUrls.STATS_BASE.getDefaultUrl();
+      statsBaseUrl = CallStatsUrls.STATS_BASE.getDefaultUrl();
     } else {
-      STATS_BASE_URL = statsUrl;
+      statsBaseUrl = statsUrl;
     }
-    logger.info("URLs " + AUTH_BASE_URL + " " + EVENTS_BASE_URL + " " + STATS_BASE_URL);
+    logger.info("URLs " + authBaseUrl + " " + eventsBaseUrl + " " + statsBaseUrl);
   }
 }

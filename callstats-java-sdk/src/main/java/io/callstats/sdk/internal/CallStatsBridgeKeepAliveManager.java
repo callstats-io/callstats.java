@@ -1,10 +1,6 @@
 package io.callstats.sdk.internal;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -54,7 +50,7 @@ public class CallStatsBridgeKeepAliveManager {
   /** The Constant logger. */
   private static final Logger logger = LogManager.getLogger("CallStatsBridgeKeepAliveManager");
 
-  private int keepAliveInterval = CallStatsConst.KEEPALIVE_INTERVAL;
+  private int keepAliveInterval;
 
   /**
    * Instantiates a new call stats bridge keep alive manager.
@@ -71,27 +67,7 @@ public class CallStatsBridgeKeepAliveManager {
       CallStatsBridgeKeepAliveStatusListener keepAliveStatusListener) {
     super();
     keepAliveEventUrl = "/" + appId + "/stats/bridge/alive";
-    Properties prop = new Properties();
-    InputStream input = null;
-
-    // input =
-    // getClass().getClassLoader().getResourceAsStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-    try {
-      input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-      if (input != null) {
-        prop.load(input);
-        if (prop.getProperty("CallStats.keepAliveInterval") != null) {
-          keepAliveInterval = Integer.parseInt(prop.getProperty("CallStats.keepAliveInterval"));
-        }
-      }
-    } catch (FileNotFoundException e) {
-      logger.error("Configuration file not found", e);
-      throw new RuntimeException("Configuration file not found");
-    } catch (IOException e) {
-      logger.error("Configuration file read IO exception", e);
-      throw new RuntimeException("Configuration file read IO exception");
-    }
-
+    this.keepAliveInterval = CallStatsConfigProvider.keepAliveInterval;
     this.appId = appId;
     this.bridgeId = bridgeId;
     this.token = token;

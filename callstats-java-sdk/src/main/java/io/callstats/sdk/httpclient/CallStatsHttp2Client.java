@@ -65,43 +65,43 @@ public class CallStatsHttp2Client {
 
   public void sendBridgeEvents(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    if (CallStatsConfigProvider.EVENTS_BASE_URL == null) {
+    if (CallStatsConfigProvider.eventsBaseUrl == null) {
       logger.error("sendBridgeEvents: URL Not Available");
       return;
     }
     logger.info("sending bridge events " + body);
-    Request request = buildRequest(CallStatsConfigProvider.EVENTS_BASE_URL + url, token, body);
+    Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, body);
     send(request, listener);
   }
 
   public void sendBridgeStats(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    if (CallStatsConfigProvider.STATS_BASE_URL == null) {
+    if (CallStatsConfigProvider.statsBaseUrl == null) {
       logger.error("sendBridgeStats: URL Not Available");
       return;
     }
-    logger.info("sending stats " + CallStatsConfigProvider.STATS_BASE_URL + url);
-    Request request = buildRequest(CallStatsConfigProvider.STATS_BASE_URL + url, token, body);
+    logger.info("sending stats " + CallStatsConfigProvider.statsBaseUrl + url);
+    Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
 
   public void sendBridgeAlive(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    if (CallStatsConfigProvider.STATS_BASE_URL == null) {
+    if (CallStatsConfigProvider.statsBaseUrl == null) {
       logger.error("sendBridgeAlive: URL Not Available");
       return;
     }
-    Request request = buildRequest(CallStatsConfigProvider.STATS_BASE_URL + url, token, body);
+    Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
 
   public void sendBridgeStatistics(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    if (CallStatsConfigProvider.STATS_BASE_URL == null) {
+    if (CallStatsConfigProvider.statsBaseUrl == null) {
       logger.error("sendBridgeStatistics: URL Not Available");
       return;
     }
-    Request request = buildRequest(CallStatsConfigProvider.STATS_BASE_URL + url, token, body);
+    Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
 
@@ -114,7 +114,7 @@ public class CallStatsHttp2Client {
     }
 
     RequestBody msg = builder.build();
-    Request request = new Request.Builder().url(CallStatsConfigProvider.AUTH_BASE_URL + url)
+    Request request = new Request.Builder().url(CallStatsConfigProvider.authBaseUrl + url)
         .addHeader("Content-type", "application/x-www-form-urlencoded")
         .addHeader("Accept", "application/json").post(msg).build();
 
