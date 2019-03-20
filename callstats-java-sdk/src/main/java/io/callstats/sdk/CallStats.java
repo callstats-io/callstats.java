@@ -23,6 +23,7 @@ import io.callstats.sdk.internal.BridgeStatusInfoQueue;
 import io.callstats.sdk.internal.CallStatsAuthenticator;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
+import io.callstats.sdk.internal.CallStatsConfigProvider;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.CallStatsResponseStatus;
 import io.callstats.sdk.internal.TokenGeneratorHs256;
@@ -164,9 +165,10 @@ public class CallStats {
     this.bridgeId = bridgeId;
     this.listener = callStatsInitListener;
     this.serverInfo = serverInfo;
+    CallStatsConfigProvider.init();
 
-    httpClient = new CallStatsHttp2Client();
-    authHttpClient = new CallStatsHttp2Client();
+    httpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
+    authHttpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
     authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient,
         new CallStatsInitListener() {
           public void onInitialized(String msg) {
@@ -190,52 +192,53 @@ public class CallStats {
    * @param bridgeStatusInfo the bridge status info
    */
   public void sendCallStatsBridgeStatusUpdate(BridgeStatusInfo bridgeStatusInfo) {
-    if (isInitialized()) {
-      long epoch = System.currentTimeMillis();
-      String token = getToken();
-      BridgeStatusUpdateMessage eventMessage =
-          new BridgeStatusUpdateMessage(bridgeId, epoch, bridgeStatusInfo);
-      String requestMessageString = gson.toJson(eventMessage);
-      String url = "/" + appId + "/stats/bridge/status";
-      httpClient.sendBridgeStatistics(url, token, requestMessageString,
-          new CallStatsHttp2ResponseListener() {
-            public void onResponse(Response response) {
-              int responseStatus = response.code();
-              BridgeStatusUpdateResponse eventResponseMessage;
-              try {
-                String responseString = response.body().string();
-                eventResponseMessage =
-                    gson.fromJson(responseString, BridgeStatusUpdateResponse.class);
-              } catch (IOException e) {
-                logger.error("IO Exception " + e.getMessage(), e);
-                throw new RuntimeException(e);
-              } catch (JsonSyntaxException e) {
-                logger.error("Json Syntax Exception " + e.getMessage(), e);
-                e.printStackTrace();
-                throw new RuntimeException(e);
-              }
-              logger.debug("BridgeStatusUpdate Response " + eventResponseMessage.getStatus() + ":"
-                  + eventResponseMessage.getMsg());
-              httpClient.setDisrupted(false);
-              if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
-                sendCallStatsBridgeStatusUpdateFromQueue();
-              } else if (responseStatus == CallStatsResponseStatus.INVALID_AUTHENTICATION_TOKEN) {
-                bridgeKeepAliveManager.stopKeepAliveSender();
-                authenticator.doAuthentication();
-              } else {
-                httpClient.setDisrupted(true);
-              }
-            }
+    if (!isInitialized()) {
+      bridgeStatusInfoQueue.push(bridgeStatusInfo);
+      return;
+    }
 
-            public void onFailure(Exception e) {
-              logger.error("Response exception" + e.getMessage(), e);
+    long epoch = System.currentTimeMillis();
+    String token = getToken();
+    BridgeStatusUpdateMessage eventMessage =
+        new BridgeStatusUpdateMessage(bridgeId, epoch, bridgeStatusInfo);
+    String requestMessageString = gson.toJson(eventMessage);
+    String url = "/" + appId + "/stats/bridge/status";
+    httpClient.sendBridgeStatistics(url, token, requestMessageString,
+        new CallStatsHttp2ResponseListener() {
+          public void onResponse(Response response) {
+            int responseStatus = response.code();
+            BridgeStatusUpdateResponse eventResponseMessage;
+            try {
+              String responseString = response.body().string();
+              eventResponseMessage =
+                  gson.fromJson(responseString, BridgeStatusUpdateResponse.class);
+            } catch (IOException e) {
+              logger.error("IO Exception " + e.getMessage(), e);
+              throw new RuntimeException(e);
+            } catch (JsonSyntaxException e) {
+              logger.error("Json Syntax Exception " + e.getMessage(), e);
+              e.printStackTrace();
+              throw new RuntimeException(e);
+            }
+            logger.debug("BridgeStatusUpdate Response " + eventResponseMessage.getStatus() + ":"
+                + eventResponseMessage.getMsg());
+            httpClient.setDisrupted(false);
+            if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
+              sendCallStatsBridgeStatusUpdateFromQueue();
+            } else if (responseStatus == CallStatsResponseStatus.INVALID_AUTHENTICATION_TOKEN) {
+              bridgeKeepAliveManager.stopKeepAliveSender();
+              authenticator.doAuthentication();
+            } else {
               httpClient.setDisrupted(true);
             }
+          }
 
-          });
-    } else {
-      bridgeStatusInfoQueue.push(bridgeStatusInfo);
-    }
+          public void onFailure(Exception e) {
+            logger.error("Response exception" + e.getMessage(), e);
+            httpClient.setDisrupted(true);
+          }
+
+        });
   }
 
   private synchronized void sendCallStatsBridgeStatusUpdateFromQueue() {
@@ -304,6 +307,11 @@ public class CallStats {
   private synchronized void sendCallStatsConferenceEventMessage(String url, String reqMsg,
       final CallStatsStartConferenceListener listener) {
     String token = getToken();
+    if (token == null) {
+      logger.error("sendCallStatsConferenceEvent: Not Initialized/Token Unavaialble");
+      return;
+    }
+
     httpClient.sendBridgeEvents(url, token, reqMsg, new CallStatsHttp2ResponseListener() {
       public void onResponse(Response response) {
         int responseStatus = response.code();
@@ -436,6 +444,10 @@ public class CallStats {
     }
 
     String token = getToken();
+    if (token == null) {
+      logger.error("sendCallStatsConferenceStats: Not Initialized/Token Unavaialble");
+      return;
+    }
     String url = "";
     try {
       url = "/" + appId + "/conferences/" + URLEncoder.encode(userInfo.getConfID(), "utf-8") + "/"

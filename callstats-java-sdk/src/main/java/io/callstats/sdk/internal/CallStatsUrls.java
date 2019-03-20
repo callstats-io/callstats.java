@@ -28,6 +28,4 @@ public enum CallStatsUrls {
   public String toString() {
     return this.propertyName;
   }
-
-
 }

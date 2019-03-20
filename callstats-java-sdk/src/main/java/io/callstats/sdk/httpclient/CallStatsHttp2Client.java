@@ -1,17 +1,12 @@
 package io.callstats.sdk.httpclient;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import io.callstats.sdk.internal.CallStatsConst;
-import io.callstats.sdk.internal.CallStatsUrls;
+import io.callstats.sdk.internal.CallStatsConfigProvider;
 import io.callstats.sdk.internal.NameValuePair;
 import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
 import okhttp3.Call;
@@ -29,14 +24,6 @@ import okhttp3.TlsVersion;
 
 public class CallStatsHttp2Client {
 
-  /** The base url. */
-  private String EVENTS_BASE_URL;
-  private String STATS_BASE_URL;
-  private String AUTH_BASE_URL;
-
-  /** The connection time out. */
-  private int connectionTimeOut = CallStatsConst.CONNECTION_TIMEOUT;
-
   /** The Constant logger. */
   private static final Logger logger = LogManager.getLogger("CallStatsAsyncHttpClient");
 
@@ -51,7 +38,7 @@ public class CallStatsHttp2Client {
     this.isDisrupted = isDisrupted;
   }
 
-  public CallStatsHttp2Client() {
+  public CallStatsHttp2Client(int connectionTimeOut) {
     ConnectionSpec spec =
         new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS).tlsVersions(TlsVersion.TLS_1_2)
             .allEnabledCipherSuites().supportsTlsExtensions(true).build();
@@ -64,39 +51,7 @@ public class CallStatsHttp2Client {
   }
 
   private void loadConfigurations() {
-    Properties prop = new Properties();
-    InputStream input = null;
 
-    try {
-      input = new FileInputStream(CallStatsConst.CallStatsJavaSDKPropertyFileName);
-      if (input != null) {
-        prop.load(input);
-        EVENTS_BASE_URL = prop.getProperty("CallStats.EventsBaseURL");
-        STATS_BASE_URL = prop.getProperty("CallStats.StatsBaseURL");
-        AUTH_BASE_URL = prop.getProperty("CallStats.AuthBaseURL");
-
-        if (prop.getProperty("CallStats.ConnectionTimeOut") != null) {
-          connectionTimeOut = Integer.parseInt(prop.getProperty("CallStats.ConnectionTimeOut"));
-        }
-
-        if (EVENTS_BASE_URL == null) {
-          EVENTS_BASE_URL = CallStatsUrls.EVENTS_BASE.getDefaultUrl();
-        }
-        if (STATS_BASE_URL == null) {
-          STATS_BASE_URL = CallStatsUrls.STATS_BASE.getDefaultUrl();
-        }
-        if (AUTH_BASE_URL == null) {
-          AUTH_BASE_URL = CallStatsUrls.AUTH_BASE.getDefaultUrl();
-        }
-      }
-      logger.info("Base URL is " + EVENTS_BASE_URL);
-    } catch (FileNotFoundException e) {
-      logger.error("Configuration file not found", e);
-      throw new RuntimeException("Configuration file not found");
-    } catch (IOException e) {
-      logger.error("Configuration file read IO exception", e);
-      throw new RuntimeException("Configuration file read IO exception");
-    }
   }
 
   private Request buildRequest(String url, String token, String body) {
@@ -110,27 +65,43 @@ public class CallStatsHttp2Client {
 
   public void sendBridgeEvents(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
+    if (CallStatsConfigProvider.eventsBaseUrl == null) {
+      logger.error("sendBridgeEvents: URL Not Available");
+      return;
+    }
     logger.info("sending bridge events " + body);
-    Request request = buildRequest(EVENTS_BASE_URL + url, token, body);
+    Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, body);
     send(request, listener);
   }
 
   public void sendBridgeStats(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    logger.info("sending stats " + STATS_BASE_URL + url);
-    Request request = buildRequest(STATS_BASE_URL + url, token, body);
+    if (CallStatsConfigProvider.statsBaseUrl == null) {
+      logger.error("sendBridgeStats: URL Not Available");
+      return;
+    }
+    logger.info("sending stats " + CallStatsConfigProvider.statsBaseUrl + url);
+    Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
 
   public void sendBridgeAlive(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    Request request = buildRequest(STATS_BASE_URL + url, token, body);
+    if (CallStatsConfigProvider.statsBaseUrl == null) {
+      logger.error("sendBridgeAlive: URL Not Available");
+      return;
+    }
+    Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
 
   public void sendBridgeStatistics(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
-    Request request = buildRequest(STATS_BASE_URL + url, token, body);
+    if (CallStatsConfigProvider.statsBaseUrl == null) {
+      logger.error("sendBridgeStatistics: URL Not Available");
+      return;
+    }
+    Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
 
@@ -143,7 +114,7 @@ public class CallStatsHttp2Client {
     }
 
     RequestBody msg = builder.build();
-    Request request = new Request.Builder().url(AUTH_BASE_URL + url)
+    Request request = new Request.Builder().url(CallStatsConfigProvider.authBaseUrl + url)
         .addHeader("Content-type", "application/x-www-form-urlencoded")
         .addHeader("Accept", "application/json").post(msg).build();
 

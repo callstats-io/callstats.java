@@ -1,6 +1,7 @@
 package io.callstats.sdk.messages;
 
 import com.google.gson.annotations.SerializedName;
+import io.callstats.sdk.internal.TokenMetadata;
 
 public class AuthenticateResponse {
   /** The access token */
@@ -14,6 +15,18 @@ public class AuthenticateResponse {
   /** When token expires */
   @SerializedName("expires_in")
   private long expires;
+
+  /** the token metadata */
+  @SerializedName("metadata")
+  private TokenMetadata metadata;
+
+  public TokenMetadata getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(TokenMetadata metadata) {
+    this.metadata = metadata;
+  }
 
   public String getToken() {
     return token;
