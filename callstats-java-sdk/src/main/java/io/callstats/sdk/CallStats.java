@@ -261,7 +261,7 @@ public class CallStats {
     long apiTS = System.currentTimeMillis();
     if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP) {
       ConferenceSetupEvent eventMessage =
-          new ConferenceSetupEvent(bridgeId, conferenceInfo.getInitiatorID(), apiTS, serverInfo);
+          new ConferenceSetupEvent(bridgeId, conferenceInfo.getInitiatorID(), conferenceInfo.getInitiatorSiteID(), apiTS, serverInfo);
       String requestMessageString = gson.toJson(eventMessage);
       String url = "";
       try {

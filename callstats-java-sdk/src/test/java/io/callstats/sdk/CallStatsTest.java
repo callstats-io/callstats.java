@@ -201,7 +201,7 @@ public class CallStatsTest {
     String msg = "SDK authentication successful";
     Mockito.verify(listener).onInitialized(msg);
 
-    ConferenceInfo conferenceInfo = new ConferenceInfo("callstats.io/room1", "2345");
+    ConferenceInfo conferenceInfo = new ConferenceInfo("callstats.io/room1", "2345", "site1");
     System.out.println("sending conference start ");
     callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_SETUP,
         conferenceInfo, new CallStatsStartConferenceListener() {
