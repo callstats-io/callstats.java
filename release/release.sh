@@ -27,7 +27,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKERIMGNAME="csio/callstatsjava-release"
 cd ${DIR}/../callstats-java-sdk
-DOCKERCMD="docker run --rm -it -v $(pwd):/usr/src/app -v ${DIR}/../release/.m2:/root/.m2 -v $HOME/.gnupg:/root/.gnupg2 -w /usr/src/app $DOCKERIMGNAME"
+DOCKERCMD="docker run --rm -it -v $(pwd):/usr/src/app -v ${DIR}/../release/.m2:/root/.m2 -v $HOME/.gnupg:/root/.gnupg -w /usr/src/app $DOCKERIMGNAME"
 
 function die_with() {
 	echo "$*" >&2
