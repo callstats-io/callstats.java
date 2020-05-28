@@ -9,6 +9,7 @@ public class ConferenceSetupEvent {
   String deviceID;
   long timestamp;
   ServerInfo endpointInfo;
+  String siteID;
 
   public String getLocalID() {
     return localID;
@@ -50,12 +51,25 @@ public class ConferenceSetupEvent {
     this.endpointInfo = endpointInfo;
   }
 
-  public ConferenceSetupEvent(String localID, String originID, long timestamp,
+   public String getSiteID() {
+    return siteID;
+  }
+
+  public void setSiteID(String siteID) {
+    this.siteID = siteID;
+  }
+
+  public ConferenceSetupEvent(String localID, String originID,  String siteID, long timestamp,
       ServerInfo serverInfo) {
     this.localID = localID;
     this.originID = originID;
     this.timestamp = timestamp;
     this.endpointInfo = serverInfo;
     this.deviceID = this.localID;
+    this.siteID = siteID;
+  }
+  public ConferenceSetupEvent(String localID, String originID, long timestamp,
+      ServerInfo serverInfo) {
+    this(localID, originID, "", timestamp , serverInfo);
   }
 }
