@@ -23,6 +23,7 @@ import io.callstats.sdk.internal.BridgeStatusInfoQueue;
 import io.callstats.sdk.internal.CallStatsAuthenticator;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
+import io.callstats.sdk.internal.CallStatsConferenceAliveManager;
 import io.callstats.sdk.internal.CallStatsConfigProvider;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.CallStatsResponseStatus;
@@ -78,10 +79,14 @@ public class CallStats {
 
   /** The bridge keep alive manager. */
   private CallStatsBridgeKeepAliveManager bridgeKeepAliveManager;
+  
+  private CallStatsConferenceAliveManager conferenceKeepAliveManager;
 
   private ICallStatsTokenGenerator tokenGenerator;
 
   private CallStatsHttp2Client authHttpClient;
+  
+  private CallStatsHttp2Client conferenceAliveHttpClient;
 
   /**
    * Checks if is initialized.
@@ -169,6 +174,8 @@ public class CallStats {
 
     httpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
     authHttpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
+    conferenceAliveHttpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
+    
     authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient,
         new CallStatsInitListener() {
           public void onInitialized(String msg) {
@@ -184,6 +191,44 @@ public class CallStats {
           }
         });
     authenticator.doAuthentication();
+  }
+  
+  /**
+   * Start the conference Alive sender
+   *
+   * @param confID conference identifier
+   * @param ucID ucID obtained from conference creation
+   */
+  
+  public void startConferenceAliveSender(String confID, String ucID) {
+    if (conferenceKeepAliveManager == null) {
+  conferenceKeepAliveManager = new CallStatsConferenceAliveManager(appId, bridgeId,
+    authenticator.getToken(), conferenceAliveHttpClient, new CallStatsBridgeKeepAliveStatusListener() {
+        public void onKeepAliveError(CallStatsErrors error, String errMsg) {
+          if (error == CallStatsErrors.AUTH_ERROR) {
+            authenticator.doAuthentication();
+          }
+        }
+
+        public void onSuccess() {
+          sendCallStatsBridgeStatusUpdateFromQueue();
+        }
+      });
+    }
+    conferenceKeepAliveManager.startConferenceAliveSender(confID, ucID, authenticator.getToken());
+  }
+  
+  /**
+   * Stop the conference Alive sender
+   *
+   * @param ucID ucID obtained from conference creation
+   */
+  
+  public void stopConferenceAliveSender(String ucID) {
+    if (conferenceKeepAliveManager == null) {
+      return;
+    }
+    conferenceKeepAliveManager.stopConferenceAliveSender(ucID);
   }
 
   /**

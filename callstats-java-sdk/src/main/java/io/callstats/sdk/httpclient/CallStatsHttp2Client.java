@@ -120,6 +120,16 @@ public class CallStatsHttp2Client {
 
     send(request, listener);
   }
+  
+  public void sendConferenceAlive(String url, String token, String messageBody,
+	      final CallStatsHttp2ResponseListener listener) {
+	if (CallStatsConfigProvider.statsBaseUrl == null) {
+	  logger.error("sendConferenceAlive: URL Not Available");
+	  return;
+	}
+	Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, messageBody);
+	send(request, listener);
+  }
 
   private void send(Request request, final CallStatsHttp2ResponseListener listener) {
     Call call = okHttpClientclient.newCall(request);
