@@ -272,6 +272,7 @@ public class CallStats {
       additionalIDs.setProductName(conferenceInfo.getProductName());
       additionalIDs.setTenantID(conferenceInfo.getTenantID());
       additionalIDs.setXcaasID(conferenceInfo.getXcaasID());
+      additionalIDs.setCustomerID(conferenceInfo.getCustomerID());
       ConferenceSetupEvent eventMessage =
           new ConferenceSetupEvent(bridgeId, conferenceInfo.getInitiatorID(), conferenceInfo.getInitiatorSiteID(), apiTS, serverInfo, additionalIDs);
       String requestMessageString = gson.toJson(eventMessage);
