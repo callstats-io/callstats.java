@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+import io.callstats.sdk.data.AdditionalIDs;
 import io.callstats.sdk.data.BridgeStatusInfo;
 import io.callstats.sdk.data.ConferenceInfo;
 import io.callstats.sdk.data.ConferenceStats;
@@ -260,9 +262,20 @@ public class CallStats {
 
     long apiTS = System.currentTimeMillis();
     if (eventType == CallStatsConferenceEvents.CONFERENCE_SETUP) {
+      AdditionalIDs additionalIDs = new AdditionalIDs();
+      additionalIDs.setFqExtensionID(conferenceInfo.getFqExtensionID());
+      additionalIDs.setSessionID(conferenceInfo.getSessionID());
+      additionalIDs.setServerName(conferenceInfo.getServerName());
+      additionalIDs.setPbxID(conferenceInfo.getPbxID());
+      additionalIDs.setPbxExtensionID(conferenceInfo.getPbxExtensionID());
+      additionalIDs.setMeetingsName(conferenceInfo.getMeetingsName());
+      additionalIDs.setProductName(conferenceInfo.getProductName());
+      additionalIDs.setTenantID(conferenceInfo.getTenantID());
+      additionalIDs.setXcaasID(conferenceInfo.getXcaasID());
       ConferenceSetupEvent eventMessage =
-          new ConferenceSetupEvent(bridgeId, conferenceInfo.getInitiatorID(), conferenceInfo.getInitiatorSiteID(), apiTS, serverInfo);
+          new ConferenceSetupEvent(bridgeId, conferenceInfo.getInitiatorID(), conferenceInfo.getInitiatorSiteID(), apiTS, serverInfo, additionalIDs);
       String requestMessageString = gson.toJson(eventMessage);
+      eventMessage.setLoginlID(conferenceInfo.getLoginID());
       String url = "";
       try {
         url =

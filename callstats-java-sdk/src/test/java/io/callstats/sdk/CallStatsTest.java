@@ -202,6 +202,8 @@ public class CallStatsTest {
     Mockito.verify(listener).onInitialized(msg);
 
     ConferenceInfo conferenceInfo = new ConferenceInfo("callstats.io/room1", "2345", "site1");
+    conferenceInfo.setMeetingsName("JVBMeeting");
+    conferenceInfo.setTenantID("JVB tenant");
     System.out.println("sending conference start ");
     callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_SETUP,
         conferenceInfo, new CallStatsStartConferenceListener() {

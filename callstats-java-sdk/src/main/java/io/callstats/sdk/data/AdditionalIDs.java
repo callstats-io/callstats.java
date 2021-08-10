@@ -1,11 +1,7 @@
 package io.callstats.sdk.data;
 
-public class ConferenceInfo {
+public class AdditionalIDs {
 
-  private String confID;
-  private String initiatorID;
-  private String initiatorSiteID;
-  
   private String sessionID;
   private String pbxID;
   private String pbxExtensionID;
@@ -14,10 +10,8 @@ public class ConferenceInfo {
   private String meetingsName;
   private String serverName;
   private String fqExtensionID;
-  private String loginID;
   private String xcaasID;
   
-
   public String getSessionID() {
 	return sessionID;
   }
@@ -82,14 +76,6 @@ public class ConferenceInfo {
 	this.fqExtensionID = fqExtensionID;
   }
 
-  public String getLoginID() {
-	return loginID;
-  }
-
-  public void setLoginID(String loginID) {
-	this.loginID = loginID;
-  }
-
   public String getXcaasID() {
 	return xcaasID;
   }
@@ -98,37 +84,4 @@ public class ConferenceInfo {
 	this.xcaasID = xcaasID;
   }
 
-  public String getConfID() {
-    return confID;
-  }
-
-  public void setConfID(String confID) {
-    this.confID = confID;
-  }
-
-  public String getInitiatorID() {
-    return initiatorID;
-  }
-
-  public void setInitiatorID(String initiatorID) {
-    this.initiatorID = initiatorID;
-  }
-
-  public String getInitiatorSiteID() {
-    return initiatorSiteID;
-  }
-
-  public void setInitiatorSiteID(String initiatorSiteID) {
-    this.initiatorSiteID = initiatorSiteID;
-  }
-
-  public ConferenceInfo(String confID, String initiatorID) {
-    this(confID, initiatorID, "");
-  }
-  public ConferenceInfo(String confID, String initiatorID, String initiatorSiteID) {
-    super();
-    this.confID = confID;
-    this.initiatorID = initiatorID;
-    this.initiatorSiteID = initiatorSiteID;
-  }
 }
