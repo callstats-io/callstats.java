@@ -36,7 +36,7 @@ public class CallStatsTest {
   ServerInfo serverInfo;
 
   /** The app id. */
-  public static int appId = 1234567;
+  public static int appId = 123456;
 
   /** The app secret. */
   public static String appSecret = "app_secret";
@@ -213,7 +213,7 @@ public class CallStatsTest {
 
             // callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED,
             // userInfo);
-            callstatslib.startConferenceAliveSender(confID, ucid);
+            callstatslib.startConferenceAliveSender(conferenceInfo.getInitiatorID(), confID, ucid);
             
             try {
                 Thread.sleep(150000);

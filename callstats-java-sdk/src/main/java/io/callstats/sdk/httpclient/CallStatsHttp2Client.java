@@ -40,7 +40,8 @@ public class CallStatsHttp2Client {
 
   public CallStatsHttp2Client(int connectionTimeOut) {
     ConnectionSpec spec =
-        new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS).tlsVersions(TlsVersion.TLS_1_2)
+        new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+        	.tlsVersions(TlsVersion.TLS_1_2)
             .allEnabledCipherSuites().supportsTlsExtensions(true).build();
 
     okHttpClientclient = new OkHttpClient.Builder()
@@ -80,7 +81,7 @@ public class CallStatsHttp2Client {
       logger.error("sendBridgeStats: URL Not Available");
       return;
     }
-    logger.info("sending stats " + CallStatsConfigProvider.statsBaseUrl + url);
+    logger.info("sending stats " + CallStatsConfigProvider.statsBaseUrl + url + body);
     Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }

@@ -36,6 +36,7 @@ import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
 import io.callstats.sdk.messages.CallStatsEventResponse;
 import io.callstats.sdk.messages.ConferenceSetupEvent;
 import io.callstats.sdk.messages.ConferenceStatsEvent;
+import io.callstats.sdk.messages.FabricSetupEvent;
 import okhttp3.Response;
 
 /**
@@ -187,6 +188,7 @@ public class CallStats {
 
           public void onError(CallStatsErrors error, String errMsg) {
             logger.info("SDK Initialization Failed " + errMsg);
+            System.out.println(errMsg);
             listener.onError(error, errMsg);;
           }
         });
@@ -196,13 +198,14 @@ public class CallStats {
   /**
    * Start the conference Alive sender
    *
+   * @param originID initiator identifier
    * @param confID conference identifier
    * @param ucID ucID obtained from conference creation
    */
   
-  public void startConferenceAliveSender(String confID, String ucID) {
+  public void startConferenceAliveSender(String originID, String confID, String ucID) {
     if (conferenceKeepAliveManager == null) {
-  conferenceKeepAliveManager = new CallStatsConferenceAliveManager(appId, bridgeId,
+    conferenceKeepAliveManager = new CallStatsConferenceAliveManager(appId, bridgeId,
     authenticator.getToken(), conferenceAliveHttpClient, new CallStatsBridgeKeepAliveStatusListener() {
         public void onKeepAliveError(CallStatsErrors error, String errMsg) {
           if (error == CallStatsErrors.AUTH_ERROR) {
@@ -211,10 +214,21 @@ public class CallStats {
         }
 
         public void onSuccess() {
-          sendCallStatsBridgeStatusUpdateFromQueue();
         }
       });
     }
+    long apiTS = System.currentTimeMillis();
+    FabricSetupEvent eventMessage = new FabricSetupEvent(bridgeId, originID, "jitsi", apiTS);
+    String requestMessageString = gson.toJson(eventMessage);
+    String url = "";
+    try {
+      url =
+          "/" + appId + "/conferences/" + URLEncoder.encode(confID, "utf-8") + "/" + ucID + "/events/fabric/setup";
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    sendCallStatsConferenceEventMessage(url, requestMessageString, null);
     conferenceKeepAliveManager.startConferenceAliveSender(confID, ucID, authenticator.getToken());
   }
   
@@ -424,7 +438,7 @@ public class CallStats {
       ConferenceStats conferenceStats = tempStats.get(0);
       ConferenceStatsEvent conferenceStatsEvent =
           new ConferenceStatsEvent(bridgeId, conferenceStats.getRemoteUserID(),
-              conferenceStats.getLocalUserID(), conferenceStats.getConfID(), apiTS);
+              conferenceStats.getLocalUserID(), conferenceStats.getLocalUserID(), apiTS);
       UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getRemoteUserID(),
           conferenceStats.getUcID());
 
