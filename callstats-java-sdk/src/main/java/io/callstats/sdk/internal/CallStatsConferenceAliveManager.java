@@ -63,7 +63,7 @@ public class CallStatsConferenceAliveManager {
    * Instantiates a new call stats bridge keep alive manager.
    *
    * @param appId the app id
-   * @param ucID the bridge id
+   * @param bridgeID the bridge id
    * @param token the token
    * @param httpClient the http client
    * @param keepAliveStatusListener listener
