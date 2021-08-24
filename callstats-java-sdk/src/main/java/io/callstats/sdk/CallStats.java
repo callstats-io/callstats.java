@@ -188,7 +188,6 @@ public class CallStats {
 
           public void onError(CallStatsErrors error, String errMsg) {
             logger.info("SDK Initialization Failed " + errMsg);
-            System.out.println(errMsg);
             listener.onError(error, errMsg);;
           }
         });

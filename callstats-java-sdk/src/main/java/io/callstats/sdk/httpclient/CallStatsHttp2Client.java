@@ -70,7 +70,7 @@ public class CallStatsHttp2Client {
       logger.error("sendBridgeEvents: URL Not Available");
       return;
     }
-    logger.info("sending bridge events " + body);
+    logger.info("sending bridge events ");
     Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, body);
     send(request, listener);
   }
@@ -81,7 +81,7 @@ public class CallStatsHttp2Client {
       logger.error("sendBridgeStats: URL Not Available");
       return;
     }
-    logger.info("sending stats " + CallStatsConfigProvider.statsBaseUrl + url + body);
+    logger.info("sending stats ");
     Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
