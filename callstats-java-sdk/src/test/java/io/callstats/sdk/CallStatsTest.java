@@ -36,7 +36,7 @@ public class CallStatsTest {
   ServerInfo serverInfo;
 
   /** The app id. */
-  public static int appId = 1234567;
+  public static int appId = 123456;
 
   /** The app secret. */
   public static String appSecret = "app_secret";
@@ -213,6 +213,13 @@ public class CallStatsTest {
 
             // callstatslib.sendCallStatsConferenceEvent(CallStatsConferenceEvents.CONFERENCE_TERMINATED,
             // userInfo);
+            callstatslib.startConferenceAliveSender(conferenceInfo.getInitiatorID(), confID, ucid);
+            
+            try {
+                Thread.sleep(150000);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
 
             callstatslib.startStatsReportingForUser(userID, confID);
             ConferenceStats conferenceStats = new ConferenceStatsBuilder().bytesSent(23456)
@@ -234,20 +241,21 @@ public class CallStatsTest {
             callstatslib.reportConferenceStats(userID, conferenceStats);
 
             callstatslib.stopStatsReportingForUser(userID, confID);
-
+            System.out.println("Stopping conference alive ");
+            callstatslib.stopConferenceAliveSender(ucid);
           }
 
           public void onError(CallStatsErrors error, String errMsg) {
 
-        }
+          }
         });
 
     try {
-      Thread.sleep(3000);
+      Thread.sleep(170000);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-
+    System.out.println("Ending conference start ");
   }
 
 }

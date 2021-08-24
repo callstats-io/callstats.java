@@ -40,7 +40,8 @@ public class CallStatsHttp2Client {
 
   public CallStatsHttp2Client(int connectionTimeOut) {
     ConnectionSpec spec =
-        new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS).tlsVersions(TlsVersion.TLS_1_2)
+        new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+        	.tlsVersions(TlsVersion.TLS_1_2)
             .allEnabledCipherSuites().supportsTlsExtensions(true).build();
 
     okHttpClientclient = new OkHttpClient.Builder()
@@ -69,7 +70,7 @@ public class CallStatsHttp2Client {
       logger.error("sendBridgeEvents: URL Not Available");
       return;
     }
-    logger.info("sending bridge events " + body);
+    logger.info("sending bridge events ");
     Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, body);
     send(request, listener);
   }
@@ -80,7 +81,7 @@ public class CallStatsHttp2Client {
       logger.error("sendBridgeStats: URL Not Available");
       return;
     }
-    logger.info("sending stats " + CallStatsConfigProvider.statsBaseUrl + url);
+    logger.info("sending stats ");
     Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
     send(request, listener);
   }
@@ -119,6 +120,16 @@ public class CallStatsHttp2Client {
         .addHeader("Accept", "application/json").post(msg).build();
 
     send(request, listener);
+  }
+  
+  public void sendConferenceAlive(String url, String token, String messageBody,
+	      final CallStatsHttp2ResponseListener listener) {
+	if (CallStatsConfigProvider.statsBaseUrl == null) {
+	  logger.error("sendConferenceAlive: URL Not Available");
+	  return;
+	}
+	Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, messageBody);
+	send(request, listener);
   }
 
   private void send(Request request, final CallStatsHttp2ResponseListener listener) {

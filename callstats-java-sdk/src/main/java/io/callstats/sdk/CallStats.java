@@ -23,6 +23,7 @@ import io.callstats.sdk.internal.BridgeStatusInfoQueue;
 import io.callstats.sdk.internal.CallStatsAuthenticator;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveManager;
 import io.callstats.sdk.internal.CallStatsBridgeKeepAliveStatusListener;
+import io.callstats.sdk.internal.CallStatsConferenceAliveManager;
 import io.callstats.sdk.internal.CallStatsConfigProvider;
 import io.callstats.sdk.internal.CallStatsConst;
 import io.callstats.sdk.internal.CallStatsResponseStatus;
@@ -35,6 +36,7 @@ import io.callstats.sdk.messages.BridgeStatusUpdateResponse;
 import io.callstats.sdk.messages.CallStatsEventResponse;
 import io.callstats.sdk.messages.ConferenceSetupEvent;
 import io.callstats.sdk.messages.ConferenceStatsEvent;
+import io.callstats.sdk.messages.FabricSetupEvent;
 import okhttp3.Response;
 
 /**
@@ -78,10 +80,14 @@ public class CallStats {
 
   /** The bridge keep alive manager. */
   private CallStatsBridgeKeepAliveManager bridgeKeepAliveManager;
+  
+  private CallStatsConferenceAliveManager conferenceKeepAliveManager;
 
   private ICallStatsTokenGenerator tokenGenerator;
 
   private CallStatsHttp2Client authHttpClient;
+  
+  private CallStatsHttp2Client conferenceAliveHttpClient;
 
   /**
    * Checks if is initialized.
@@ -169,6 +175,8 @@ public class CallStats {
 
     httpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
     authHttpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
+    conferenceAliveHttpClient = new CallStatsHttp2Client(CallStatsConfigProvider.connectionTimeOut);
+    
     authenticator = new CallStatsAuthenticator(appId, this.tokenGenerator, bridgeId, authHttpClient,
         new CallStatsInitListener() {
           public void onInitialized(String msg) {
@@ -184,6 +192,56 @@ public class CallStats {
           }
         });
     authenticator.doAuthentication();
+  }
+  
+  /**
+   * Start the conference Alive sender
+   *
+   * @param originID initiator identifier
+   * @param confID conference identifier
+   * @param ucID ucID obtained from conference creation
+   */
+  
+  public void startConferenceAliveSender(String originID, String confID, String ucID) {
+    if (conferenceKeepAliveManager == null) {
+    conferenceKeepAliveManager = new CallStatsConferenceAliveManager(appId, bridgeId,
+    authenticator.getToken(), conferenceAliveHttpClient, new CallStatsBridgeKeepAliveStatusListener() {
+        public void onKeepAliveError(CallStatsErrors error, String errMsg) {
+          if (error == CallStatsErrors.AUTH_ERROR) {
+            authenticator.doAuthentication();
+          }
+        }
+
+        public void onSuccess() {
+        }
+      });
+    }
+    long apiTS = System.currentTimeMillis();
+    FabricSetupEvent eventMessage = new FabricSetupEvent(bridgeId, originID, "jitsi", apiTS);
+    String requestMessageString = gson.toJson(eventMessage);
+    String url = "";
+    try {
+      url =
+          "/" + appId + "/conferences/" + URLEncoder.encode(confID, "utf-8") + "/" + ucID + "/events/fabric/setup";
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    sendCallStatsConferenceEventMessage(url, requestMessageString, null);
+    conferenceKeepAliveManager.startConferenceAliveSender(confID, ucID, authenticator.getToken());
+  }
+  
+  /**
+   * Stop the conference Alive sender
+   *
+   * @param ucID ucID obtained from conference creation
+   */
+  
+  public void stopConferenceAliveSender(String ucID) {
+    if (conferenceKeepAliveManager == null) {
+      return;
+    }
+    conferenceKeepAliveManager.stopConferenceAliveSender(ucID);
   }
 
   /**
@@ -379,7 +437,7 @@ public class CallStats {
       ConferenceStats conferenceStats = tempStats.get(0);
       ConferenceStatsEvent conferenceStatsEvent =
           new ConferenceStatsEvent(bridgeId, conferenceStats.getRemoteUserID(),
-              conferenceStats.getLocalUserID(), conferenceStats.getConfID(), apiTS);
+              conferenceStats.getLocalUserID(), conferenceStats.getLocalUserID(), apiTS);
       UserInfo info = new UserInfo(conferenceStats.getConfID(), conferenceStats.getRemoteUserID(),
           conferenceStats.getUcID());
 

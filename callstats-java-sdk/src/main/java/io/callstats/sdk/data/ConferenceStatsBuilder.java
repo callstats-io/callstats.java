@@ -9,6 +9,7 @@ public class ConferenceStatsBuilder {
   String fromUserID;
   String ucID;
   String confID;
+  String mediaType;
 
   Long packetsReceived;
   Long packetsLost;
@@ -222,7 +223,12 @@ public class ConferenceStatsBuilder {
   public String getRemoteUserID() {
     return remoteUserID;
   }
-
+  
+  public String getMediaType() {
+	return mediaType;
+  }
+  
+  
   public ConferenceStatsBuilder localUserID(String localUserID) {
     this.localUserID = localUserID;
     return this;
@@ -231,6 +237,11 @@ public class ConferenceStatsBuilder {
   public ConferenceStatsBuilder statsType(CallStatsStreamType statsType) {
     this.statsType = statsType.getMessageType();
     return this;
+  }
+  
+  public ConferenceStatsBuilder mediaType(String mediaType) {	
+	this.mediaType = mediaType;
+	return this;
   }
 
   public ConferenceStatsBuilder ssrc(String ssrc) {

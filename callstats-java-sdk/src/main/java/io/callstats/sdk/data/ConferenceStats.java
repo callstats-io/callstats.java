@@ -8,7 +8,7 @@ public class ConferenceStats {
   transient String remoteID;
   @SerializedName("type")
   String statsType; // inbound or outbound
-  String ssrc;
+  long ssrc;
   String originID;
   transient String ucID;
   transient String confID;
@@ -55,6 +55,7 @@ public class ConferenceStats {
   Double maxJBDelay;
   Double minJBDelay;
   Double avsync;
+  String mediaType;
 
   public ConferenceStats() {
 
@@ -64,7 +65,7 @@ public class ConferenceStats {
     this.localID = builder.getLocalUserID();
     this.statsType = builder.getStatsType();
     this.originID = builder.getFromUserID();
-    this.ssrc = builder.getSsrc();
+    this.ssrc = Long.parseLong(builder.getSsrc());
     this.remoteID = builder.getRemoteUserID();
     this.ucID = builder.getUcID();
     this.confID = builder.getConfID();
@@ -111,6 +112,7 @@ public class ConferenceStats {
     this.maxJBDelay = builder.getMaxJBDelay();
     this.minJBDelay = builder.getMinJBDelay();
     this.avsync = builder.getAvsync();
+    this.mediaType = builder.getMediaType();
   }
 
   public String getUcID() {
@@ -137,12 +139,12 @@ public class ConferenceStats {
     this.localID = localUserID;
   }
 
-  public String getSsrc() {
+  public long getSsrc() {
     return this.ssrc;
   }
 
   public void setSsrc(String ssrc) {
-    this.ssrc = ssrc;
+    this.ssrc = Long.parseLong(ssrc);
   }
 
   public String getFromUserID() {
@@ -167,5 +169,13 @@ public class ConferenceStats {
 
   public void setRemoteUserID(String remoteUserID) {
     this.remoteID = remoteUserID;
+  }
+  
+  public String getMediaType() {
+	return this.mediaType;
+  }
+
+  public void setMediaType(String mediaType) {
+    this.mediaType = mediaType;
   }
 }
