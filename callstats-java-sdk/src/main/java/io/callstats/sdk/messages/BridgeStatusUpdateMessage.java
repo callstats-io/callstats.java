@@ -2,8 +2,8 @@ package io.callstats.sdk.messages;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.*;
+
 import io.callstats.sdk.data.BridgeStatusInfo;
 
 /**
@@ -85,7 +85,7 @@ public class BridgeStatusUpdateMessage {
   private int participantsCount;
 
   /** The logger. */
-  private static final Logger logger = LogManager.getLogger("CallStats");
+  private static final Logger logger = Logger.getLogger("CallStats");
 
   /**
    * Instantiates a new bridge event message.
@@ -103,7 +103,7 @@ public class BridgeStatusUpdateMessage {
       this.setOriginID(this.localID);
       this.setDeviceID(this.localID);
     } catch (UnsupportedEncodingException e) {
-      logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+      logger.log(Level.SEVERE, "UnsupportedEncodingException " + e.getMessage(), e);
       e.printStackTrace();
       throw new RuntimeException(e);
     }
@@ -155,7 +155,7 @@ public class BridgeStatusUpdateMessage {
     try {
       this.localID = URLEncoder.encode(userID, "UTF-8");
     } catch (UnsupportedEncodingException e) {
-      logger.error("UnsupportedEncodingException " + e.getMessage(), e);
+      logger.log(Level.SEVERE, "UnsupportedEncodingException " + e.getMessage(), e);
       e.printStackTrace();
       throw new RuntimeException(e);
     } ;

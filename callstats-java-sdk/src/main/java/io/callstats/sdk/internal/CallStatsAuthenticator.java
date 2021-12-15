@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.callstats.sdk.CallStatsErrors;
@@ -28,7 +28,7 @@ import okhttp3.Response;
 public class CallStatsAuthenticator {
 
   /** The Constant logger. */
-  private static final Logger logger = LogManager.getLogger("CallStatsAuthenticator");
+  private static final Logger logger = Logger.getLogger("CallStatsAuthenticator");
 
   /** The Constant authorizeUrl. */
   private static final String authenticateUrl = "/authenticate";

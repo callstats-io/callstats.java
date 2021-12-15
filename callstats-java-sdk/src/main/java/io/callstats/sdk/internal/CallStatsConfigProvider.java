@@ -5,13 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CallStatsConfigProvider {
 
   /** The Constant logger. */
-  private static final Logger logger = LogManager.getLogger("CallStatsConfigProvider");
+  private static final Logger logger = Logger.getLogger("CallStatsConfigProvider");
 
 
   /** The base url. */
@@ -46,10 +46,10 @@ public class CallStatsConfigProvider {
         }
       }
     } catch (FileNotFoundException e) {
-      logger.error("Configuration file not found", e);
+      logger.log(Level.SEVERE, "Configuration file not found", e);
       throw new RuntimeException("Configuration file not found");
     } catch (IOException e) {
-      logger.error("Configuration file read IO exception", e);
+      logger.log(Level.SEVERE, "Configuration file read IO exception", e);
       throw new RuntimeException("Configuration file read IO exception");
     }
   }
