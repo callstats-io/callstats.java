@@ -8,9 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import io.callstats.sdk.data.BridgeStatusInfo;
@@ -62,7 +63,7 @@ public class CallStats {
   private CallStatsAuthenticator authenticator;
 
   /** The logger. */
-  private static final Logger logger = LogManager.getLogger("CallStats");
+  private static final Logger logger = Logger.getLogger("CallStats");
 
   /** The gson. */
   private Gson gson;
@@ -140,7 +141,7 @@ public class CallStats {
   public void initialize(final int appId, final String appSecret, final String bridgeId,
       final ServerInfo serverInfo, final CallStatsInitListener callStatsInitListener) {
     if (StringUtils.isBlank(appSecret)) {
-      logger.error("intialize: Arguments cannot be null ");
+      logger.severe("intialize: Arguments cannot be null ");
       throw new IllegalArgumentException("intialize: Arguments cannot be null");
     }
     initialize(appId, new TokenGeneratorHs256(appSecret.toCharArray(), appId, bridgeId), bridgeId,
@@ -162,7 +163,7 @@ public class CallStats {
       final CallStatsInitListener callStatsInitListener) {
     if (appId <= 0 || StringUtils.isBlank(bridgeId) || serverInfo == null
         || callStatsInitListener == null) {
-      logger.error("intialize: Arguments cannot be null ");
+      logger.severe("intialize: Arguments cannot be null ");
       throw new IllegalArgumentException("intialize: Arguments cannot be null");
     }
 
@@ -271,14 +272,14 @@ public class CallStats {
               eventResponseMessage =
                   gson.fromJson(responseString, BridgeStatusUpdateResponse.class);
             } catch (IOException e) {
-              logger.error("IO Exception " + e.getMessage(), e);
+              logger.log(Level.SEVERE, "IO Exception " + e.getMessage(), e);
               throw new RuntimeException(e);
             } catch (JsonSyntaxException e) {
-              logger.error("Json Syntax Exception " + e.getMessage(), e);
+              logger.log(Level.SEVERE, "Json Syntax Exception " + e.getMessage(), e);
               e.printStackTrace();
               throw new RuntimeException(e);
             }
-            logger.debug("BridgeStatusUpdate Response " + eventResponseMessage.getStatus() + ":"
+            logger.fine("BridgeStatusUpdate Response " + eventResponseMessage.getStatus() + ":"
                 + eventResponseMessage.getMsg());
             httpClient.setDisrupted(false);
             if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
@@ -292,7 +293,7 @@ public class CallStats {
           }
 
           public void onFailure(Exception e) {
-            logger.error("Response exception" + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Response exception" + e.getMessage(), e);
             httpClient.setDisrupted(true);
           }
 
@@ -312,7 +313,7 @@ public class CallStats {
   public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType,
       ConferenceInfo conferenceInfo, final CallStatsStartConferenceListener listener) {
     if (eventType == null || conferenceInfo == null || listener == null) {
-      logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
+      logger.severe("sendCallStatsConferenceEvent: Arguments cannot be null ");
       throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
     }
 
@@ -338,7 +339,7 @@ public class CallStats {
   public synchronized void sendCallStatsConferenceEvent(CallStatsConferenceEvents eventType,
       UserInfo userInfo) {
     if (eventType == null || userInfo == null) {
-      logger.error("sendCallStatsConferenceEvent: Arguments cannot be null ");
+      logger.severe("sendCallStatsConferenceEvent: Arguments cannot be null ");
       throw new IllegalArgumentException("sendCallStatsConferenceEvent: Arguments cannot be null");
     }
 
@@ -366,7 +367,7 @@ public class CallStats {
       final CallStatsStartConferenceListener listener) {
     String token = getToken();
     if (token == null) {
-      logger.error("sendCallStatsConferenceEvent: Not Initialized/Token Unavaialble");
+      logger.severe("sendCallStatsConferenceEvent: Not Initialized/Token Unavaialble");
       return;
     }
 
@@ -380,17 +381,17 @@ public class CallStats {
           // TODO Auto-generated catch block
           e1.printStackTrace();
         }
-        logger.debug("received response " + responseString);
+        logger.fine("received response " + responseString);
         if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
           CallStatsEventResponse eventResponseMessage;
           try {
             eventResponseMessage = gson.fromJson(responseString, CallStatsEventResponse.class);
           } catch (JsonSyntaxException e) {
-            logger.error("Json Syntax Exception " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Json Syntax Exception " + e.getMessage(), e);
             e.printStackTrace();
             throw new RuntimeException(e);
           }
-          logger.debug("conference event Response status is " + eventResponseMessage.getStatus()
+          logger.fine("conference event Response status is " + eventResponseMessage.getStatus()
               + ":" + eventResponseMessage.getUcID());
           if (listener != null) {
             listener.onResponse(eventResponseMessage.getUcID());
@@ -403,7 +404,7 @@ public class CallStats {
       }
 
       public void onFailure(Exception e) {
-        logger.error("Response exception" + e.getMessage(), e);
+        logger.log(Level.SEVERE, "Response exception" + e.getMessage(), e);
         httpClient.setDisrupted(true);
       }
 
@@ -412,7 +413,7 @@ public class CallStats {
 
   public synchronized void startStatsReportingForUser(String userID, String confID) {
     if (userID == null || confID == null) {
-      logger.error("startStatsReportingForUser: Arguments cannot be null ");
+      logger.severe("startStatsReportingForUser: Arguments cannot be null ");
       throw new IllegalArgumentException("startStatsReportingForUser: Arguments cannot be null");
     }
 
@@ -427,7 +428,7 @@ public class CallStats {
 
   public synchronized void stopStatsReportingForUser(String userID, String confID) {
     if (userID == null || confID == null) {
-      logger.error("stopStatsReportingForUser: Arguments cannot be null ");
+      logger.severe("stopStatsReportingForUser: Arguments cannot be null ");
       throw new IllegalArgumentException("stopStatsReportingForUser: Arguments cannot be null");
     }
     String key = userID + ":" + confID;
@@ -449,7 +450,7 @@ public class CallStats {
       });
 
       String statsString = gson.toJson(conferenceStatsEvent);
-      logger.debug("Stats string -" + statsString);
+      logger.fine("Stats string -" + statsString);
       sendCallStatsConferenceStats(statsString, info);
       conferenceStatsMap.remove(key);
     }
@@ -457,7 +458,7 @@ public class CallStats {
 
   public synchronized void reportConferenceStats(String userID, ConferenceStats stats) {
     if (stats == null || userID == null) {
-      logger.error("sendConferenceStats: Arguments cannot be null ");
+      logger.severe("sendConferenceStats: Arguments cannot be null ");
       throw new IllegalArgumentException("sendConferenceStats: Arguments cannot be null");
     }
     String key = userID + ":" + stats.getConfID();
@@ -492,18 +493,18 @@ public class CallStats {
 
   private synchronized void sendCallStatsConferenceStats(String stats, UserInfo userInfo) {
     if (stats == null || userInfo == null) {
-      logger.error("sendCallStatsConferenceStats: Arguments cannot be null ");
+      logger.severe("sendCallStatsConferenceStats: Arguments cannot be null ");
       throw new IllegalArgumentException("sendCallStatsConferenceStats: Arguments cannot be null");
     }
 
     if (userInfo.getUcID() == null) {
-      logger.error("sendCallStatsConferenceStats: UCID is null ");
+      logger.severe("sendCallStatsConferenceStats: UCID is null ");
       throw new IllegalArgumentException("sendCallStatsConferenceStats: UCID is null");
     }
 
     String token = getToken();
     if (token == null) {
-      logger.error("sendCallStatsConferenceStats: Not Initialized/Token Unavaialble");
+      logger.severe("sendCallStatsConferenceStats: Not Initialized/Token Unavaialble");
       return;
     }
     String url = "";
@@ -523,7 +524,7 @@ public class CallStats {
         } catch (IOException e1) {
           e1.printStackTrace();
         }
-        logger.debug("sendBridgeStats : received response " + responseString);
+        logger.fine("sendBridgeStats : received response " + responseString);
         if (responseStatus == CallStatsResponseStatus.RESPONSE_STATUS_SUCCESS) {
           httpClient.setDisrupted(false);
         } else {
@@ -533,7 +534,7 @@ public class CallStats {
       }
 
       public void onFailure(Exception e) {
-        logger.error("Response exception" + e.getMessage(), e);
+        logger.log(Level.SEVERE, "Response exception" + e.getMessage(), e);
         httpClient.setDisrupted(true);
       }
 

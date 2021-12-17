@@ -2,8 +2,8 @@ package io.callstats.sdk.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import io.callstats.sdk.data.BridgeStatusInfo;
 
 public class BridgeStatusInfoQueue {
@@ -11,7 +11,7 @@ public class BridgeStatusInfoQueue {
   private List<BridgeStatusInfo> bridgeStatusInfoList;
   private int MAX_QUEUE_LENGTH = 5000;
   /** The logger. */
-  private static final Logger logger = LogManager.getLogger("CallStats");
+  private static final Logger logger = Logger.getLogger("CallStats");
 
   public BridgeStatusInfoQueue() {
     bridgeStatusInfoList = new ArrayList<BridgeStatusInfo>();
@@ -23,7 +23,7 @@ public class BridgeStatusInfoQueue {
 
   public void push(BridgeStatusInfo bridgeStatusInfo) {
     if (getLength() > MAX_QUEUE_LENGTH) {
-      logger.warn("Queue is full, removing old element");
+      logger.warning("Queue is full, removing old element");
       pop();
     }
 

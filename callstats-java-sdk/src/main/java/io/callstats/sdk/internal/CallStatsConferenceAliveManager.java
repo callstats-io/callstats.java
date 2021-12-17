@@ -9,8 +9,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import io.callstats.sdk.CallStatsErrors;
@@ -55,7 +56,7 @@ public class CallStatsConferenceAliveManager {
 
 
   /** The Constant logger. */
-  private static final Logger logger = LogManager.getLogger("CallStatsBridgeKeepAliveManager");
+  private static final Logger logger = Logger.getLogger("CallStatsBridgeKeepAliveManager");
 
   private int keepAliveInterval;
 
@@ -159,7 +160,7 @@ public class CallStatsConferenceAliveManager {
           e.printStackTrace();
           throw new RuntimeException(e);
         } catch (JsonSyntaxException e) {
-          logger.error("Json Syntax Exception " + e.getMessage(), e);
+          logger.log(Level.SEVERE, "Json Syntax Exception " + e.getMessage(), e);
           e.printStackTrace();
           throw new RuntimeException(e);
         }

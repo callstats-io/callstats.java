@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import io.callstats.sdk.internal.CallStatsConfigProvider;
 import io.callstats.sdk.internal.NameValuePair;
 import io.callstats.sdk.internal.listeners.CallStatsHttp2ResponseListener;
@@ -25,7 +25,7 @@ import okhttp3.TlsVersion;
 public class CallStatsHttp2Client {
 
   /** The Constant logger. */
-  private static final Logger logger = LogManager.getLogger("CallStatsAsyncHttpClient");
+  private static final Logger logger = Logger.getLogger("CallStatsAsyncHttpClient");
 
   private OkHttpClient okHttpClientclient;
   private boolean isDisrupted;
@@ -67,7 +67,7 @@ public class CallStatsHttp2Client {
   public void sendBridgeEvents(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
     if (CallStatsConfigProvider.eventsBaseUrl == null) {
-      logger.error("sendBridgeEvents: URL Not Available");
+      logger.severe("sendBridgeEvents: URL Not Available");
       return;
     }
     logger.info("sending bridge events ");
@@ -78,7 +78,7 @@ public class CallStatsHttp2Client {
   public void sendBridgeStats(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
     if (CallStatsConfigProvider.statsBaseUrl == null) {
-      logger.error("sendBridgeStats: URL Not Available");
+      logger.severe("sendBridgeStats: URL Not Available");
       return;
     }
     logger.info("sending stats ");
@@ -89,7 +89,7 @@ public class CallStatsHttp2Client {
   public void sendBridgeAlive(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
     if (CallStatsConfigProvider.statsBaseUrl == null) {
-      logger.error("sendBridgeAlive: URL Not Available");
+      logger.severe("sendBridgeAlive: URL Not Available");
       return;
     }
     Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
@@ -99,7 +99,7 @@ public class CallStatsHttp2Client {
   public void sendBridgeStatistics(String url, String token, String body,
       final CallStatsHttp2ResponseListener listener) {
     if (CallStatsConfigProvider.statsBaseUrl == null) {
-      logger.error("sendBridgeStatistics: URL Not Available");
+      logger.severe("sendBridgeStatistics: URL Not Available");
       return;
     }
     Request request = buildRequest(CallStatsConfigProvider.statsBaseUrl + url, token, body);
@@ -125,7 +125,7 @@ public class CallStatsHttp2Client {
   public void sendConferenceAlive(String url, String token, String messageBody,
 	      final CallStatsHttp2ResponseListener listener) {
 	if (CallStatsConfigProvider.statsBaseUrl == null) {
-	  logger.error("sendConferenceAlive: URL Not Available");
+	  logger.severe("sendConferenceAlive: URL Not Available");
 	  return;
 	}
 	Request request = buildRequest(CallStatsConfigProvider.eventsBaseUrl + url, token, messageBody);
