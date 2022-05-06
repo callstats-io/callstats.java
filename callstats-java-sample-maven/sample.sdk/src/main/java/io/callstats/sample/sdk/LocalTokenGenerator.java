@@ -32,7 +32,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPrivateKeySpec;
-import org.bouncycastle.util.encoders.Base64Encoder;
 import org.jose4j.jwk.EcJwkGenerator;
 import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -199,9 +198,6 @@ public class LocalTokenGenerator implements ICallStatsTokenGenerator {
 	    	try {
 				@SuppressWarnings({ "unchecked", "rawtypes" })
 				EllipticCurveJsonWebKey jwk = new EllipticCurveJsonWebKey((Map<String, Object>)(Map)son);
-				Base64Encoder enc = new Base64Encoder();
-				ByteArrayOutputStream os = new ByteArrayOutputStream();
-	        	enc.encode(jwk.getPrivateKey().getEncoded(), 0, jwk.getPrivateKey().getEncoded().length, os);
 				return jwk.getPrivateKey();
 			} catch (JoseException e1) {
 				e1.printStackTrace();
